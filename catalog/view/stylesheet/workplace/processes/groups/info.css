@@ -1,0 +1,7 @@
+.processes-table {
+  grid-template-columns: 8fr 1fr;
+}
+
+.processes-table>span:nth-last-child(-n+3) {
+  border: none;
+}

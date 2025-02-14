@@ -1,0 +1,147 @@
+<?php
+class ModelProcesses extends Model 
+{
+
+  private const processes_name_field_size = 254;
+  private const processes_description_field_size = 268435455;
+  private const processes_groups_name_field_size = 254;
+  private const processes_groups_description_field_size = 254;
+
+  //----------------------------------------------------------------------------
+  // Return maximum string size of processes name database field
+  //----------------------------------------------------------------------------
+
+  public function Get_Processes_Name_Maximum_String_Size()
+  {
+
+    // Return maximum string size of processes name database field
+    return ( self::processes_name_field_size );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Return maximum string size of processes description database field
+  //----------------------------------------------------------------------------
+
+  public function Get_Processes_Description_Maximum_String_Size()
+  {
+
+    // Return maximum string size of processes description database field
+    return ( self::processes_description_field_size );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Return maximum string size of processes description database field
+  //----------------------------------------------------------------------------
+
+  public function Get_Processes_Groups_Description_Maximum_String_Size()
+  {
+
+    // Return maximum string size of processes groups description database field
+    return ( self::processes_description_field_size );
+
+  }
+  //----------------------------------------------------------------------------
+  // Return maximum string size of processes groups name database field
+  //----------------------------------------------------------------------------
+
+  public function Get_Processes_Groups_Name_Maximum_String_Size()
+  {
+
+    // Return maximum string size of processes groups name database field
+    return ( self::processes_name_field_size );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Get processes groups
+  //----------------------------------------------------------------------------
+
+  public function Get_Processes_Groups( $language_code = 'XX' )
+  {
+
+    // Compose SQL query
+    $sql =
+      "SELECT " .
+        "`processes_groups`.`guid` AS guid, " .
+        "`processes_groups`.`status` AS status, " .
+        "`processes_groups`.`creation_date` AS creation_date, " .
+        "`processes_groups`.`modification_date` AS modification_date, " .
+        "`processes_group_description`.`name` AS name, " .
+        "`processes_group_description`.`description` AS description " .
+      "FROM " .
+        "`processes_groups` " .
+      "LEFT JOIN " .
+        "`processes_group_description` " .
+      "ON " .
+        "`processes_groups`.`guid`=`processes_group_description`.`group_guid` " .
+      "WHERE " .
+        "( `processes_group_description`.`language_code`='" . $this->db->escape( $language_code ) . "' ) OR " .
+        "( `processes_group_description`.`language_code` IS NULL )";
+
+    // Perform SQL query
+    $query = $this->db->query( $sql );
+
+    // Return properties description
+    return ( $query->rows );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Create new group of processes
+  //----------------------------------------------------------------------------
+
+  public function Create_Group( $guid = '', $data = [] )
+  {
+
+    // Compose SQL query
+    $sql =
+      "INSERT INTO " .
+        "`processes_groups` " .
+      "SET " .
+        "`processes_groups`.`guid`='" . $this->db->escape( $guid ) . "', " .
+        "`processes_groups`.`status`= '" . $this->db->escape( $data[ 'status' ] ) . "', ".
+        "`processes_groups`.`creation_date`= NOW(), " .
+        "`processes_groups`.`modification_date`= NOW() ";
+
+    // Perform SQL query
+    $this->db->query( $sql );
+
+    // Get list of active languages
+    $languages = $this->language->Get_Languages();
+
+    // Iterate over all languages
+    foreach( $languages as $language )
+    {
+
+      // Test for name setted
+      if( isset( $data[ 'name_' . $language[ 'code' ] ] ) === true )
+      {
+
+        // Compose SQL query
+        $sql =
+        "INSERT INTO " .
+          "`processes_group_description` " .
+        "SET " .
+          "`processes_group_description`.`group_guid`='" . $this->db->escape( $guid ) . "', " .
+          "`processes_group_description`.`language_code`='". $this->db->escape( $language[ 'guid' ] ) . "', " .
+          "`processes_group_description`.`name`='" . $this->db->escape( $data[ 'name_' . $language[ 'code' ] ] ) . "'";
+
+        // Query database
+        $this->db->query( $sql );
+
+      }
+
+    }
+
+    // Return success/error code
+    return( true );
+
+  }
+
+}
+//------------------------------------------------------------------------------
+// End of file
+//------------------------------------------------------------------------------
+?>

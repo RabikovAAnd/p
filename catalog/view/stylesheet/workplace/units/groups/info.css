@@ -1,0 +1,7 @@
+.units-table {
+  grid-template-columns: 8fr 1fr;
+}
+
+.units-table>span:nth-last-child(-n+3) {
+  border: none;
+}

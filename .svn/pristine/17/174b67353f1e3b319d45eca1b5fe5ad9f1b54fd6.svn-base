@@ -1,0 +1,107 @@
+<?php echo $common_header; ?>
+<div id="content">
+  <h1>
+    <?php echo $group_unit[ 'data' ][ 'name' ]; ?>
+  </h1>
+  <div class="account-area">
+    <?php echo $workplace_menu; ?>
+    <div class="main-area">
+      <div class="list">
+        <div class="info-content-block list">
+          <div class="info-content-block end">
+            <a href="<?php echo $edit_button_href; ?>">
+              <button class="small-button" type="button">
+                <?php echo $workplace_units_groups_info_edit_button_text; ?>
+              </button>
+            </a>
+          </div>
+          <div>
+            <span>
+              <?php echo $workplace_units_groups_info_general_data_guid_text; ?>:
+              <?php echo $group_unit[ 'data' ][ 'guid' ]; ?>
+            </span>
+            <br>
+            <span>
+              <?php echo $workplace_units_groups_info_general_data_create_date_text; ?>:
+              <?php echo $group_unit[ 'data' ][ 'creation_date' ]; ?>
+            </span>
+            <br>
+            <span>
+              <?php echo $workplace_units_groups_info_general_data_modification_date_text; ?>:
+              <?php echo $group_unit[ 'data' ][ 'modification_date' ]; ?>
+            </span>
+            <br>
+            <span>
+              <?php echo $workplace_units_groups_info_general_data_status_text; ?>:
+              <?php echo $group_unit[ 'data' ][ 'status' ]; ?>
+            </span>
+
+
+          </div>
+
+        </div>
+
+        <div class="info-content-block list">
+          <h2>
+            <?php echo $workplace_units_groups_info_units_header; ?>
+          </h2>
+          <div class="info-content-block end">
+            <a href="<?php echo $add_unit_button_href; ?>">
+              <button class="small-button" type="button">
+                <?php echo $workplace_units_groups_info_add_unit_button_text; ?>
+              </button>
+            </a>
+          </div>
+          <?php if( isset( $units ) ){ ?>
+            <?php if( count( $units ) > 0){ ?>
+            <div class="table-menu-style">
+              <div class="units-table table-menu-header">
+                <span><b>
+                    <?php echo $workplace_units_groups_info_units_table_name; ?>
+                  </b></span>
+                <span><b>
+                    <?php echo $workplace_units_groups_info_units_table_status; ?>
+                  </b></span>
+              </div>
+
+              <?php foreach (  $units as $unit ){ ?>
+              <div id="<?php echo $unit[ 'element_href' ]; ?>" class="units-table table-menu-element">
+                <span><a href="<?php echo $unit[ 'href' ]; ?>">
+                    <?php echo $unit[ 'name' ]; ?>
+                  </a>
+                </span>
+                <span>
+                  <?php echo $unit[ 'status' ]; ?>
+                </span>
+                <div class="table-button-menu" style="display: none;">
+                  <a href="<?php echo $unit[ 'edit_button_href' ]; ?>"
+                    title="<?php echo $workplace_units_groups_info_edit_button_hint; ?>">
+                    <button type="button">
+                      <?php echo $workplace_units_groups_info_edit_button_text; ?>
+                    </button></a>
+
+                    <button type="button" onMouseDown="File_Form('<?php echo $type[ 'active_button_href' ]; ?>')">
+                      <?php echo $workplace_units_groups_info_active_button_text; ?>
+                    </button>
+                    <button type="button" onMouseDown="File_Form('<?php echo $type[ 'inactive_button_href' ]; ?>')">
+                      <?php echo $workplace_units_groups_info_inactive_button_text; ?>
+                    </button>
+                  <button class="red-button" type="button"
+                    onMouseDown="File_Form('<?php echo $unit[ 'remove_button_href' ]; ?>')">
+                    <?php echo $workplace_units_groups_info_remove_button_text; ?>
+                  </button>
+                </div>
+              </div>
+              <?php } ?>
+            <?php } ?>
+          </div>
+
+          <?php } ?>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+<?php echo $common_footer; ?>

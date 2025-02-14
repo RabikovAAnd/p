@@ -1,0 +1,468 @@
+<?php
+class ModelDocumentsDocuments extends Model
+{
+
+  // Database fields size definitions
+  private const document_type_name_field_size = 127;
+
+  //----------------------------------------------------------------------------
+  // Return maximum string size of document type name database field
+  //----------------------------------------------------------------------------
+
+  public function Get_Document_Type_Name_Maximum_String_Size()
+  {
+
+    // Return maximum string size of document type name database field
+    return( self::document_type_name_field_size );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Get document types
+  //----------------------------------------------------------------------------
+
+  public function Get_Document_Types()
+  {
+
+    // Compose SQL query
+    $sql =
+      "SELECT " .
+        "* " .
+      "FROM " .
+        "`document_types`";
+
+    // Query database
+    $results = $this->db->query( $sql );
+
+    // Return data
+    return( $results->rows );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Change Document Type Status
+  //----------------------------------------------------------------------------
+
+  public function Change_Document_Type_Status( $guid='00000000000000000000000000000000', $status='inactive' )
+  {
+
+    // Compose SQL query
+    $sql =
+      "UPDATE " .
+        "`document_types` " .
+      "SET " .
+        "`document_types`.`status`='" . $this->db->escape( $status ) . "' " .
+      "WHERE " .
+        "`document_types`.`guid`='" . $this->db->escape( $guid ) . "'";
+
+    // Perform SQL query
+    $this->db->query( $sql );
+
+    // Return group
+    return( true );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Edit Document Type information
+  //----------------------------------------------------------------------------
+
+  public function Edit_Document_Type( $data = array() )
+  {
+
+    // Compose SQL query
+    $sql =
+      "UPDATE " .
+        "`document_types` " .
+      "SET " .
+//        "`document_types`.`name`='" . $this->db->escape( $data[ 'name_en' ] ) . "', " .
+        "`document_types`.`status`='" . $this->db->escape( $data[ 'status' ] ) . "' " .
+      "WHERE " .
+        "`document_types`.`guid`='" . $this->db->escape( $data[ 'guid' ] ) . "'";
+
+    // Perform SQL query
+    $this->db->query( $sql );
+
+    // Get list of languages
+    $languages = $this->language->Get_Languages();
+
+    // Iterate over all languages
+    foreach( $languages as $language )
+    {
+
+      // Test for language exists
+      if( isset( $data[ 'name_' . $language[ 'code' ] ] ) === true )
+      {
+
+        // Compose SQL query
+        $sql =
+        "INSERT INTO " .
+          "`document_types_description` " .        
+        "SET " .
+          "`document_types_description`.`guid`='" . $this->db->escape( $data[ 'guid' ] ) . "', " .
+          "`document_types_description`.`language_code`='". $this->db->escape( $language[ 'guid' ] ) . "', " .
+          "`document_types_description`.`name`='" . $this->db->escape( $data[ 'name_' . $language[ 'code' ] ] ) . "' " .
+        "ON DUPLICATE KEY UPDATE " .
+          "`document_types_description`.`name`='" . $this->db->escape( $data[ 'name_' . $language[ 'code' ] ] ) . "'";
+
+        // Query database
+        $this->db->query( $sql );
+
+      }
+
+    }
+
+    // Return success code
+    return( true );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Get document type descriptions
+  //----------------------------------------------------------------------------
+
+  public function Get_Document_Type_Descriptions( $guid = '' )
+  {
+
+    // Compose SQL query
+    $sql =
+      "SELECT " .
+        " * " .
+      "FROM " .
+        "`document_types_description` ".
+      "WHERE " .
+        "`document_types_description`.`guid`='" . $this->db->escape( $guid ) . "' ";
+
+    // Query database
+    $results = $this->db->query( $sql );
+
+    // Return data
+    return( $results->rows );
+  }
+  //----------------------------------------------------------------------------
+  // Get document 
+  //----------------------------------------------------------------------------
+
+  public function Get_Document_Type_Info( $guid = '' )
+  {
+
+    // Compose SQL query
+    $sql =
+      "SELECT " .
+        " * " .
+      "FROM " .
+        "`document_types` ".
+      "WHERE " .
+        "`document_types`.`guid`='" . $this->db->escape( $guid ) . "' LIMIT 1";
+
+    // Query database
+    $results = $this->db->query( $sql );
+
+    // Return data
+    return( $results->row );
+  }
+
+  //----------------------------------------------------------------------------
+  // Get document types
+  //----------------------------------------------------------------------------
+
+  public function Get_Document_Type_Description( $guid = '', $language_code = 'XX' )
+  {
+
+    // Compose SQL query
+    $sql =
+      "SELECT " .
+        "`document_types_description`.`name` AS name, " .
+        "`document_types_description`.`description` AS description " .
+      "FROM " .
+        "`document_types_description` ".
+      "WHERE " .
+        "`document_types_description`.`guid`='" . $this->db->escape( $guid ) . "' AND " .
+        "`document_types_description`.`language_code`='" . $this->db->escape( $language_code ) . "' " .
+      "LIMIT 1";
+
+    // Query database
+    $results = $this->db->query( $sql );
+
+    // Return data
+    return( $results->row );
+
+  }
+
+ //----------------------------------------------------------------------------
+  // Create new document type
+  //----------------------------------------------------------------------------
+
+  public function Create_Document_Type( $guid = '', $data = [] )
+  {
+
+    // Compose SQL query
+    $sql =
+      "INSERT INTO " .
+        "`document_types` " .
+      "SET " .
+        "`document_types`.`guid`='" . $this->db->escape( $guid ) . "', " .
+        "`document_types`.`name`='" . $this->db->escape( $data[ 'name_en' ] ) . "', " .
+        "`document_types`.`status`= '" . $this->db->escape( $data[ 'status' ] ) . "'";
+
+    // Perform SQL query
+    $this->db->query( $sql );
+
+    // Get list of active languages
+    $languages = $this->language->Get_Languages();
+
+    // Iterate over all languages
+    foreach( $languages as $language )
+    {
+
+      if( isset( $data[ 'name_' . $language[ 'code' ] ] ) === true )
+      {
+
+        // Compose SQL query
+        $sql =
+        "INSERT INTO " .
+          "`document_types_description` " .
+        "SET " .
+          "`document_types_description`.`guid`='" . $this->db->escape( $guid ) . "', " .
+          "`document_types_description`.`language_code`='". $this->db->escape( $language[ 'guid' ] ) . "', " .
+          "`document_types_description`.`name`='" . $this->db->escape( $data[ 'name_' . $language[ 'code' ] ] ) . "', " .
+          "`document_types_description`.`description`='" . $this->db->escape( $data[ 'name_' . $language[ 'code' ] ] ) . "'";
+
+        // Query database
+        $this->db->query( $sql );
+
+      }
+
+    }
+
+    // Return success/error code
+    return( true );
+
+  }
+
+
+  //----------------------------------------------------------------------------
+  // Get document types list
+  //----------------------------------------------------------------------------
+
+  public function Get_List_Of_Document_Types( $page_length = 30, $search = '')
+  {
+
+    // Compose SQL query
+    $sql =
+      "SELECT " .
+        "* " .
+      "FROM " .
+        "`document_types` " .
+      "WHERE " .
+        "`document_types`.`name` LIKE '%" . $this->db->escape( $search ) . "%'  " .
+      "LIMIT " . $this->db->escape( $page_length ) . ";";
+
+    // Query database
+    $results = $this->db->query( $sql );
+
+    // Return data
+    return( $results->rows );
+
+  }
+
+ //----------------------------------------------------------------------------
+  // Is document type exist
+  //----------------------------------------------------------------------------
+
+  public function Is_Exists_Document_Type( $type_guid = '' )
+  {
+
+    // Compose SQL query
+    $sql =
+      "SELECT " .
+        "`document_types`.`guid` AS guid " .
+      "FROM " .
+        "`document_types` " .
+      "WHERE " .
+        "`document_types`.`guid`='" . $type_guid . "'  " .
+      "LIMIT 1";
+
+    // Perform SQL query
+    $results = $this->db->query( $sql );
+
+    // Test for document type exists
+    if ( $results->num_rows != 1 )
+    {
+
+      //------------------------------------------------------------------------
+      // Document type not found
+      //------------------------------------------------------------------------
+
+      // Set not found status
+      $item_found = false;
+
+    }
+    else
+    {
+
+      //------------------------------------------------------------------------
+      // Document type found
+      //------------------------------------------------------------------------
+
+      // Set found status
+      $item_found = true;
+
+    }
+
+    // Return status
+    return( $item_found );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Add item document
+  //----------------------------------------------------------------------------
+
+  public function Add_Item_Document( $data )
+  {
+
+    // Generate item GUID
+    $guid = UUID_V4_T1();
+
+    // Compose SQL query
+    $sql =
+      "INSERT INTO " .
+        "`documents` " .
+      "SET " .
+        "`documents`.`guid`='" . $this->db->escape( $guid ) . "', " .
+        "`documents`.`filename`='" . $this->db->escape( $data[ 'filename' ] ) . "', " .
+        "`documents`.`mime`='" . $this->db->escape( $data[ 'mime' ] ) . "', " .       
+        "`documents`.`size`='" . $this->db->escape( $data[ 'size' ] ) . "', " .       
+        "`documents`.`hash`='" . $this->db->escape( $data[ 'hash' ] ) . "', " .       
+        "`documents`.`name`='" . $this->db->escape( $data[ 'document_name' ] ) . "', " .
+        "`documents`.`type_guid`='" . $this->db->escape( $data[ 'document_type' ] ) . "', " .
+        "`documents`.`description`='" . $this->db->escape( $data[ 'document_description' ] ) . "', " .
+        "`documents`.`version`='" . $this->db->escape( $data[ 'document_version' ] ) . "', " .
+        "`documents`.`revision`='" . $this->db->escape( $data[ 'document_revision' ] ) . "', " .
+        "`documents`.`date`='" . $this->db->escape( $data[ 'document_date' ] ) . "', " .
+        "`documents`.`issuer`=' ', " .
+        "`documents`.`number`='". $this->db->escape( $data[ 'document_number' ] ) . "' " ;
+
+    // Query database
+    $this->db->query( $sql );
+
+//! @bug ANVILEX KM: Insert file content as BLOB!!!
+
+    // Compose SQL query
+    $sql =
+      "INSERT INTO " .
+        "`document_contents` " .
+      "SET " .
+        "`document_guid`='" . $this->db->escape( $guid ) . "', " .
+        "`content`='" . $this->db->escape( $data[ 'file_data' ] ) . "'";
+
+    // Query database
+    $this->db->query( $sql );
+
+    // Compose SQL query
+    $sql =
+      "INSERT INTO " .
+        "`document_to_item` " .
+      "SET " .
+        "`document_to_item`.`document_guid`='" . $this->db->escape( $guid ) . "', " .
+        "`document_to_item`.`item_guid`='" . $this->db->escape( $data[ 'item_guid' ] ) . "'";
+
+    // Query database
+    $this->db->query( $sql );
+
+    // Set success code
+    $return_code = true;
+
+    // Return success/error code
+    return( $return_code );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Get document content
+  //----------------------------------------------------------------------------
+
+  public function Get_Document_Content( $document_guid = '' )
+  {
+
+    // Compose SQL query
+    $sql =
+      "SELECT " .
+        "`documents`.`guid` AS guid, " .
+        "`documents`.`filename` AS filename, " .
+        "`documents`.`mime` AS mime, " .
+        "`documents`.`size` AS size, " .
+        "`documents`.`hash` AS hash, " .
+        "`document_contents`.`content` AS data " .
+      "FROM " .
+        "`documents` " .
+      "LEFT JOIN " .
+        "`document_contents` " .
+      "ON " .
+        "`document_contents`.`document_guid`=`documents`.`guid` " .
+      "WHERE " .
+        "`documents`.`guid`='" . $this->db->escape( $document_guid ) . "'";
+
+    // Query database
+    $results = $this->db->query( $sql );
+
+    // Test for document type exists
+    if ( $results->num_rows != 1 )
+    {
+
+      //------------------------------------------------------------------------
+      // Document type not found
+      //------------------------------------------------------------------------
+
+      // Set not found status
+      $return_data[ 'return_code' ] = false;
+
+    }
+    else
+    {
+
+      //------------------------------------------------------------------------
+      // Document type found
+      //------------------------------------------------------------------------
+
+      // Set found status
+      $return_data[ 'return_code' ] = true;
+      $return_data[ 'data' ] = $results->rows[ 0 ];
+
+    }
+
+    // Return data
+    return( $return_data );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Remove item document
+  //----------------------------------------------------------------------------
+
+  public function Remove_Document( $document_guid = '00000000000000000000000000000000', $item_guid = '00000000000000000000000000000000' )
+  {
+
+    // Compose SQL query
+    $sql =
+      "DELETE FROM " .
+        "`document_to_item` " .
+      "WHERE " .
+        "`document_to_item`.`document_guid`='" . $this->db->escape( $document_guid ) . "' AND " .
+        "`document_to_item`.`item_guid`='". $this->db->escape( $item_guid ) . "'";
+
+//$this->log->Log_Debug( 'sql' .  $sql );
+
+    // Query database
+    $this->db->query( $sql );
+
+    // Return success code
+    return( true );
+
+  }
+}
+//------------------------------------------------------------------------------
+// End of file
+//------------------------------------------------------------------------------
+?>

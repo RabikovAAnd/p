@@ -1,0 +1,9 @@
+2024-12-20 11:17:38 - DEBUG: SYSTEM : System prepared for request processing.
+2024-12-20 11:17:38 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/home.tpl
+2024-12-20 11:17:39 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/company/teaser.tpl
+2024-12-20 11:17:39 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/catalog/teaser.tpl
+2024-12-20 11:17:39 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/news/teaser.tpl
+2024-12-20 11:17:39 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/news/subscribe.tpl
+2024-12-20 11:17:39 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/footer.tpl
+2024-12-20 11:17:39 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/header.tpl
+2024-12-20 11:17:39 - DEBUG: SYSTEM : Request dispatched.

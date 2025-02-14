@@ -1,121 +1,92 @@
 <?php
+class ControllerFeedYandexSitemap extends Controller {
+    public function index() {
+        // Путь для сохранения файлов карты сайта
+        $outputDir = DIR_SITEMAP;
+        $baseUrl = HTTP_SERVER;
 
-//------------------------------------------------------------------------------
-// Controller class for generating Yandex Sitemap
-//------------------------------------------------------------------------------
+        // 2.1 Список публичных категорий
+        $categories = $this->getCategories();
+        $this->generateSitemapFile('categories', $categories, $outputDir, $baseUrl);
 
-class ControllerFeedsYandexSitemap extends Controller 
-{
-  public function index()
-  {
-    // Load required models
-    $this->load->model('categories/categories');
-    $this->load->model('items/items');
-    $this->load->model('manufacturers/manufacturers');
+        // 2.2 Список товаров
+        $products = $this->getProducts();
+        $this->generateSitemapFile('products', $products, $outputDir, $baseUrl);
 
-    // Initialize sitemap XML output
-    $sitemapIndex = '<?xml version="1.0" encoding="UTF-8"?>';
-    $sitemapIndex .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+        // 2.3 Список производителей
+        $manufacturers = $this->getManufacturers();
+        $this->generateSitemapFile('manufacturers', $manufacturers, $outputDir, $baseUrl);
 
-    // 1. Add public categories
-    $categories = $this->model_categories_categories->getAllCategories();
-    $categorySitemap = $this->generateCategorySitemap($categories);
-    $this->saveSitemapFile('categories.xml', $categorySitemap);
-    $sitemapIndex .= '<sitemap><loc>' . HTTPS_SERVER . 'sitemap/categories.xml</loc></sitemap>';
+        // 2.4 Индексный файл
+        $this->generateIndexFile(['categories', 'products', 'manufacturers'], $outputDir, $baseUrl);
 
-    // 2. Add product links
-    $products = $this->model_items_items->getAllProducts();
-    $productSitemap = $this->generateProductSitemap($products);
-    $this->saveSitemapFile('products.xml', $productSitemap);
-    $sitemapIndex .= '<sitemap><loc>' . HTTPS_SERVER . 'sitemap/products.xml</loc></sitemap>';
-
-    // 3. Add manufacturer links
-    $manufacturers = $this->model_manufacturers_manufacturers->getAllManufacturers();
-    $manufacturerSitemap = $this->generateManufacturerSitemap($manufacturers);
-    $this->saveSitemapFile('manufacturers.xml', $manufacturerSitemap);
-    $sitemapIndex .= '<sitemap><loc>' . HTTPS_SERVER . 'sitemap/manufacturers.xml</loc></sitemap>';
-
-    // 4. Finalize and save sitemap index
-    $sitemapIndex .= '</sitemapindex>';
-    $this->saveSitemapFile('sitemap_index.xml', $sitemapIndex);
-
-    // Output sitemap index link
-    $this->response->addHeader('Content-Type: application/xml; charset=utf-8');
-    $this->response->setOutput($sitemapIndex);
-  }
-
-  public function categories()
-  {
-
-    // Load required models
-    $this->load->model('categories/categories');
-
-    $categories = $this->model_categories_categories->getAllCategories();
-
-    $output = '<?xml version="1.0" encoding="UTF-8"?>';
-    $output .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
-    foreach ($categories as $category) 
-    {
-      $output .= '<url>';
-      $output .= '<loc>' . $this->url->link('catalog/categories', 'category_guid=' . $category['guid']) . '</loc>';
-      $output .= '</url>';
+        echo "Yandex Sitemap successfully generated!";
     }
-    $output .= '</urlset>';
 
-    // Output sitemap index link
-    $this->response->addHeader('Content-Type: application/xml; charset=utf-8');
-    $this->response->setOutput($output);
-
-  }
-  
-  
-  private function generateCategorySitemap($categories)
-  {
-    $output = '<?xml version="1.0" encoding="UTF-8"?>';
-    $output .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
-    foreach ($categories as $category) {
-      $output .= '<url>';
-      $output .= '<loc>' . $this->url->link('catalog/categories', 'category_guid=' . $category['guid']) . '</loc>';
-      $output .= '</url>';
+    // Метод для получения категорий
+    private function getCategories() {
+        $query = $this->db->query("SELECT category_guid FROM categories WHERE is_public = 1");
+        return array_map(function($row) {
+            return "index.php?route=catalog/categories&category_guid=" . $row['category_guid'];
+        }, $query->rows);
     }
-    $output .= '</urlset>';
-    return $output;
-  }
 
-  private function generateProductSitemap($products)
-  {
-    $output = '<?xml version="1.0" encoding="UTF-8"?>';
-    $output .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
-    foreach ($products as $product) {
-      $output .= '<url>';
-      $output .= '<loc>' . $this->url->link('items/info', 'guid=' . $product['guid']) . '</loc>';
-      $output .= '</url>';
+    // Метод для получения товаров
+    private function getProducts() {
+        $query = $this->db->query("SELECT guid FROM product");
+        return array_map(function($row) {
+            return "index.php?route=items/info&guid=" . $row['guid'];
+        }, $query->rows);
     }
-    $output .= '</urlset>';
-    return $output;
-  }
 
-  private function generateManufacturerSitemap($manufacturers)
-  {
-    $output = '<?xml version="1.0" encoding="UTF-8"?>';
-    $output .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
-    foreach ($manufacturers as $manufacturer) {
-      $output .= '<url>';
-      $output .= '<loc>' . $this->url->link('manufacturers/info', 'manufacturer_id=' . $manufacturer['id']) . '</loc>';
-      $output .= '</url>';
+    // Метод для получения производителей
+    private function getManufacturers() {
+        $query = $this->db->query("SELECT manufacturer_id FROM manufacturers");
+        return array_map(function($row) {
+            return "index.php?route=manufacturers/info&manufacturer_id=" . $row['manufacturer_id'];
+        }, $query->rows);
     }
-    $output .= '</urlset>';
-    return $output;
-  }
 
-  private function saveSitemapFile($filename, $content)
-  {
-    $path = DIR_SITEMAP . $filename;
-    file_put_contents($path, $content);
-  }
+    // Метод для генерации карты сайта
+    private function generateSitemapFile($type, $links, $outputDir, $baseUrl) {
+        $fileName = "{$outputDir}{$type}_sitemap.xml";
+        $xml = new DOMDocument('1.0', 'UTF-8');
+        $urlset = $xml->createElement('urlset');
+        $urlset->setAttribute('xmlns', 'http://www.sitemaps.org/schemas/sitemap/0.9');
+        $xml->appendChild($urlset);
+
+        foreach ($links as $link) {
+            $url = $xml->createElement('url');
+            $loc = $xml->createElement('loc', htmlspecialchars($baseUrl . $link));
+            $url->appendChild($loc);
+            $urlset->appendChild($url);
+        }
+
+        $xml->formatOutput = true;
+        $xml->save($fileName);
+    }
+
+    // Метод для генерации индексного файла
+    private function generateIndexFile($types, $outputDir, $baseUrl) {
+        $indexFile = "{$outputDir}index_sitemap.xml";
+        $xml = new DOMDocument('1.0', 'UTF-8');
+        $sitemapindex = $xml->createElement('sitemapindex');
+        $sitemapindex->setAttribute('xmlns', 'http://www.sitemaps.org/schemas/sitemap/0.9');
+        $xml->appendChild($sitemapindex);
+
+        foreach ($types as $type) {
+            $file = "{$outputDir}{$type}_sitemap.xml";
+            if (file_exists($file)) {
+                $sitemap = $xml->createElement('sitemap');
+                $loc = $xml->createElement('loc', htmlspecialchars($baseUrl . basename($file)));
+                $lastmod = $xml->createElement('lastmod', date('c', filemtime($file)));
+                $sitemap->appendChild($loc);
+                $sitemap->appendChild($lastmod);
+                $sitemapindex->appendChild($sitemap);
+            }
+        }
+
+        $xml->formatOutput = true;
+        $xml->save($indexFile);
+    }
 }
-
-//------------------------------------------------------------------------------
-// End of file
-//------------------------------------------------------------------------------
-?>

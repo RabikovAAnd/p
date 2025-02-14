@@ -1,0 +1,13 @@
+2024-12-24 12:10:41 - DEBUG: SYSTEM : System prepared for request processing.
+2024-12-24 12:10:41 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/home.tpl
+2024-12-24 12:10:42 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/company/teaser.tpl
+2024-12-24 12:10:42 - PHP WARNING: Undefined variable $company_teaser_header in C:\xampp\htdocs\shop\catalog\view\template\company\teaser.tpl on line 1
+2024-12-24 12:10:42 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/catalog/teaser.tpl
+2024-12-24 12:10:42 - PHP WARNING: Undefined variable $catalog_teaser_header in C:\xampp\htdocs\shop\catalog\view\template\catalog\teaser.tpl on line 3
+2024-12-24 12:10:42 - PHP WARNING: Undefined variable $news_teaser_header in C:\xampp\htdocs\shop\catalog\view\template\news\teaser.tpl on line 5
+2024-12-24 12:10:42 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/news/teaser.tpl
+2024-12-24 12:10:42 - PHP WARNING: Undefined variable $news_teaser_header in C:\xampp\htdocs\shop\catalog\view\template\news\teaser.tpl on line 5
+2024-12-24 12:10:42 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/news/subscribe.tpl
+2024-12-24 12:10:42 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/footer.tpl
+2024-12-24 12:10:42 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/header.tpl
+2024-12-24 12:10:42 - DEBUG: SYSTEM : Request dispatched.

@@ -1,0 +1,142 @@
+<?php
+
+//------------------------------------------------------------------------------
+// Controller class for generating Yandex Sitemap
+// This controller handles the creation of XML sitemaps for categories, products,
+// and manufacturers, and generates a sitemap index file linking to them.
+//------------------------------------------------------------------------------
+
+class ControllerFeedsYandexSitemap extends Controller 
+{
+    //----------------------------------------------
+     // Main entry point for generating the sitemap index file.
+     // This file references individual sitemaps for categories, products, and manufacturers.
+     //---------------------------------------------
+    public function index()
+    {
+        // Load required models for accessing data
+        $this->load->model('categories/categories');
+        $this->load->model('items/items');
+        $this->load->model('manufacturers/manufacturers');
+
+        // Start building the sitemap index XML
+        $sitemapIndex = '<?xml version="1.0" encoding="UTF-8"?>';
+        $sitemapIndex .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+
+        // Add references to individual sitemaps
+        $sitemapIndex .= '<sitemap><loc>' . HTTPS_SERVER . 'sitemap/categories.xml</loc></sitemap>';
+        $sitemapIndex .= '<sitemap><loc>' . HTTPS_SERVER . 'sitemap/products.xml</loc></sitemap>';
+        $sitemapIndex .= '<sitemap><loc>' . HTTPS_SERVER . 'sitemap/manufacturers.xml</loc></sitemap>';
+
+        // Close the sitemap index
+        $sitemapIndex .= '</sitemapindex>';
+
+        // Save the sitemap index to a file
+        file_put_contents(DIR_SITEMAP . 'sitemap_index.xml', $sitemapIndex);
+
+        // Set response headers and output the sitemap index
+        $this->response->addHeader('Content-Type: application/xml; charset=utf-8');
+        $this->response->setOutput($sitemapIndex);
+    }
+
+    //---------------------------------------------
+     // Generates and saves the sitemap for categories.
+     // Outputs the sitemap as an XML response.
+     //--------------------------------------------
+    public function categories()
+    {
+        // Load the model for categories
+        $this->load->model('categories/categories');
+
+        // Retrieve all categories
+        $categories = $this->model_categories_categories->getAllCategories();
+
+        // Generate the XML sitemap
+        $output = $this->generateSitemap($categories, 'catalog/categories', 'category_guid');
+
+        // Save the sitemap to a file
+        file_put_contents(DIR_SITEMAP . 'categories.xml', $output);
+
+        // Set response headers and output the sitemap
+        $this->response->addHeader('Content-Type: application/xml; charset=utf-8');
+        $this->response->setOutput($output);
+    }
+
+    //----------------------------------------
+     // Generates and saves the sitemap for products.
+     // Outputs the sitemap as an XML response.
+     //---------------------------------------
+    public function products()
+    {
+        // Load the model for products
+        $this->load->model('items/items');
+
+        // Retrieve all products
+        $products = $this->model_items_items->getAllProducts();
+
+        // Generate the XML sitemap
+        $output = $this->generateSitemap($products, 'items/info', 'guid');
+
+        // Save the sitemap to a file
+        file_put_contents(DIR_SITEMAP . 'products.xml', $output);
+
+        // Set response headers and output the sitemap
+        $this->response->addHeader('Content-Type: application/xml; charset=utf-8');
+        $this->response->setOutput($output);
+    }
+
+    //------------------------------------------
+     // Generates and saves the sitemap for manufacturers.
+     // Outputs the sitemap as an XML response.
+    //------------------------------------------
+    public function manufacturers()
+    {
+        // Load the model for manufacturers
+        $this->load->model('manufacturers/manufacturers');
+
+        // Retrieve all manufacturers
+        $manufacturers = $this->model_manufacturers_manufacturers->getAllManufacturers();
+
+        // Generate the XML sitemap
+        $output = $this->generateSitemap($manufacturers, 'manufacturers/info', 'manufacturer_id');
+
+        // Save the sitemap to a file
+        file_put_contents(DIR_SITEMAP . 'manufacturers.xml', $output);
+
+        // Set response headers and output the sitemap
+        $this->response->addHeader('Content-Type: application/xml; charset=utf-8');
+        $this->response->setOutput($output);
+    }
+
+    //-------------------------------------------------------
+     // Helper function to generate a sitemap XML for a given set of items.
+     
+     // @param array  $items   The array of items to include in the sitemap.
+     // @param string $route   The route used to generate URLs for items.
+     // @param string $idKey   The key in the item array that contains the unique identifier.
+     // @return string         The generated XML string.
+    //-------------------------------------------------------
+    private function generateSitemap($items, $route, $idKey)
+    {
+        // Start building the XML structure
+        $output = '<?xml version="1.0" encoding="UTF-8"?>';
+        $output .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+
+        // Add each item as a <url> entry
+        foreach ($items as $item) {
+            $output .= '<url>';
+            $output .= '<loc>' . $this->url->link($route, $idKey . '=' . $item[$idKey]) . '</loc>';
+            $output .= '</url>';
+        }
+
+        // Close the XML structure
+        $output .= '</urlset>';
+
+        return $output;
+    }
+}
+
+//------------------------------------------------------------------------------
+// End of file
+//------------------------------------------------------------------------------
+?>

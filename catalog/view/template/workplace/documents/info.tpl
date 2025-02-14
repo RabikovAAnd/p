@@ -1,0 +1,96 @@
+<?php echo $common_header; ?>
+<div id="content">
+  <h1>
+    <?php echo $current_name; ?>
+  </h1>
+  <div class="account-area">
+    <?php echo $workplace_menu; ?>
+    <div class="main-area">
+      <div class="list">
+        <div class="info-content-block list">
+
+          <div class="info-content-block end">
+            <a href="<?php echo $edit_button_href; ?>">
+              <button class="small-button" type="button">
+                <?php echo $workplace_documents_info_edit_button_text; ?>
+              </button>
+            </a>
+            <button
+            class="small-button" type="button" 
+            onMouseDown="File_Form('<?php echo $active_button_href; ?>')">
+              <?php echo $workplace_documents_info_active_button_text; ?>
+            </button>
+            <button
+            class="small-button" type="button" 
+            onMouseDown="File_Form('<?php echo $inactive_button_href; ?>')">
+              <?php echo $workplace_documents_info_inactive_button_text; ?>
+            </button>
+            <button
+            class="small-button red-button" type="button" 
+            onMouseDown="File_Form('<?php echo $remove_button_href; ?>')">
+              <?php echo $workplace_documents_info_remove_button_text; ?>
+            </button>
+          </div>
+          <div>
+            <span>
+              <?php echo $workplace_documents_info_general_data_guid_text; ?>:
+              <?php echo $document_type[ 'guid' ]; ?>
+            </span>
+            <br>
+            <span>
+              <?php echo $workplace_documents_info_general_data_status_text; ?>:
+              <?php echo $document_type[ 'status' ]; ?>
+            </span>
+            <br>
+            <span>
+              <?php echo $workplace_documents_info_general_data_create_date_text; ?>:
+              <?php echo $document_type[ 'creation_date' ]; ?>
+            </span>
+            <br>
+            <span>
+              <?php echo $workplace_documents_info_general_data_modification_date_text; ?>:
+              <?php echo $document_type[ 'modification_date' ]; ?>
+            </span>
+
+          </div>
+
+        </div>
+
+        <div class="info-content-block list">
+          <h2>
+            <?php echo $workplace_documents_info_descriptions_table_header; ?>
+          </h2>
+          
+          <?php if( isset( $document_type_descriptions ) ){ ?>
+          <div class="table-menu-style">
+            <div class="document-type-descriptions-table table-menu-header">
+              <span><b>
+                  <?php echo $workplace_documents_info_descriptions_table_language_code; ?>
+                </b></span>
+                <span><b>
+                    <?php echo $workplace_documents_info_descriptions_table_name; ?>
+                  </b></span>
+            </div>
+
+            <?php foreach (  $document_type_descriptions as $document_type_description ){ ?>
+            <div id="<?php echo $document_type_description[ 'element_href' ]; ?>" class="document-type-descriptions-table table-menu-element">
+              <span>
+                  <?php echo $document_type_description[ 'language_code' ]; ?>
+              </span>
+              <span>
+                  <?php echo $document_type_description[ 'name' ]; ?>
+              </span>
+            </div>
+            <?php } ?>
+          </div>
+
+        <?php } ?>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+</div>
+<?php echo $common_footer; ?>
