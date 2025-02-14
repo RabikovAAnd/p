@@ -1,0 +1,559 @@
+<?php
+class ControllerWorkplaceItemsSubitemsAdd extends Controller
+{
+
+  //----------------------------------------------------------------------------
+  // Index method
+  //----------------------------------------------------------------------------
+
+  public function index()
+  {
+
+    //! @todo ANVILEX KM: Add 'item_guid' parameter cheking
+
+    // Get item GUID parameter
+    $item_guid = $this->request->Get_GET_Parameter_As_String( 'item_guid' );
+
+    // Load messages
+    $this->messages->Load( $this->data, 'workplace', 'add_assembly_unit', 'index', $this->language->Get_Language_Code() );
+
+    // Load data model
+    $this->load->model( 'items/items' );
+
+    // Load parent item information
+    $parent_item = $this->model_items_items->Get_Information( $item_guid );
+
+    // Get list of units
+    //! @bug ANVILEX KM: Not needed to load
+    $this->data[ 'units' ] = $this->model_items_items->Get_Units( $this->language->Get_Language_Code() );
+
+    // Get item guid
+    //! @todo ANVILEX KM: Better to use: $this->data[ 'parent_item' ] = $parent_item;
+    $this->data[ 'item_guid' ] = $parent_item[ 'guid' ];
+    $this->data[ 'item_mpn' ] = $parent_item[ 'mpn' ];
+
+
+    // Load item proposal
+    $items = $this->model_items_items->Get_List_Of_Items( 30, 1, '', false, true, false, '', $this->language->Get_Language_Code() );
+
+    // Process all proposed items
+    foreach ( $items as $item )
+    {
+
+      // Add item to the list
+      $this->data[ 'items' ][] = array(
+        'guid' => $item[ 'guid' ],
+        'key' => $item[ 'guid' ] . '&' . $item[ 'mpn' ] . '&' . $item[ 'manufacturer_name' ],
+        'mpn' => $item[ 'mpn' ],
+        'name' => $item[ 'name' ],
+        'manufacturer_name' => $item[ 'manufacturer_name' ]
+      );
+
+    }
+
+    // Compose links
+    $this->data[ 'add_button_href' ] = $this->url->link( 'workplace/items/subitems/add/Add_Unit', '', 'SSL' );
+    $this->data[ 'cancel_button_href' ] =  $this->url->link( 'workplace/items/info', 'guid=' . $parent_item[ 'guid' ], 'SSL' );
+
+    //------------------------------------------------------------------------
+    // Set page data
+    //------------------------------------------------------------------------
+
+    // Set document properties
+    $this->response->setTitle( $this->messages->Get_Message( 'document_title_text' ) );
+    $this->response->setDescription( $this->messages->Get_Message( 'document_description_text' ) );
+    $this->response->setKeywords( '' );
+    $this->response->setRobots( 'index, follow' );
+
+    // Set page configuration
+    $this->children = array(
+      'common/footer',
+      'workplace/menu',
+      'common/header'
+    );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Search query
+  //----------------------------------------------------------------------------
+  // Caller: AJAX
+  //----------------------------------------------------------------------------
+
+  public function Search()
+  {
+
+    // Initialise json data
+    $json = array();
+
+    // Test for customer not logged in
+    if ( $this->customer->Is_Logged() === false )
+    {
+
+      //------------------------------------------------------------------------
+      // ERROR: Customer not logged in
+      //------------------------------------------------------------------------
+
+      // Set redirect link to login page
+      $json[ 'redirect_url' ] = $this->url->link( 'account/login', '', 'SSL' );
+
+      // Set error code
+      $json[ 'return_code' ] = false;
+
+    }
+    else
+    {
+
+      //------------------------------------------------------------------------
+      // Custommer logged in
+      //------------------------------------------------------------------------
+
+      // Test for parameter exists
+      if ( $this->request->Is_POST_Parameter_Exists( 'search' ) === false )
+      {
+
+        //----------------------------------------------------------------------
+        // ERROR: 'search' parameter not found
+        //----------------------------------------------------------------------
+        
+        // Set error code
+        $json[ 'return_code' ] = false;
+
+      }
+      else
+      {
+
+        //----------------------------------------------------------------------
+        // Parameter found, continue processing
+        //----------------------------------------------------------------------
+
+        // Load data models
+        $this->load->model( 'items/items' );
+
+        // Get proposed items
+        $items = $this->model_items_items->Get_List_Of_Items( 30, 1, $this->request->Get_POST_Parameter_As_String( 'search' ), false, true, false, '', $this->language->Get_Language_Code() );
+
+        // Process all item
+        foreach ( $items as $item )
+        {
+
+          // Set item data as subitem proposal
+          $json[ 'items' ][] = array(
+            'guid' => $item[ 'guid' ],
+            'mpn' => $item[ 'mpn' ],
+            'name' => $item[ 'name' ],
+            'manufacturer_name' => $item[ 'manufacturer_name' ]
+          );
+
+        }
+
+        // Set success code
+        $json[ 'return_code' ] = true;
+
+      }
+
+    }
+
+    // Render page
+    $this->response->Set_Json_Output( $json );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Add unit
+  //----------------------------------------------------------------------------
+  // Caller: AJAX
+  //----------------------------------------------------------------------------
+
+  public function Add_Unit()
+  {
+
+    // Init json data
+    $json = array();
+
+    // Test for customer not logged in
+    if ( $this->customer->Is_Logged() === false )
+    {
+
+      //------------------------------------------------------------------------
+      // ERROR: Customer not logged in
+      //------------------------------------------------------------------------
+
+      // Set redirect link to login page
+      $json[ 'redirect_url' ] = $this->url->link( 'account/login', '', 'SSL' );
+
+      // Set error code
+      $json[ 'return_code' ] = false;
+
+    }
+    else
+    {
+
+      //------------------------------------------------------------------------
+      // Custommer logged in
+      //------------------------------------------------------------------------
+
+      // Load messages
+      $this->messages->Load( $this->data, 'workplace', 'add_assembly_unit', 'Add_Unit', $this->language->Get_Language_Code() );
+
+      // Load data models
+      $this->load->model( 'items/items' );
+
+      // Init unit data
+      $unit_data = array();
+      
+      // Set request data valid status
+      $request_data_valid = true;
+
+      //------------------------------------------------------------------------
+      // Check parameter: Parent item GUID
+      //------------------------------------------------------------------------
+
+      // Test for parameter exists
+      if( $this->request->Is_POST_Parameter_GUID( 'item_guid' ) === false )
+      {
+
+        //----------------------------------------------------------------------
+        // ERROR: Item parameter not found
+        //----------------------------------------------------------------------
+
+        // Set error message text
+        $json[ 'error' ][ 'item_guid' ] = $this->data[ 'workplace_add_assembly_unit_item_guid_error' ];
+
+        // Clear request data valid status
+        $request_data_valid = false;
+
+      }
+      else
+      {
+
+        //----------------------------------------------------------------------
+        // Item parameter found
+        //----------------------------------------------------------------------
+
+        // Store item GUID 
+        $item_guid = $this->request->Get_POST_Parameter_As_GUID( 'item_guid' );
+
+        // Test for parent item exists
+        if ( $this->model_items_items->Is_Exists_By_GUID( $item_guid ) === false )
+        {
+
+          //----------------------------------------------------------------------
+          // ERROR: Item not valid
+          //----------------------------------------------------------------------
+
+          // Set error message text
+          $json[ 'error' ][ 'item_guid' ] = $this->data[ 'workplace_add_assembly_unit_item_error' ];
+
+          // Clear request data valid status
+          $request_data_valid = false;
+
+        }
+        else
+        {
+
+          //--------------------------------------------------------------------
+          // Item found
+          //--------------------------------------------------------------------
+
+          // Store item guid
+          $unit_data[ 'item_guid' ] = $item_guid;
+
+        }
+
+      }
+
+      //------------------------------------------------------------------------
+      // Check parameter: Position designator
+      //------------------------------------------------------------------------
+
+      // Test for subitem designator parameter exists
+      if ( $this->request->Is_POST_Parameter_Exists( 'designator' ) === false )
+      {
+
+        //----------------------------------------------------------------------
+        // ERROR: Position designation parameter not found
+        //----------------------------------------------------------------------
+
+        // Set error message text
+        $json[ 'error' ][ 'designator' ] = $this->data[ 'workplace_add_assembly_unit_position_designation_error' ];
+
+        // Clear request data valid status
+        $request_data_valid = false;
+
+      }
+      else
+      {
+
+        //----------------------------------------------------------------------
+        // Position designation parameter found
+        //----------------------------------------------------------------------
+
+        // Get designator
+        $designator = $this->request->Get_POST_Parameter_As_String( 'designator' );
+
+        if (
+          ( utf8_strlen( $designator ) > 256 ) ||
+          ( utf8_strlen( $designator ) < 1 )
+        )
+        {
+
+          //----------------------------------------------------------------------
+          // ERROR: Position designation parameter not valid
+          //----------------------------------------------------------------------
+
+          // Set error message text
+          $json[ 'error' ][ 'designator' ] = $this->data[ 'workplace_add_assembly_unit_position_designation_error' ];
+
+          // Clear request data valid status
+          $request_data_valid = false;
+
+        }
+        else
+        {
+
+          //----------------------------------------------------------------------
+          // Position designation parameter valid
+          //----------------------------------------------------------------------
+
+          // Store designator
+          $unit_data[ 'designator' ] = $designator;
+
+        }
+
+      }
+
+      //------------------------------------------------------------------------
+      // Check parameter: Quantity
+      //------------------------------------------------------------------------
+
+      // Test for parameter exists
+      if( $this->request->Is_POST_Parameter_Positive_Integer( 'quantity' ) === false )
+      {
+
+        //----------------------------------------------------------------------
+        // ERROR: Quantity parameter not found
+        //----------------------------------------------------------------------
+
+        // Set error message text
+        $json[ 'error' ][ 'quantity' ] = $this->data[ 'workplace_add_assembly_unit_quantity_error' ];
+
+        // Clear request data valid status
+        $request_data_valid = false;
+
+      }
+      else
+      {
+
+        //----------------------------------------------------------------------
+        // Quantity parameter found
+        //----------------------------------------------------------------------
+
+        // Get subitem quantity
+        $quantity = $this->request->Get_POST_Parameter_As_Integer( 'quantity' );
+
+        // Test for quantity non zero value
+        if ( $quantity == 0 )
+        {
+
+          //----------------------------------------------------------------------
+          // ERROR: Quantity parameter not positive integer
+          //----------------------------------------------------------------------
+
+          // Set error message text
+          $this->error[ 'quantity' ] = $this->data[ 'workplace_add_assembly_unit_quantity_error' ];
+
+          // Clear request data valid status
+          $request_data_valid = false;
+
+        }
+        else
+        {
+
+          //----------------------------------------------------------------------
+          // Quantity parameter is positive integer
+          //----------------------------------------------------------------------
+
+          $unit_data[ 'quantity' ] = $quantity;
+
+        }
+
+      }
+
+      //------------------------------------------------------------------------
+      // Check parameter: Subitem GUID
+      //------------------------------------------------------------------------
+
+      // Test for parameter exists
+      if( $this->request->Is_POST_Parameter_GUID( 'subitems' ) === false )
+      {
+
+        //----------------------------------------------------------------------
+        // ERROR: Assembly unit parameter not found
+        //----------------------------------------------------------------------
+
+        // Set error message text
+        $json[ 'error' ][ 'subitems' ] = $this->data[ 'workplace_add_assembly_unit_assembly_unit_error' ];
+
+        // Clear request data valid status
+        $request_data_valid = false;
+
+      }
+      else
+      {
+
+        //----------------------------------------------------------------------
+        // Assembly unit parameter found
+        //----------------------------------------------------------------------
+
+        // Store subitem GUID 
+        $subitem_guid = $this->request->Get_POST_Parameter_As_GUID( 'subitems' );
+
+        // Test for item exists
+        if ( $this->model_items_items->Is_Exists_By_GUID( $subitem_guid ) === false )
+        {
+
+          //----------------------------------------------------------------------
+          // ERROR: Item not found
+          //----------------------------------------------------------------------
+
+          // Set error message text
+          $json[ 'error' ][ 'subitems' ] = $this->data[ 'workplace_add_assembly_unit_assembly_unit_error' ];
+
+          // Clear request data valid status
+          $request_data_valid = false;
+
+        }
+        else
+        {
+
+          //----------------------------------------------------------------------
+          // Assembly unit parameter valid
+          //----------------------------------------------------------------------
+
+          // Store subitem GUID
+          $unit_data[ 'subitem_guid' ] = $subitem_guid;
+
+        }
+
+      }
+
+      //------------------------------------------------------------------------
+      // Subitem with designator not exists, try to add subitem
+      //------------------------------------------------------------------------
+
+      // Is request data valid
+      if ( $request_data_valid === false )
+      {
+
+        //----------------------------------------------------------------------
+        // ERROR: Parameters not valid
+        //----------------------------------------------------------------------
+
+        // Set error code
+        $json[ 'return_code' ] = false;
+
+      }
+      else
+      {
+
+        //----------------------------------------------------------------------
+        // Parameters present and valid, try to add subitem
+        //----------------------------------------------------------------------
+
+        // Test for subitem with given designatir and subitem GUID exists
+        if ( $this->model_items_items->Is_Subitem_Exist_By_Designator( $item_guid, $designator ) === true )
+        {
+
+          //--------------------------------------------------------------------
+          // ERROR: Subitem with designator already exists
+          //--------------------------------------------------------------------
+
+          // Set error message text
+          $json[ 'error' ][ 'designator' ] = $this->data[ 'workplace_add_assembly_unit_designator_exists_error' ];
+
+          // Set error code
+          $json[ 'return_code' ] = false;
+
+        }
+        else
+        {
+
+          //--------------------------------------------------------------------
+          // Subitem not exists, add subitem
+          //--------------------------------------------------------------------
+
+          // Test for recursive subitem insertion
+          //! @todo ANVILEX KM: Implement full recursion search, and not only at top level
+          if ( $item_guid == $subitem_guid )
+          {
+
+            //------------------------------------------------------------------
+            // ERROR: Recursive insertion detected
+            //------------------------------------------------------------------
+
+            // Set error message
+            $json[ 'error' ][ 'error' ] = 'Recursive insertion found.';
+
+            // Set error code
+            $json[ 'return_code' ] = false;
+            
+          }
+          else
+          {
+            
+            //------------------------------------------------------------------
+            // Recursive insertion not found
+            //------------------------------------------------------------------
+            
+            // Add new subitem
+            $return_data = $this->model_items_items->Add_Subitem( $unit_data );
+
+            // Test for error
+            if ( $return_data[ 'return_code' ] === false )
+            {
+          
+              //----------------------------------------------------------------
+              // ERROR: Create subitem failed
+              //----------------------------------------------------------------
+
+              // Set error message
+              $json[ 'error' ][ 'error' ] = $this->data[ 'workplace_add_assembly_unit_designator_exists_error' ];
+
+              // Set error code
+              $json[ 'return_code' ] = false;
+          
+            }
+            else
+            {
+
+              //----------------------------------------------------------------
+              // Subitem successfully added
+              //----------------------------------------------------------------
+
+              // Set redirect URL
+              $json[ 'redirect_url' ] = $this->url->link( 'workplace/items/info', 'guid=' . $item_guid, 'SSL' );
+
+              // Set success code
+              $json[ 'return_code' ] = true;
+
+            }
+          
+          }
+
+        }
+
+      }
+
+    }
+
+    // Encode and send json data
+    $this->response->Set_Json_Output( $json );
+
+  }
+
+}
+//------------------------------------------------------------------------------
+// End of file
+//------------------------------------------------------------------------------
+?>

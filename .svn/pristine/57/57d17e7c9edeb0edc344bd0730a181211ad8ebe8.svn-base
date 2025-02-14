@@ -1,0 +1,363 @@
+<?php
+class ControllerWorkplaceFront extends Controller
+{
+
+  //----------------------------------------------------------------------------
+  // Index method
+  //----------------------------------------------------------------------------
+
+  public function index()
+  {
+
+    // Load messages
+    $this->messages->Load( $this->data, 'workplace', 'front', 'index', $this->language->Get_Language_Code() );
+
+    // Load data models
+    $this->load->model( 'projects/projects' );
+    $this->load->model( 'items/items' );
+    $this->load->model( 'tasks/tasks' );
+
+    //------------------------------------------------------------------------
+    // Observed projects
+    //------------------------------------------------------------------------
+
+    // Initialise items data section
+    $this->data[ 'projects' ] = array();
+
+    // Get my observed items
+    $projects = $this->model_projects_projects->Get_Favorite_Projects( $this->customer->Get_GUID() );
+
+    // Process observed items
+    foreach ( $projects as $project )
+    {
+
+      // Get observed item information
+      $project_data = $this->model_projects_projects->Get_Information( $project[ 'guid' ] );
+
+      if( $project_data[ 'return_code' ] === true )
+      {
+
+        // Add item information
+        $this->data[ 'projects' ][] = array(
+          'element_href' => 'project' . $project_data[ 'data' ][ 'guid' ],
+          'guid' => $project_data[ 'data' ][ 'guid' ],
+          'designator' => $project_data[ 'data' ][ 'designator' ],
+          'year' => $project_data[ 'data' ][ 'year' ],
+          'number' => $project_data[ 'data' ][ 'number' ],
+          'create_date' => $project_data[ 'data' ][ 'create_date' ],
+          'name' => $project_data[ 'data' ][ 'name' ],
+          'description' => $project_data[ 'data' ][ 'description' ],
+          'href' => $this->url->link( 'workplace/projects/info', 'guid=' . $project_data[ 'data' ][ 'guid' ], 'SSL' )
+        );
+
+      }
+
+    }
+
+    // Compose links
+    $this->data[ 'delete_customer_project_button_href' ] = $this->url->link( 'workplace/front/Delete_Project', '', 'SSL' );
+
+    //------------------------------------------------------------------------
+    // Observed items
+    //------------------------------------------------------------------------
+
+    // Initialise items data section
+    $this->data[ 'observed_items' ] = array();
+
+    // Get my observed items
+    $observed_items = $this->model_items_items->Get_Favorite_Items( $this->customer->Get_GUID() );
+
+    // Process observed items
+    foreach ( $observed_items as $observed_item )
+    {
+
+      // Get observed item information
+      $item = $this->model_items_items->Get_Information( $observed_item[ 'guid' ], $this->language->Get_Language_Code() );
+
+      // Add item information
+      $this->data[ 'observed_items' ][] = array(
+        'element_href' => 'item' . $observed_item[ 'guid' ],
+        'item_id' =>  $item[ 'item_id' ],
+        'item_guid' =>  $observed_item[ 'guid' ],
+        'mpn' => $item[ 'mpn' ],
+        'description' => $this->model_items_items->Get_Description( $item[ 'guid' ], $this->language->Get_Language_Code() )[ 'description' ],
+        'item_href' => $this->url->link( 'workplace/items/info', 'guid=' . $item[ 'guid' ], 'SSL' ),
+        'manufacturer_href' => $this->url->link( 'manufacturers/info', 'manufacturer_guid=' . $item[ 'manufacturer_guid' ], 'SSL' ),
+        'manufacturer_name' => $item[ 'manufacturer_name' ]
+      );
+
+    }
+
+    // Compose links
+    $this->data[ 'delete_customer_item_button_href' ] = $this->url->link( 'workplace/front/Delete_Item', '', 'SSL' );
+
+    //------------------------------------------------------------------------
+    // Tasks
+    //------------------------------------------------------------------------
+
+    // Get submitted tasks assigned to customer
+    $this->data['tasks_groups'][ 'submitted_tasks' ]['name'] =  'submitted_tasks';
+
+    // Get new tasks assigned to customer
+    $this->data['tasks_groups'][ 'new_tasks' ]['name'] = 'new_tasks';
+
+    // Get wait for processing tasks assigned to customer
+    $this->data['tasks_groups'][ 'wait_for_processing_tasks' ]['name'] ='wait_for_processing_tasks';
+
+    // Get wait for fixing tasks assigned to customer
+    $this->data['tasks_groups'][ 'wait_for_fixing_tasks' ]['name'] = 'wait_for_fixing_tasks';
+
+    // Get tasks in processing assigned to customer
+    $this->data['tasks_groups'][ 'in_processing_tasks' ]['name'] = 'in_processing_tasks';
+
+    // Get paused tasks assigned to customer
+    $this->data['tasks_groups'][ 'paused_tasks' ]['name'] = 'paused_tasks';
+
+    // Get completed tasks assigned to customer
+    $this->data['tasks_groups'][ 'completed_tasks' ]['name'] = 'completed_tasks';
+
+    // Get tasks waited for verification assigned to customer
+    $this->data['tasks_groups'][ 'waited_for_verification_tasks' ]['name'] = 'waited_for_verification_tasks';
+
+    // Get tasks in verification process assigned to customer
+    $this->data['tasks_groups'][ 'in_verification_tasks' ]['name'] ='in_verification_tasks';
+
+    // Get closed tasks assigned to customer
+    $this->data['tasks_groups'][ 'closed_tasks' ]['name'] = 'closed_tasks';
+
+    // Get discarded tasks assigned to customer
+    $this->data['tasks_groups'][ 'discarded_tasks' ]['name'] = 'discarded_tasks';
+
+    // Get submitted tasks assigned to customer
+    $this->data['tasks_groups'][ 'submitted_tasks' ]['data'] = $this->model_tasks_tasks->Get_Task_List_Assigned_To_Customer( $this->customer->Get_GUID(), 'unconfirmed', 5 );
+
+    // Get new tasks assigned to customer
+    $this->data['tasks_groups'][ 'new_tasks' ]['data'] = $this->model_tasks_tasks->Get_Task_List_Assigned_To_Customer( $this->customer->Get_GUID(), 'new', 5 );
+
+    // Get wait for processing tasks assigned to customer
+    $this->data['tasks_groups'][ 'wait_for_processing_tasks' ]['data'] = $this->model_tasks_tasks->Get_Task_List_Assigned_To_Customer( $this->customer->Get_GUID(), 'wait_for_processing', 5 );
+
+    // Get wait for fixing tasks assigned to customer
+    $this->data['tasks_groups'][ 'wait_for_fixing_tasks' ]['data'] = $this->model_tasks_tasks->Get_Task_List_Assigned_To_Customer( $this->customer->Get_GUID(), 'wait_for_fixing', 5 );
+
+    // Get tasks in processing assigned to customer
+    $this->data['tasks_groups'][ 'in_processing_tasks' ]['data'] = $this->model_tasks_tasks->Get_Task_List_Assigned_To_Customer( $this->customer->Get_GUID(), 'processing', 5 );
+
+    // Get paused tasks assigned to customer
+    $this->data['tasks_groups'][ 'paused_tasks' ]['data'] = $this->model_tasks_tasks->Get_Task_List_Assigned_To_Customer( $this->customer->Get_GUID(), 'paused', 5 );
+
+    // Get completed tasks assigned to customer
+    $this->data['tasks_groups'][ 'completed_tasks' ]['data'] = $this->model_tasks_tasks->Get_Task_List_Assigned_To_Customer( $this->customer->Get_GUID(), 'completed', 5 );
+
+    // Get tasks waited for verification assigned to customer
+    $this->data['tasks_groups'][ 'waited_for_verification_tasks' ]['data'] = $this->model_tasks_tasks->Get_Task_List_Assigned_To_Customer( $this->customer->Get_GUID(), 'wait_for_verification', 5 );
+
+    // Get tasks in verification process assigned to customer
+    $this->data['tasks_groups'][ 'in_verification_tasks' ]['data'] = $this->model_tasks_tasks->Get_Task_List_Assigned_To_Customer( $this->customer->Get_GUID(), 'verification', 5 );
+
+    // Get closed tasks assigned to customer
+    $this->data['tasks_groups'][ 'closed_tasks' ]['data'] = $this->model_tasks_tasks->Get_Task_List_Assigned_To_Customer( $this->customer->Get_GUID(), 'closed', 5 );
+
+    // Get discarded tasks assigned to customer
+    $this->data['tasks_groups'][ 'discarded_tasks' ]['data'] = $this->model_tasks_tasks->Get_Task_List_Assigned_To_Customer( $this->customer->Get_GUID(), 'discarded', 5 );
+
+
+    // Compose links
+    $this->data[ 'edit_task_href' ] = $this->url->link( 'tasks/edit_task', '', 'SSL' );
+    $this->data[ 'confirm_task_href' ] = $this->url->link( 'tasks/confirm_task', '', 'SSL' );
+    $this->data[ 'discard_task_href' ] = $this->url->link( 'tasks/discard_task', '', 'SSL' );
+    $this->data[ 'start_task_href' ] = $this->url->link( 'tasks/start_task', '', 'SSL' );
+    $this->data[ 'assign_developer_task_href' ] = $this->url->link( 'tasks/assign_developer_task', '', 'SSL' );
+    $this->data[ 'assign_verifier_task_href' ] = $this->url->link( 'tasks/assign_verifier_task', '', 'SSL' );
+    $this->data[ 'verify_task_href' ] = $this->url->link( 'tasks/verify_task', '', 'SSL' );
+    $this->data[ 'reject_task_href' ] = $this->url->link( 'tasks/reject_task', '', 'SSL' );
+    $this->data[ 'accept_task_href' ] = $this->url->link( 'tasks/accept_task', '', 'SSL' );
+    $this->data[ 'done_task_href' ] = $this->url->link( 'tasks/done_task', '', 'SSL' );
+    $this->data[ 'pause_task_href' ] = $this->url->link( 'tasks/pause_task', '', 'SSL' );
+    $this->data[ 'resume_task_href' ] = $this->url->link( 'tasks/resume_task', '', 'SSL' );
+    $this->data[ 'reopen_task_href' ] = $this->url->link( 'tasks/reopen_task', '', 'SSL' );
+    $this->data[ 'decline_task_href' ] = $this->url->link( 'tasks/decline_task', '', 'SSL' );
+
+    //------------------------------------------------------------------------
+    // Render page
+    //------------------------------------------------------------------------
+
+    // Set document properties
+    $this->response->setTitle( $this->messages->Get_Message( 'document_title_text' ) );
+    $this->response->setDescription( $this->messages->Get_Message( 'document_description_text' ) );
+    $this->response->setKeywords( '' );
+    $this->response->setRobots( 'index, follow' );
+
+    // Set page configuration
+    $this->children = array(
+      'common/footer',
+      'workplace/workplace_menu',
+      'common/header'
+    );
+
+    // Render page
+    $this->response->Set_HTTP_Output( $this->Render( 'workplace/front.tpl' ) );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Delete item
+  //----------------------------------------------------------------------------
+  // Caller: AJAX
+  //----------------------------------------------------------------------------
+/*
+  public function Delete_Item()
+  {
+
+    // Init json data
+    $json = array();
+
+    if ( $this->request->Is_POST_Parameter_GUID( 'item_guid' ) === false )
+    {
+
+      //----------------------------------------------------------------------
+      // ERROR: Parameter not found
+      //----------------------------------------------------------------------
+
+      // Set error code
+      $json[ 'return_code' ] = false;
+
+    }
+    else
+    {
+
+      //----------------------------------------------------------------------
+      // Parameter found, continue processing
+      //----------------------------------------------------------------------
+
+      // Get item GUID
+      $item_guid = $this->request->Get_POST_Parameter_As_GUID( 'item_guid' );
+
+      // Load data model
+      $this->load->model( 'items/items' );
+
+      if ( $this->model_items_items->Is_In_Favorites( $this->customer->Get_GUID(), $item_guid ) === true )
+      {
+
+        // Set redirect link
+        $json[ 'delete' ] = 'item' . $item_guid;
+
+        //! @bug ANVILEX KM: 'return_code' redefinition
+        $json[ 'return_code' ] = $this->model_items_items->Remove_From_Favorites( $this->customer->Get_GUID(), $item_guid );
+
+        // Set success code
+        $json[ 'return_code' ] = true;
+
+      }
+
+    }
+
+
+    // Render page
+    $this->response->Set_Json_Output( $json );
+
+  }
+*/
+  //----------------------------------------------------------------------------
+  // Delete project
+  //----------------------------------------------------------------------------
+  // Caller: AJAX
+  //----------------------------------------------------------------------------
+/*
+  public function Delete_Project()
+  {
+
+    // Init json data
+    $json = array();
+
+    if ( $this->request->Is_POST_Parameter_GUID( 'guid' ) === false )
+    {
+
+      //----------------------------------------------------------------------
+      // ERROR: Parameter not found
+      //----------------------------------------------------------------------
+
+      // Set error code
+      $json[ 'return_code' ] = false;
+
+    }
+    else
+    {
+
+      //----------------------------------------------------------------------
+      // Parameter found, continue processing
+      //----------------------------------------------------------------------
+
+      // Get item GUID
+      $guid = $this->request->Get_POST_Parameter_As_GUID( 'guid' );
+
+      // Load data model
+      $this->load->model( 'projects/projects' );
+
+      if ( $this->model_projects_projects->Is_In_Favorites( $this->customer->Get_GUID(), $guid ) === true )
+      {
+
+        // Set redirect link
+        $json[ 'delete' ] = 'project' . $guid;
+
+        //! @bug ANVILEX KM: 'return_code' redefinition
+        $json[ 'return_code' ] = $this->model_projects_projects->Remove_From_Favorites( $this->customer->Get_GUID(), $guid );
+
+        // Set success code
+        $json[ 'return_code' ] = true;
+
+      }
+
+    }
+
+    // Render page
+    $this->response->Set_Json_Output( $json );
+
+  }
+*/
+  //----------------------------------------------------------------------------
+  // Delete task
+  //----------------------------------------------------------------------------
+  // Caller: AJAX
+  //----------------------------------------------------------------------------
+/*
+  public function Delete_Task()
+  {
+
+    // Init json data
+    $json = array();
+
+    $json[ 'return_code' ] = false;
+
+    if ( $this->request->Is_POST_Parameter_Exists( 'task_id' ) )
+    {
+
+      // Load data model
+      $this->load->model( 'tasks/tasks' );
+
+      if ( $this->model_tasks_tasks->Is_Exist_Customer_Task( $this->request->Get_POST_Parameter_As_String( 'task_id' ) ) )
+      {
+
+        $json[ 'return_code' ] = $this->model_tasks_tasks->Delete_Task( $this->request->Get_POST_Parameter_As_String('task_id') );
+
+        // Set redirect link
+        $json[ 'redirect_url' ] = $this->url->link( 'workplace/front', '', 'SSL' );
+
+        // Set success code
+        $json[ 'return_code' ] =true;
+
+      }
+
+    }
+
+    // Render page
+    $this->response->Set_Json_Output( $json );
+
+  }
+*/
+}
+
+//------------------------------------------------------------------------------
+// End of file
+//------------------------------------------------------------------------------
+?>

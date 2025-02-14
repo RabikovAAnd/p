@@ -1,0 +1,58 @@
+<?php echo $common_header; ?>
+<div id="content">
+  <h1 class="header-list__edit"><?php echo $workplace_customer_info_header;?></h1>
+  <div class="account-area">
+    <?php echo $workplace_menu; ?>
+    <div class="main-area list">
+      <div class="info-content-block list">
+        <h2><?php echo $workplace_customer_general_data_header; ?></h2>
+        <div class="info-content-block end">
+          <a href="<?php echo $customer_info_edit_button_href; ?>">
+            <button  class="small-button" type="button">
+              <?php echo $workplace_customer_info_edit_button_text; ?>
+            </button>
+          </a>
+        </div>  
+        <div class="general-info">
+          <?php if ( $customer[ 'legal_entity' ] === '1' ) { ?>
+            <?php echo $workplace_customer_info_account_type_text . ': ' . $workplace_customer_info_legal_entity_text; ?><br>
+            <?php echo $workplace_customer_info_company_name_text . ': ' . $customer[ 'company_name' ]; ?><br>
+            <?php echo $workplace_customer_info_full_name_text; ?>: <?php echo $customer[ 'lastname' ]; ?> <?php echo $customer[ 'firstname' ]; ?> <?php echo $customer[ 'middlename' ]; ?><br>
+          <?php } else { ?>
+            <?php echo $workplace_customer_info_account_type_text . ': '. $workplace_customer_info_individual_text; ?><br>
+            <?php echo $workplace_customer_info_full_name_text; ?>: <?php echo $customer[ 'lastname' ]; ?> <?php echo $customer[ 'firstname' ]; ?> <?php echo $customer[ 'middlename' ]; ?><br>
+          <?php } ?>
+          <?php echo $workplace_customer_info_email_text; ?>: <?php echo $customer[ 'email' ]; ?><br>
+          <?php echo $workplace_customer_info_date_creation_text; ?>: <?php echo $customer[ 'date_added' ]; ?><br>
+          <?php echo $workplace_customer_info_id_text; ?>: <?php echo $customer[ 'contact_id' ]; ?><br>
+          <?php echo $workplace_customer_info_guid_text; ?>: <?php echo $customer[ 'guid' ]; ?>        
+        </div>
+      </div>
+      <div class="info-content-block list">
+        <h2><?php echo $workplace_customer_info_addinfo_data_header; ?></h2>
+        <div class="info-content-block end">
+          <a href="<?php echo $customer_info_edit_button_href; ?>">
+            <button class="small-button" type="button">
+              <?php echo $workplace_customer_info_add_addinfo_button_text; ?>
+            </button>
+          </a>
+        </div>  
+        
+      </div>
+      <div class="info-content-block list">
+        <h2><?php echo $workplace_customer_info_address_data_header; ?></h2>
+        <div class="info-content-block end">
+          <a href="<?php echo $customer_add_address_button_href; ?>">
+            <button class="small-button" type="button">
+              <?php echo $workplace_customer_info_add_address_button_text; ?>
+            </button>
+          </a>
+        </div>  
+        
+      </div>
+    </div>
+    
+  </div>
+  </div>
+</div>
+<?php echo $common_footer; ?>

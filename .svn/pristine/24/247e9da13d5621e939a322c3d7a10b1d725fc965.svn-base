@@ -1,0 +1,240 @@
+<?php
+class ControllerWorkplaceCategoriesMove extends Controller
+{
+
+  //----------------------------------------------------------------------------
+  // Index method
+  //----------------------------------------------------------------------------
+
+  public function index()
+  {
+
+    // Test for Property GUID parameter exists
+    if ($this->request->Is_GET_Parameter_GUID('guid') === false) {
+
+      //----------------------------------------------------------------------
+      // ERROR: Property GUID parameter not found
+      //----------------------------------------------------------------------
+
+
+    } else {
+
+      //------------------------------------------------------------------------
+      // Property GUID parameter found, continue processing
+      //------------------------------------------------------------------------
+
+      // Load messages
+      $this->messages->Load($this->data, 'workplace', 'categories_move', 'index', $this->language->Get_Language_Code());
+
+      // Load models
+      $this->load->model('categories/categories');
+      $this->load->model('items/items');
+
+      // Get Property guid
+      $category_guid = $this->request->Get_GET_Parameter_As_GUID('guid');
+
+      // Get current category information
+      $this->data['current_category'] = $this->model_categories_categories->Get_Category($category_guid, $this->language->Get_Language_Code());
+
+      // Get category information
+      $this->data['categories'] = $this->model_categories_categories->Get_List_Of_Categories(30, 1, '', $this->language->Get_Language_Code());
+
+       // Set links
+       $this->data['move_button_href'] = $this->url->link('workplace/categories/move/Move', 'category_guid=' . $category_guid, 'SSL');
+       $this->data['cancel_button_href'] =  $this->request->Get_Request_Referer();
+      //------------------------------------------------------------------------
+      // Render page
+      //------------------------------------------------------------------------
+
+      // Set document properties
+      $this->response->setTitle($this->messages->Get_Message('document_title_text'));
+      $this->response->setDescription($this->messages->Get_Message('document_description_text'));
+      $this->response->setKeywords('');
+      $this->response->setRobots('index, follow');
+
+      // Set page configuration
+      $this->children = array(
+        'common/footer',
+        'workplace/menu',
+        'common/header'
+      );
+    }
+  }
+  //----------------------------------------------------------------------------
+  // Search query
+  //----------------------------------------------------------------------------
+  // Caller: AJAX
+  //----------------------------------------------------------------------------
+
+  public function Search()
+  {
+
+    // Initialise json data
+    $json = array();
+
+    // Test for parameter exists
+    if ( $this->request->Is_POST_Parameter_Exists( 'search' ) === false )
+    {
+
+      //----------------------------------------------------------------------
+      // ERROR: 'search' parameter not found
+      //----------------------------------------------------------------------
+      
+      // Set error code
+      $json[ 'return_code' ] = false;
+
+    }
+    else
+    {
+
+      //----------------------------------------------------------------------
+      // Parameter found, continue processing
+      //----------------------------------------------------------------------
+
+      // Load data models
+      $this->load->model( 'categories/categories' );
+
+      // Get proposed categories
+      $json['categories'] = $this->model_categories_categories->Get_List_Of_Categories(30, 1, $this->request->Get_POST_Parameter_As_String( 'search' ), $this->language->Get_Language_Code());
+     
+      // Set success code
+      $json[ 'return_code' ] = true;
+
+    }
+
+
+    // Render page
+    $this->response->Set_Json_Output( $json );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Move category
+  //----------------------------------------------------------------------------
+  // Caller: AJAX
+  //----------------------------------------------------------------------------
+
+  public function Move()
+  {
+
+    // Init json data
+    $json = array();
+
+    // Load messages
+    $this->messages->Load($this->data, 'workplace', 'categories_move', 'Move', $this->language->Get_Language_Code());
+
+    // Init customer data
+    $data = array();
+
+    // Clear request data valid sataus
+    $request_data_valid = true;
+      
+   
+    //------------------------------------------------------------------------
+    // Category GUID
+    //------------------------------------------------------------------------
+
+    // Test for parameter exists
+    if ( $this->request->Is_GET_Parameter_GUID( 'category_guid' ) === false )
+    {
+
+      //----------------------------------------------------------------------
+      // ERROR: Category GUID not found
+      //----------------------------------------------------------------------
+
+      // Set error message text
+      $json[ 'error' ][ 'guid' ] = $this->data['workplace_categories_edit_' . 'category_guid' . '_error'];
+
+      // Clear request data valid sataus
+      $request_data_valid = false;
+
+    }
+    else
+    {
+
+      //----------------------------------------------------------------------
+      // Category GUID parameter found
+      //----------------------------------------------------------------------
+
+      $data[ 'guid' ] = trim( $this->request->Get_GET_Parameter_As_GUID( 'category_guid' ) );
+
+    }
+    
+    //------------------------------------------------------------------------
+    // Parent category GUID
+    //------------------------------------------------------------------------
+
+    // Test for parameter exists
+    if ( $this->request->Is_POST_Parameter_GUID( 'parent_guid' ) === false )
+    {
+
+      //----------------------------------------------------------------------
+      // ERROR: Parent category GUID not found
+      //----------------------------------------------------------------------
+
+      // Set error message text
+      $json[ 'error' ][ 'parent_guid' ] = $this->data['workplace_categories_edit_' . 'parent_guid' . '_error'];
+
+      // Clear request data valid status
+      $request_data_valid = false;
+
+    }
+    else
+    {
+
+      //----------------------------------------------------------------------
+      // Parent category GUID parameter found
+      //----------------------------------------------------------------------
+
+      $data[ 'parent_guid' ] = trim( $this->request->Get_POST_Parameter_As_GUID( 'parent_guid' ) );
+
+    }
+
+   
+    
+    //------------------------------------------------------------------------
+    // Process data
+    //------------------------------------------------------------------------
+
+    // Is request data valid
+    if ($request_data_valid === false) {
+
+      //------------------------------------------------------------------------
+      // ERROR: Parameters not valid
+      //------------------------------------------------------------------------
+
+      // Set error code
+      $json['return_code'] = false;
+
+    } else
+    {
+
+      //--------------------------------------------------------------------
+      // Parameters present and valid
+      //--------------------------------------------------------------------
+
+      // Load data models
+      $this->load->model('categories/categories');
+
+      // Move Category
+      $this->model_categories_categories->Move_Category($data);
+
+      // Set redirect URL
+      $json['redirect_url'] = $this->url->link('workplace/categories/info', 'guid=' . $data[ 'parent_guid' ], 'SSL');
+
+      // Set success code
+      $json['return_code'] = true;
+
+    }
+
+    // Encode and send json data
+    $this->response->Set_Json_Output($json);
+
+  }
+
+}
+
+//------------------------------------------------------------------------------
+// End of file
+//------------------------------------------------------------------------------
+?>

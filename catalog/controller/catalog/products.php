@@ -1,0 +1,213 @@
+<?php
+class ControllerCatalogProducts extends Controller
+{
+
+  //----------------------------------------------------------------------------
+  // Default method
+  //----------------------------------------------------------------------------
+
+  public function index()
+  {
+
+    // Load messages
+    $this->messages->Load( $this->data, 'items', 'list', 'index', $this->language->Get_Language_Code() );
+
+    // Test for parameters exists
+    if ( $this->request->Is_GET_Parameter_Exists( 'category_guid' ) === false )
+    {
+
+      //------------------------------------------------------------------------
+      // ERROR: Category ID parameter not set
+      //------------------------------------------------------------------------
+
+//      $this->Log->Notice( 'Parameter not provided: category_guid' );
+
+      // Redirect
+      $this->response->Redirect( $this->url->link( 'catalog/error' ) );
+
+    }
+    else
+    {
+
+      //------------------------------------------------------------------------
+      // Category ID parameter exists
+      //------------------------------------------------------------------------
+
+      // Get category ID
+      $category_guid = $this->request->Get_GET_Parameter_As_String( 'category_guid' );
+
+      //------------------------------------------------------------------------
+      // Get category information
+      //------------------------------------------------------------------------
+
+      // Load data models
+      $this->load->model( 'categories/categories' );
+
+      // Get category information
+      $category = $this->model_categories_categories->Get_Category( $category_guid, $this->language->Get_Language_Code() );
+
+      // Set category data
+      $this->data[ 'text_category_header' ] = $category[ 'name' ];
+      $this->data[ 'text_category_description' ] = $category[ 'description' ];
+
+      //------------------------------------------------------------------------
+      // Get category products
+      //------------------------------------------------------------------------
+      
+      // Load data models
+      $this->load->model( 'items/items' );
+
+      // Get items
+      $items = $this->model_items_items->Get_Items_By_Category( $category_guid );
+
+      // Initislise list of items
+      $this->data[ 'items' ] = array();
+
+//      if ( count $items )
+        
+      // Iterate over all products
+      foreach ( $items as $item )
+      {
+
+        // Get item information
+        $item_info = $this->model_items_items->Get_Information( $item[ 'guid' ] );
+
+        // Test for product info valid
+        if ( $item_info[ 'valid' ] == false )
+        {
+
+          //----------------------------------------------------------------------
+          // ERROR: Invalid product information detected
+          //----------------------------------------------------------------------
+
+          // Add empty data
+          $this->data[ 'items' ] = array();
+
+        }
+        else
+        {
+
+          //----------------------------------------------------------------------
+          // Product information valid, continue processing
+          //----------------------------------------------------------------------
+
+          // Set product generic information
+          $item_data[ 'guid' ] = $item_info[ 'guid' ];
+          $item_data[ 'mpn' ] = $item_info[ 'mpn' ];
+          $item_data[ 'href' ] = $this->url->link( 'items/info', 'guid=' . $item_info[ 'guid' ], "SSL" );
+          $item_data[ 'manufacturer_name' ] = $item_info[ 'manufacturer_name' ];
+          $item_data[ 'manufacturer_href' ] = $this->url->link( 'manufacturers/info', 'manufacturer_id=' . (int)$item_info[ 'manufacturer_id' ] );
+                      
+          //----------------------------------------------------------------------
+          // Get item description
+          //----------------------------------------------------------------------
+
+          // Get product description
+          $description = $this->model_items_items->Get_Description( $item_info[ 'guid' ], $this->language->Get_Language_Code() );
+
+          // Get product description
+          $item_data[ 'description' ] = $description[ 'description' ];
+
+          //----------------------------------------------------------------------
+          // Get item images
+          //----------------------------------------------------------------------
+        
+          // Get product image
+          $item_image = $this->model_items_items->Get_Image( $item[ 'guid' ] );
+         
+          // Set default item image
+          $item_data[ 'image_data' ] = ( $item_image[ 'valid' ] == false ) ? '' : 'data:'. $item_image[ 'type' ] . ';base64, ' . base64_encode( $item_image[ 'data' ] );
+
+          //----------------------------------------------------------------------
+          // Get item properties
+          //----------------------------------------------------------------------
+        
+          // Get primary products properties          
+          $item_properties = $this->model_items_items->Get_Product_Primary_Properties( $item[ 'guid' ], $this->language->Get_Language_Code() );
+
+          //----------------------------------------------------------------------
+          // Get cart line information
+          //----------------------------------------------------------------------
+
+          // Try to get cart line totals
+          $item_cart = $this->cart->Get_Line_Totals( $item[ 'guid' ] );
+
+          //----------------------------------------------------------------------
+          // Get warehouse information
+          //----------------------------------------------------------------------
+
+          // Get item warehouse information
+          $item_warehouse = $this->warehouse->Get_Item_Stocked_Quantity( $item[ 'guid' ] );
+
+          //--------------------------------------------------------------------
+        
+          // Add item data
+          $this->data[ 'items' ][] = 
+            array(
+              'data' => $item_data,
+              'properties' => $item_properties,
+              'cart' => $item_cart,
+              'warehouse' => $item_warehouse
+            );
+
+        }  
+          
+/*        
+        // Test product validity
+        if ( $item[ 'valid' ] == true )
+        {
+            
+          // Get price information
+          $product_price_information = $this->warehouse->getProductPrice( $product[ 'guid' ] );
+
+          //------------------------------------------------------------------
+          // Process stock information
+          //------------------------------------------------------------------
+            
+          // Get stock information
+          $product_stock_information = $this->warehouse->Get_Item_Stocked_Quantity( $product[ 'guid' ] );
+
+          // Set product data
+          $product_data[ 'product_guid' ] = $item[ 'guid' ];
+          $product_data[ 'product_href' ] = $this->url->link( 'items/info', 'guid=' . $product[ 'guid' ] );
+          $product_data[ 'product_mpn' ] = $item[ 'product_mpn' ];
+          $product_data[ 'product_lifecycle' ] = $item[ 'product_lifecycle_id' ];
+          $product_data[ 'product_stock_quantity' ] = $product_stock_information[ 'quantity' ];
+          $product_data[ 'product_price' ] = number_format( $product_price_information[ 'price' ], 4 ) ;
+          $product_data[ 'product_link' ] = 'Info';
+          $product_data[ 'product_quantity' ] = number_format( $product[ 'quantity' ], 0 ) . ' ' .  $item[ 'quantisation_unit_name' ];
+
+          // Add product data
+          $this->data[ 'products' ][] = $product_data;
+
+        }
+*/
+      }
+
+      //------------------------------------------------------------------------
+      // Render page
+      //------------------------------------------------------------------------
+
+      // Set document information
+      $this->response->setTitle( $category[ 'name' ] );
+      $this->response->setDescription( $category[ 'description' ] );
+      $this->response->setKeywords( '' );
+
+      // Add styles
+      $this->response->addStyle( 'catalog/view/stylesheet/products/list.css' );
+
+      // Configure page
+      $this->children = array(
+        'common/footer',
+        'common/header'
+      );
+
+    }
+    
+  }
+  
+}
+//------------------------------------------------------------------------------
+// End of file
+//------------------------------------------------------------------------------
+?>

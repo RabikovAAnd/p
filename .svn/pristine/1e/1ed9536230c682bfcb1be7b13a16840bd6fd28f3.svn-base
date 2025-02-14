@@ -1,0 +1,62 @@
+<?php
+
+class ControllerCompanyContactSuccess extends Controller
+{
+
+  //----------------------------------------------------------------------------
+  // Default method
+  //----------------------------------------------------------------------------
+
+  public function index()
+  {
+
+    if (isset($this->session->data['contact_success'])) 
+    {
+
+      //------------------------------------------------------------------------
+      // Customer logged
+      //------------------------------------------------------------------------
+      //------------------------------------------------------------------------
+      // Set page data
+      //------------------------------------------------------------------------
+
+      // Load messages
+      $this->messages->Load($this->data, 'company', 'contact_success', 'index', $this->language->Get_Language_Code());
+      
+      unset($this->session->data['contact_success']);
+      
+      //------------------------------------------------------------------------
+      // Render page
+      //------------------------------------------------------------------------
+
+      // Set document properties
+      $this->response->setTitle($this->messages->Get_Message('document_title_text'));
+      $this->response->setDescription($this->messages->Get_Message('document_description_text'));
+      $this->response->setKeywords('');
+      $this->response->setRobots('index, follow');
+
+      // Set page template
+      $this->children = array(
+        'common/footer',
+        'common/header'
+      );
+
+      // Render page
+      $this->response->Set_HTTP_Output( $this->Render( 'company/contact_success.tpl' ) );
+
+    } 
+    else 
+    {
+
+      $this->response->Redirect($this->url->link( 'company/contact', '', 'SSL') );
+
+    }
+
+  }
+
+}
+
+//------------------------------------------------------------------------------
+// End of file
+//------------------------------------------------------------------------------
+?>

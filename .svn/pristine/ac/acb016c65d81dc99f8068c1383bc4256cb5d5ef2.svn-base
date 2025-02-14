@@ -1,0 +1,398 @@
+<?php
+class ModelDatabaseDatabase extends Model
+{
+
+  //----------------------------------------------------------------------------
+  // Get list of favorite items observed by customer
+  //----------------------------------------------------------------------------
+
+  public function Process_Contacts()
+  {
+/*
+    // Compose SQL query
+    $sql =
+      "SELECT " .
+        "`anvilex`.`contacts`.`id` AS id, " .
+        "`anvilex`.`contacts`.`guid` AS guid, " .
+        "`anvilex`.`contacts`.`company` AS company, " .
+        "`anvilex`.`contacts`.`street` AS street, " .
+        "`anvilex`.`contacts`.`building` AS building, " .
+        "`anvilex`.`contacts`.`area_code` AS area_code, " .
+        "`anvilex`.`contacts`.`city` AS city, " .
+        "`anvilex`.`contacts`.`country_id` AS country_id, " .
+        "`anvilex`.`contacts`.`first_name` AS first_name, " .
+        "`anvilex`.`contacts`.`last_name` AS last_name, " .
+        "`anvilex`.`contacts`.`create_date` AS create_date, " .
+        "`anvilex`.`contacts`.`modify_date` AS modify_date, " .
+        "`anvilex`.`contacts`.`email` AS email, " .
+        "`anvilex`.`contacts`.`phone` AS phone, " .
+        "`anvilex`.`contacts`.`fax` AS fax " .
+      "FROM " .
+        "`anvilex`.`contacts` " .
+//      "WHERE " .
+//        "`customer_items`.`customer_guid`='" . $this->db->escape( $customer_guid ) . "'";
+//      "LIMIT 2";
+      "";
+
+    // Query database
+    $result = $this->db->query( $sql );
+
+    // Create properties array
+    $rows = array();
+
+    // Iterate over all properties
+    foreach ( $result->rows as $row )
+    {
+
+      // Compose SQL query
+      $sql_new =
+        "INSERT INTO " .
+          "`online`.`customer` " .
+        "SET " .
+//        "`online`.`customer`.`customer_id` INT(11) NOT NULL AUTO_INCREMENT,
+          "`online`.`customer`.`id`='" . $row[ 'id' ] . "', " .
+          "`online`.`customer`.`guid`='" . strtoupper( str_replace( "-", "", trim( $row[ 'guid' ], "{}" ) ) ) . "', " .
+          "`online`.`customer`.`gender_id`='0', " .
+          "`online`.`customer`.`firstname`='" . $this->db->escape( trim( $row[ 'first_name' ] ) ) . "', " .
+          "`online`.`customer`.`lastname`='" . $this->db->escape( trim( $row[ 'last_name' ] ) ) . "', " .
+          "`online`.`customer`.`middlename`='', " .
+          "`online`.`customer`.`email`='" . $this->db->escape( trim( $row[ 'email' ] ) ) . "', " .
+          "`online`.`customer`.`phone`='" . $this->db->escape( trim( $row[ 'phone' ] ) ) . "', " .
+          "`online`.`customer`.`fax`='" . $this->db->escape( trim( $row[ 'fax' ] ) ) . "', " .
+          "`online`.`customer`.`legal_entity`=" . ( $row[ 'company' ] == '' ? "0" : "1" ) . ", " .
+          "`online`.`customer`.`company_name`='" . $this->db->escape( trim( $row[ 'company' ] ) ) . "', " .
+          "`online`.`customer`.`company_register_id`='', " .
+          "`online`.`customer`.`company_tax_id`='', " .
+          "`online`.`customer`.`password`='', " .
+          "`online`.`customer`.`hash`='', " .
+          "`online`.`customer`.`hash_datetime`='0000-00-00 00:00:00', " .
+          "`online`.`customer`.`address_id`='0', " .
+          "`online`.`customer`.`newsletter`=1, " .
+          "`online`.`customer`.`status`=1, " .
+          "`online`.`customer`.`approved`=1, " .
+          "`online`.`customer`.`ip`='0.0.0.0', " .
+          "`online`.`customer`.`date_added`='" . $row[ 'create_date' ] . "', " .
+          "`online`.`customer`.`modification_date`='" . $row[ 'modify_date' ] . "'";
+
+      // Query database
+      $result = $this->db->query( $sql_new );
+
+      //------------------------------------------------------------------------
+
+      // Compose SQL query
+      $sql_address =
+        "INSERT INTO " .
+          "`online`.`addresses` " .
+        "SET " .
+//        "`online`.`addresses`.`customer_id` INT(11) NOT NULL AUTO_INCREMENT,
+//          "`online`.`addresses`.`address_id`='0', " .
+          "`online`.`addresses`.`guid`='" . UUID_V4_T1() . "', " .          
+          "`online`.`addresses`.`customer_guid`='" . strtoupper( str_replace( "-", "", trim( $row[ 'guid' ], "{}" ) ) ) . "', " .
+          "`online`.`addresses`.`country_id`='" . $row[ 'country_id' ] . "', " .
+          "`online`.`addresses`.`zone_id`='0', " .
+          "`online`.`addresses`.`postcode`='" . $this->db->escape( trim( $row[ 'area_code' ] ) ) . "', " .
+          "`online`.`addresses`.`city`='" . $this->db->escape( trim( $row[ 'city' ] ) ) . "', " .
+          "`online`.`addresses`.`street`='" . $this->db->escape( trim( $row[ 'street' ] ) ) . "', " .
+          "`online`.`addresses`.`house`='" . $this->db->escape( trim( $row[ 'building' ] ) ) . "', " .
+          "`online`.`addresses`.`building`='', " .
+          "`online`.`addresses`.`apartment`='', " .
+          "`online`.`addresses`.`contact_firstname`='" . $this->db->escape( trim( $row[ 'first_name' ] ) ) . "', " .
+          "`online`.`addresses`.`contact_lastname`='" . $this->db->escape( trim( $row[ 'last_name' ] ) ) . "', " .
+          "`online`.`addresses`.`contact_middlename`='', " .
+          "`online`.`addresses`.`comment`='', " .
+          "`online`.`addresses`.`active`=1";
+
+      // Query database
+      $result = $this->db->query( $sql_address );
+
+    }
+ 
+    // Return data
+//    return( $result->rows );
+*/
+  }
+
+  //----------------------------------------------------------------------------
+  
+  public function Fix()
+  {
+
+/*
+//    $this->db->query( "UPDATE `online`.`item_property_index` SET `online`.`item_property_index`.`XX`=''" );
+    $this->db->query( "UPDATE `online`.`item_property_index` SET `online`.`item_property_index`.`DE`=''" );
+    $this->db->query( "UPDATE `online`.`item_property_index` SET `online`.`item_property_index`.`RU`=''" );
+    $this->db->query( "UPDATE `online`.`item_property_index` SET `online`.`item_property_index`.`EN`=''" );
+    $this->db->query( "UPDATE `online`.`item_property_index` SET `online`.`item_property_index`.`IT`=''" );
+    $this->db->query( "UPDATE `online`.`item_property_index` SET `online`.`item_property_index`.`FR`=''" );
+    $this->db->query( "UPDATE `online`.`item_property_index` SET `online`.`item_property_index`.`ES`=''" );
+*/
+
+//    $this->db->query( "DELETE FROM `online`.`item_property_index` WHERE `online`.`item_property_index`.`property_id`='236'" );
+//    $this->db->query( "DELETE FROM `online`.`item_property_index` WHERE `online`.`item_property_index`.`XX`='' AND `online`.`item_property_index`.`property_id`='132'" );
+    
+//    $this->db->query( "DELETE FROM `online`.`item_property_index` WHERE `online`.`item_property_index`.`property_id`='85' AND (`online`.`item_property_index`.`XX`='') AND (`online`.`item_property_index`.`DE`='') AND (`online`.`item_property_index`.`XX`='EN') AND (`online`.`item_property_index`.`RU`='') AND (`online`.`item_property_index`.`FR`='') AND (`online`.`item_property_index`.`IT`='') AND (`online`.`item_property_index`.`ES`='' ) LIMIT 100" );
+    
+/*
+    // Compose SQL query
+    $sql =
+      "SELECT " .
+        "`online`.`item_property_value`.`id` AS id, " .      
+        "`online`.`item_property_value`.`property_id` AS property_id, " .
+        "`online`.`item_property_value`.`value` AS value " .
+      "FROM " .
+        "`online`.`item_property_value` " .
+      "WHERE " .
+        "`online`.`item_property_value`.`language_id`='DE' " .
+      "ORDER BY `online`.`item_property_value`.`id` ASC " .
+      "LIMIT 200000";
+
+    // Perform SQL query
+    $items = $this->db->query( $sql );
+
+    foreach ( $items->rows as $item )
+    {
+
+      $this->db->query( "UPDATE `online`.`item_property_index` SET `online`.`item_property_index`.`DE`='" . $this->db->escape( $item[ 'value' ] ). "' WHERE `online`.`item_property_index`.`id`='" . $item[ 'property_id' ] . "'" );
+    
+      $this->db->query( "DELETE FROM `online`.`item_property_value` WHERE `online`.`item_property_value`.`id`='" . $item[ 'id' ] . "'" );
+    
+    }
+*/
+  }
+
+  //----------------------------------------------------------------------------
+
+  public function Process_Items()
+  {
+/*
+CREATE TABLE `item_subitem_index` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`item_id` INT(11) UNSIGNED NOT NULL DEFAULT '0',
+	`item_guid` CHAR(32) NULL DEFAULT '00000000000000000000000000000000' COLLATE 'utf8mb3_general_ci',
+	`subitem_guid` CHAR(32) NULL DEFAULT '00000000000000000000000000000000' COLLATE 'utf8mb3_general_ci',
+	`subitem_item_id` INT(11) UNSIGNED NOT NULL DEFAULT '0',
+	`basic_item` INT(1) NULL DEFAULT '0',
+	`designator` TINYTEXT NULL DEFAULT NULL COLLATE 'utf8mb3_general_ci',
+	`quantity` DOUBLE NULL DEFAULT '0',
+	`x_position` DOUBLE NULL DEFAULT '0',
+	`y_position` DOUBLE NULL DEFAULT '0',
+	`z_position` DOUBLE NULL DEFAULT '0',
+	`x_rotation` DOUBLE NULL DEFAULT '0',
+	`y_rotation` DOUBLE NULL DEFAULT '0',
+	`z_rotation` DOUBLE NULL DEFAULT '0',
+	`top_side` TINYINT(1) NULL DEFAULT '1',
+	`pa600_slot` TINYTEXT NULL DEFAULT NULL COLLATE 'utf8mb3_general_ci',
+	PRIMARY KEY (`id`) USING BTREE,
+	INDEX `item_id` (`item_id`) USING BTREE
+)
+*/
+    // Compose SQL query
+    $sql =
+      "SELECT " .
+        "`production`.`item_subitem_index`.`id` AS id, " .
+//        "`production`.`item_subitem_index`.`item_id` AS item_id, " .
+        "`production`.`item_subitem_index`.`item_guid` AS item_guid, " .
+        "`production`.`item_subitem_index`.`subitem_guid` AS subitem_guid, " .
+        "`production`.`item_subitem_index`.`designator` AS designator, " .
+        "`production`.`item_subitem_index`.`quantity` AS quantity, " .
+        "`production`.`item_subitem_index`.`x_position` AS x_position, " .
+        "`production`.`item_subitem_index`.`y_position` AS y_position, " .
+        "`production`.`item_subitem_index`.`z_position` AS z_position, " .
+        "`production`.`item_subitem_index`.`x_rotation` AS x_rotation, " .
+        "`production`.`item_subitem_index`.`y_rotation` AS y_rotation, " .
+        "`production`.`item_subitem_index`.`z_rotation` AS z_rotation, " .
+        "`production`.`item_subitem_index`.`top_side` AS top_side " .
+      "FROM " .
+        "`production`.`item_subitem_index` " .
+//      "WHERE " .
+//        "`customer_items`.`customer_guid`='" . $this->db->escape( $customer_guid ) . "'";
+//      "ORDER BY `production`.`items`.`id` ASC " .
+//      "LIMIT 70000 OFFSET 70000";
+      "";
+
+    // Query database
+    $result = $this->db->query( $sql );
+
+    // Create properties array
+    $rows = array();
+
+    // Iterate over all properties
+    foreach ( $result->rows as $row )
+    {
+/*
+CREATE TABLE `item_subitems` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`subitem_index_guid` CHAR(32) NOT NULL DEFAULT '00000000000000000000000000000000' COMMENT 'Rename to: subitem_guid. Subitem GUID.' COLLATE 'latin1_general_ci',
+	`item_guid` CHAR(32) NOT NULL DEFAULT '00000000000000000000000000000000' COMMENT 'Rename to: parent_item_guid. Parent item GUID.' COLLATE 'latin1_general_ci',
+	`subitem_guid` CHAR(32) NOT NULL DEFAULT '00000000000000000000000000000000' COMMENT 'Rename to: child_item_guid. Child subitem GUID.' COLLATE 'latin1_general_ci',
+	`designator` TINYTEXT NOT NULL COMMENT 'Subitem position designator.' COLLATE 'utf8mb3_general_ci',
+	`quantity` INT(11) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Subitem quantity.',
+	`deleted` INT(11) NOT NULL DEFAULT '0',
+	PRIMARY KEY (`id`) USING BTREE,
+	INDEX `item_guid` (`item_guid`) USING BTREE,
+	INDEX `subitem_index_guid` (`subitem_index_guid`) USING BTREE
+)
+*/
+      $subitem_index_guid = UUID_V4_T1();
+      
+      // Compose SQL query
+      $sql_new =
+        "INSERT INTO " .
+          "`production`.`item_subitems` " .
+        "SET " .
+	        "`production`.`item_subitems`.`subitem_index_guid`='" . $subitem_index_guid . "', " .
+	        "`production`.`item_subitems`.`item_guid`='" . $row[ 'item_guid' ] . "', " .
+	        "`production`.`item_subitems`.`subitem_guid`='" . $row[ 'subitem_guid' ] . "', " .
+	        "`production`.`item_subitems`.`designator`='" . trim( $row[ 'designator' ] ) . "', " .
+	        "`production`.`item_subitems`.`quantity`='" . $row[ 'quantity' ] . "', " .
+	        "`production`.`item_subitems`.`deleted`='0'";
+
+      // Query database
+      $this->db->query( $sql_new );
+
+      //------------------------------------------------------------------------
+/*
+CREATE TABLE `item_subitem_properties` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`subitem_guid` CHAR(32) NOT NULL DEFAULT '00000000000000000000000000000000' COMMENT 'Item subitem GUID.' COLLATE 'latin1_general_ci',
+	`property_guid` CHAR(32) NOT NULL DEFAULT '00000000000000000000000000000000' COMMENT 'Property GUID.' COLLATE 'latin1_general_ci',
+	`property_name` TINYTEXT NOT NULL DEFAULT '' COMMENT 'Temporary: Property name.' COLLATE 'utf8mb3_general_ci',
+	`property_value` TINYTEXT NOT NULL DEFAULT '' COMMENT 'Property value.' COLLATE 'utf8mb3_general_ci',
+	PRIMARY KEY (`id`) USING BTREE,
+	INDEX `subitem_guid` (`subitem_guid`) USING BTREE
+)
+*/
+/*
+      // Compose SQL query
+      $sql_address =
+        "INSERT INTO " .
+          "`production`.`item_subitem_properties` " .
+        "SET " .
+	        "`production`.`item_subitem_properties`.`subitem_guid`='" . $subitem_index_guid . "', " .
+	        "`production`.`item_subitem_properties`.`property_guid`='00000000000000000000000000000000', " .
+	        "`production`.`item_subitem_properties`.`property_name`='x_position', " .
+	        "`production`.`item_subitem_properties`.`property_value`='" . $row[ 'x_position' ] . "'";
+
+      // Query database
+      $this->db->query( $sql_address );
+
+      //------------------------------------------------------------------------
+      
+      // Compose SQL query
+      $sql_address =
+        "INSERT INTO " .
+          "`production`.`item_subitem_properties` " .
+        "SET " .
+	        "`production`.`item_subitem_properties`.`subitem_guid`='" . $subitem_index_guid . "', " .
+	        "`production`.`item_subitem_properties`.`property_guid`='00000000000000000000000000000000', " .
+	        "`production`.`item_subitem_properties`.`property_name`='y_position', " .
+	        "`production`.`item_subitem_properties`.`property_value`='" . $row[ 'y_position' ] . "'";
+
+      // Query database
+      $this->db->query( $sql_address );
+
+      //------------------------------------------------------------------------
+
+      // Compose SQL query
+      $sql_address =
+        "INSERT INTO " .
+          "`production`.`item_subitem_properties` " .
+        "SET " .
+	        "`production`.`item_subitem_properties`.`subitem_guid`='" . $subitem_index_guid . "', " .
+	        "`production`.`item_subitem_properties`.`property_guid`='00000000000000000000000000000000', " .
+	        "`production`.`item_subitem_properties`.`property_name`='z_position', " .
+	        "`production`.`item_subitem_properties`.`property_value`='" . $row[ 'z_position' ] . "'";
+
+      // Query database
+      $this->db->query( $sql_address );
+
+      //------------------------------------------------------------------------
+
+      // Compose SQL query
+      $sql_address =
+        "INSERT INTO " .
+          "`production`.`item_subitem_properties` " .
+        "SET " .
+	        "`production`.`item_subitem_properties`.`subitem_guid`='" . $subitem_index_guid . "', " .
+	        "`production`.`item_subitem_properties`.`property_guid`='00000000000000000000000000000000', " .
+	        "`production`.`item_subitem_properties`.`property_name`='z_rotation', " .
+	        "`production`.`item_subitem_properties`.`property_value`='" . $row[ 'z_rotation' ] . "'";
+
+      // Query database
+      $this->db->query( $sql_address );
+
+      //------------------------------------------------------------------------
+
+      // Compose SQL query
+      $sql_address =
+        "INSERT INTO " .
+          "`production`.`item_subitem_properties` " .
+        "SET " .
+	        "`production`.`item_subitem_properties`.`subitem_guid`='" . $subitem_index_guid . "', " .
+	        "`production`.`item_subitem_properties`.`property_guid`='00000000000000000000000000000000', " .
+	        "`production`.`item_subitem_properties`.`property_name`='top_side', " .
+	        "`production`.`item_subitem_properties`.`property_value`='" . $row[ 'top_side' ] . "'";
+
+      // Query database
+      $this->db->query( $sql_address );
+
+      //------------------------------------------------------------------------
+*/
+    }
+ 
+    // Return data
+//    return( $result->rows );
+
+  }
+  
+//------------------------------------------------------------------------------
+/*
+  public function Update_GUID()
+  {
+
+    // Compose SQL query
+    $sql =
+      "SELECT " .
+        "`production`.`items`.`id` AS id " .
+      "FROM " .
+        "`production`.`items` WHERE `guid`='{00000000-0000-0000-0000-000000000000}'";
+
+    // Perform SQL query
+    $items = $this->db->query( $sql );
+
+    foreach ( $items->rows as $item )
+    {
+      $this->db->query( "UPDATE `production`.`items` SET `production`.`items`.`guid`='" . UUID_V4_T1() . "' WHERE `production`.`items`.`id`='" . $item[ 'id' ] . "'" );
+    }
+    
+  }
+*/
+
+  //----------------------------------------------------------------------------
+/*
+  public function FixEndpoints()
+  {
+
+    // Compose SQL query
+    $sql =
+      "SELECT " .
+        "`production`.`endpoints`.`name` AS name " .
+      "FROM " .
+        "`production`.`endpoints` WHERE `guid`='00000000000000000000000000000000'";
+
+    // Perform SQL query
+    $items = $this->db->query( $sql );
+
+    foreach ( $items->rows as $item )
+    {
+      $this->db->query( "UPDATE `production`.`endpoints` SET `production`.`endpoints`.`guid`='" . UUID_V4_T1() . "' WHERE `production`.`endpoints`.`name`='" . $item[ 'name' ] . "'" );
+    }
+    
+  }
+*/
+}
+
+//------------------------------------------------------------------------------
+// End of file
+//------------------------------------------------------------------------------
+?>

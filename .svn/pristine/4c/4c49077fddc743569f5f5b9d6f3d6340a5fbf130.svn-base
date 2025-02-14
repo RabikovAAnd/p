@@ -1,0 +1,13 @@
+/*----------------------------------------------------------------------------*/
+/* Workplace tasks subsystem                                                  */
+/*----------------------------------------------------------------------------*/
+
+
+.task-table-c1{
+  grid-template-columns: 6fr 2fr 2fr 2fr 1fr;
+}
+
+.task-table>span:not(:first-child):nth-child(8n){
+  text-align:left;
+  justify-content:left;
+}

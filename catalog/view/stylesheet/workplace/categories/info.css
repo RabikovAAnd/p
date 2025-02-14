@@ -1,0 +1,7 @@
+.subcategories-table {
+  grid-template-columns: 8fr 1fr;
+}
+
+.subcategories-table>span:nth-last-child(-n+2) {
+  border: none;
+}

@@ -1,0 +1,71 @@
+<?php
+class ControllerWorkplaceDocumentsTypes extends Controller
+{
+
+  //----------------------------------------------------------------------------
+  // Index method
+  //----------------------------------------------------------------------------
+
+  public function index()
+  {
+
+    // Load messages
+    $this->messages->Load( $this->data, 'workplace', 'documents_types', 'index', $this->language->Get_Language_Code() );
+
+    // Load data models
+    $this->load->model( 'documents/documents' );
+
+    // Get types information
+    $types = $this->model_documents_documents->Get_Document_Types( );
+
+    // Process types
+    foreach ( $types as $type )
+    {
+
+      $type_data = $this->model_documents_documents->Get_Document_Type_Description( $type[ 'guid' ], $this->language->Get_Language_Code() );
+
+      // Set document type data
+      $this->data[ 'types' ][] = array(
+        'element_href' => 'type' . $type[ 'guid' ],
+        'guid' => $type[ 'guid' ],
+        'status' => $type[ 'status' ],
+        'name' => isset ($type_data[ 'name' ]) ? $type_data[ 'name' ] : $type[ 'name' ],
+        'description' => isset ($type_data[ 'description' ]) ? $type_data[ 'description' ] : '',
+        // 'href' =>  $this->url->link( 'workplace/categories/info', 'guid=' . $subcategory[ 'guid' ], 'SSL' ),
+        'edit_button_href' =>  $this->url->link( 'workplace/documents/edit', 'guid=' . $type[ 'guid' ], 'SSL' ),
+        'active_button_href' =>  $this->url->link( 'workplace/documents/status/change/Change', 'guid=' . $type[ 'guid' ] .'&status=active', 'SSL' ),
+        'inactive_button_href' =>  $this->url->link( 'workplace/documents/status/change/Change', 'guid=' . $type[ 'guid' ] .'&status=inactive', 'SSL' ),
+        'remove_button_href' =>  $this->url->link( 'workplace/documents/status/change/Change', 'guid=' . $type[ 'guid' ] .'&status=deleted', 'SSL' ),
+   
+      );
+
+    }
+
+    // Set links
+    $this->data[ 'add_button_href' ] = $this->url->link( 'workplace/documents/add', '', 'SSL' );
+
+    //------------------------------------------------------------------------
+    // Render page
+    //------------------------------------------------------------------------
+
+    // Set document categories
+    $this->response->setTitle( $this->messages->Get_Message( 'document_title_text' ) );
+    $this->response->setDescription( $this->messages->Get_Message( 'document_description_text' ) );
+    $this->response->setKeywords( '' );
+    $this->response->setRobots( 'index, follow' );
+
+    // Set page configuration
+    $this->children = array(
+      'common/footer',
+      'workplace/menu',
+      'common/header'
+    );
+
+  }
+
+}
+
+//------------------------------------------------------------------------------
+// End of file
+//------------------------------------------------------------------------------
+?>

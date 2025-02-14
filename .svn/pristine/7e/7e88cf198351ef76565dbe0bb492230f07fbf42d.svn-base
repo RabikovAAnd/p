@@ -1,0 +1,63 @@
+<?php
+class ControllerPaymentCod extends Controller 
+{
+	
+	//----------------------------------------------------------------------------
+	
+	public function index() 
+	{
+
+		$this->load->model('checkout/order');
+		
+		$order_info = $this->model_checkout_order->getOrder($this->session->data['checkout']['order_id']);
+
+		unset($this->session->data['checkout']['order_id']);
+
+		if ($order_info) 
+		{
+	
+			// Set prepayment received
+			$this->model_checkout_order->updateStatus($order_info['order_id'],5);
+
+			$this->session->data['order']['order_id'] = $order_info['order_id'];
+			$this->data['action'] = $this->url->link('payment/cod/success');
+
+//			$this->response->Set_HTTP_Output($this->Render( 'payment/cod.tpl' ));
+
+		}
+		else
+		{
+
+			$this->session->data['order']['order_id'] = '';
+
+//			$this->response->Set_HTTP_Output($this->Render( 'payment/cod_error.tpl' ));
+			
+		}
+		
+	}
+	
+	//----------------------------------------------------------------------------
+	
+	public function success()
+	{
+
+		$this->data['text_heading_title'] = $this->language->get('text_success_heading_title');
+
+		$this->data['text_body'] = $this->language->get('text_success');
+		$this->data['text_order_number'] = $this->language->get('text_success_order_number') . $this->session->data['order']['order_id'];
+
+		unset( $this->session->data['order']['order_id'] );
+		
+		$this->children = array(
+			'common/footer',
+			'common/header'	
+		);
+
+//		$this->response->Set_HTTP_Output($this->Render( 'payment/cod_success.tpl' ));
+
+	}
+
+  //----------------------------------------------------------------------------
+  
+}
+?>

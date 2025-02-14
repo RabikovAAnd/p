@@ -1,0 +1,81 @@
+/*----------------------------------------------------------------------------*/
+/* Workplace menu subsystem                                                          */
+/*----------------------------------------------------------------------------*/
+
+.account-area {
+  display: grid;
+  grid-template-columns: 2fr 10fr;
+  gap: var(--global-gap);
+}
+
+.header-list>h1:not(:first-child) {
+  display: none;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  gap: calc(var(--global-gap)*0.8);
+}
+
+.submenu_selected {
+  background: #ebebeb;
+}
+
+.menu__link {
+  display: flex;
+  border: 1px solid var(--global-border-color);
+  border-radius: var(--global-border-radius);
+  font-size: var(--global-text-font-size);
+  font-weight: normal;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+  justify-content: center;
+  text-decoration: none;
+  padding: 12px 24px;
+}
+
+.submenu__link {
+  display: flex;
+  border: 1px solid var(--global-border-color);
+  border-radius: var(--global-border-radius);
+  font-size: calc(var(--global-text-font-size)*1);
+  font-weight: normal;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+  justify-content: center;
+  padding: calc(var(--global-gap)*0.8) calc(var(--global-gap)*0.8);
+
+  background: #ffffff;
+}
+
+.menu__link_selected {
+  color: var(--global-header-footer-text-color);
+  background: var(--global-header-footer-background-color);
+}
+
+@media screen and (max-width: 1600px) {
+  .task-table>span {
+    padding: calc(var(--global-gap)*0.2);
+    white-space: break-spaces;
+    overflow-wrap: anywhere
+  }
+}
+
+@media screen and (max-width: 700px) {
+  .account-area {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .menu__links {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+}

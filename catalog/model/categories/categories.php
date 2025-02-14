@@ -1,0 +1,616 @@
+<?php
+class ModelCategoriesCategories extends Model
+{
+
+  // Database fields size definitions
+  private const category_name_field_size = 127;
+  private const category_description_short_field_size = 127;
+  private const category_description_field_size = 255;
+
+  //----------------------------------------------------------------------------
+  // Return maximum string size of category name database field
+  //----------------------------------------------------------------------------
+
+  public function Get_Category_Name_Maximum_String_Size()
+  {
+
+    // Return maximum string size of category name database field
+    return( self::category_name_field_size );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Return maximum string size of category short description database field
+  //----------------------------------------------------------------------------
+
+  public function Get_Category_Short_Description_Maximum_String_Size()
+  {
+
+    // Return maximum string size of category short description database field
+    return( self::category_description_short_field_size );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Return maximum string size of category description database field
+  //----------------------------------------------------------------------------
+
+  public function Get_Category_Description_Maximum_String_Size()
+  {
+
+    // Return maximum string size of category description database field
+    return( self::category_description_field_size );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Create new category
+  //----------------------------------------------------------------------------
+
+  public function Create_Category( $guid = '', $data = [] )
+  {
+
+    // Compose SQL query
+    $sql =
+      "INSERT INTO " .
+        "`category` " .
+      "SET " .
+        "`category`.`guid`='" . $this->db->escape( $guid ) . "', " .
+        "`category`.`parent_guid`='" . $this->db->escape( $data[ 'parent_guid'] ) . "', " .
+        "`category`.`name`='" . $this->db->escape( $data[ 'name_en' ] ) . "', " .
+        "`category`.`status`= '" . $this->db->escape( $data[ 'status' ] ) . "', " .
+        "`category`.`date_added`= NOW() ";
+
+    // Perform SQL query
+    $this->db->query( $sql );
+
+    // Get list of active languages
+    $languages = $this->language->Get_Languages();
+
+    // Iterate over all languages
+    foreach( $languages as $language )
+    {
+
+      if( isset( $data[ 'name_' . $language[ 'code' ] ] ) === true )
+      {
+
+        // Compose SQL query
+        $sql =
+        "INSERT INTO " .
+          "`category_description` " .
+        "SET " .
+          "`category_description`.`category_guid`='" . $this->db->escape( $guid ) . "', " .
+          "`category_description`.`language_code`='". $this->db->escape( $language[ 'guid' ] ) . "', " .
+          "`category_description`.`name`='" . $this->db->escape( $data[ 'name_' . $language[ 'code' ] ] ) . "'";
+
+        // Query database
+        $this->db->query( $sql );
+
+      }
+
+    }
+
+    // Return success/error code
+    return( true );
+
+  }
+
+ //----------------------------------------------------------------------------
+  // Get category information
+  //----------------------------------------------------------------------------
+
+  public function Get_Category_Information( $category_guid = '', $language_code = 'XX' )
+  {
+
+    // Compose SQL query
+    $sql =
+      "SELECT " .
+        "`category`.`guid` AS guid, " .
+        "`category`.`status` AS status, " .
+        "`category`.`parent_guid` AS parent_guid, " .
+        "`category`.`date_added` AS date_added, " .
+        "`category_description`.`name` AS name, " .
+        "`category_description`.`description_short` AS description_short, " .
+        "`category_description`.`description` AS description " .
+      "FROM " .
+        "`category` " .
+      "LEFT JOIN " .
+        "`category_description` " .
+      "ON " .
+        "`category`.`guid`=`category_description`.`category_guid` " .
+      "WHERE " .
+        "`category_description`.`language_code`='" . $this->db->escape( $language_code ). "' AND " .
+        "`category`.`guid`='" . $this->db->escape( $category_guid ) . "' ";
+
+    // Perform SQL query
+   $query = $this->db->query( $sql );
+
+    // Test record count
+    if ( $query->num_rows != 1 )
+    {
+
+      // Set default data
+      $return_data[ 'valid' ] = false;
+      $return_data[ 'guid' ] = '';
+      $return_data[ 'parent_guid' ] =  '';
+      $return_data[ 'date_added' ] =  '0000-00-00 00:00:00';
+      $return_data[ 'status' ] = 'inactive';
+      $return_data[ 'name' ] =  '';
+      $return_data[ 'description' ] = '';
+
+    }
+    else
+    {
+
+      // Set properties description
+      $return_data[ 'valid' ] = true;
+      $return_data[ 'guid' ] = $query->row[ 'guid' ];
+      $return_data[ 'date_added' ] = $query->row[ 'date_added' ];
+      $return_data[ 'parent_guid' ] = $query->row[ 'parent_guid' ];
+      $return_data[ 'status' ] = $query->row[ 'status' ];
+      $return_data[ 'name' ] = $query->row[ 'name' ];
+      $return_data[ 'description_short' ] = $query->row[ 'description_short' ];
+      $return_data[ 'description' ] = $query->row[ 'description' ];
+
+    }
+
+    // Return properties description
+    return( $return_data );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Get teaser catagories
+  //----------------------------------------------------------------------------
+
+  public function Get_Teaser_Categories( $category_guid = '' )
+  {
+
+    // Compose SQL query
+    $sql =
+      "SELECT " .
+        "`category`.`guid` AS guid " .
+      "FROM " .
+        "`category` " .
+      "WHERE " .
+//        "`category`.`parent_category_guid`='" . $category_guid . "' AND " .
+        "`category`.`status`='active' AND " .
+        "`category`.`teaser`=1";
+
+    // Execute query
+    $query = $this->db->query( $sql );
+
+    // Return data
+    return( $query->rows );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Get category referenced by category id
+  //----------------------------------------------------------------------------
+
+  public function Get_Category( $category_guid = '', $language_code = 'XX' )
+  {
+
+    // Compose SQL query
+    $sql =
+      "SELECT DISTINCT " .
+        "`category`.`guid` AS guid, " .
+        "`category`.`image_type`, " .
+        "`category`.`image_data`, " .
+        "`category_description`.`name` AS name, " .
+        "`category_description`.`description_short` AS description_short, " .
+        "`category_description`.`description` AS description " .
+      "FROM " .
+        "`category` " .
+      "LEFT JOIN " .
+        "`category_description` ".
+      "ON " .
+        "`category`.`guid`=`category_description`.`category_guid` " .
+      "WHERE " .
+        "`category`.`guid`='" . $this->db->escape( $category_guid ) . "' AND " .
+        "`category_description`.`language_code`='" . $this->db->escape( $language_code ). "' " .
+        // "`category`.`status`='active' " .
+      "LIMIT 1";
+
+    // Execute quiery
+    $query = $this->db->query( $sql );
+
+    // Test for no query result
+    if ( !isset( $query->row ) )
+    {
+
+      //------------------------------------------------------------------------
+      // ERROR: SQL query processing failed
+      //------------------------------------------------------------------------
+
+      // Set default values
+      $result = array(
+        'guid' => '',
+        'image_type' => '',
+        'image_data' => '',
+        'name' => '',
+        'description_short' => '',
+        'description' => ''
+      );
+
+    }
+    else
+    {
+
+      //------------------------------------------------------------------------
+      // SQL query processed
+      //------------------------------------------------------------------------
+
+      // Assugn query result
+      $result = array(
+        'guid' => $query->row[ 0 ],
+        'image_type' => $query->row[ 1 ],
+        'image_data' => $query->row[ 2 ] !== null ? $query->row[ 2 ] : '',
+        'name' => $query->row[ 3 ],
+        'description_short' => $query->row[ 4 ],
+        'description' => $query->row[ 5 ]
+      );
+
+    }
+
+    // Return data
+    return( $result );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Get count of active subcategories
+  //----------------------------------------------------------------------------
+
+  public function Get_Subcategories_Count( $category_guid = '' ) : int
+  {
+
+    // Compose SQL query
+    $sql =
+      "SELECT " .
+        "COUNT(*) " .
+      "FROM " .
+        "`category` " .
+      "WHERE " .
+        "`category`.`parent_guid`='" . $category_guid . "' AND " .
+        "`category`.`status`='active'";
+
+    // Execute query
+    $query = $this->db->query( $sql );
+
+    // Test for no query result
+    if ( !isset( $query->row ) )
+    {
+
+      //------------------------------------------------------------------------
+      // ERROR: SQL query processing failed
+      //------------------------------------------------------------------------
+
+      // Set count of subcategories to 0
+      $count = 0;
+
+    }
+    else
+    {
+
+      //------------------------------------------------------------------------
+      // SQL query processed
+      //------------------------------------------------------------------------
+
+      // Get count of the subcategories
+      $count = $query->row[ 0 ];
+
+    }
+
+    // Return data
+    return( $count );
+
+  }
+
+    //----------------------------------------------------------------------------
+  // Get Category subcategories
+  //----------------------------------------------------------------------------
+
+  public function Get_Subcategories( $category_guid = '', $language_code = 'XX' )
+  {
+
+    // Compose SQL query
+    $sql =
+      "SELECT " .
+        " * " .
+      "FROM " .
+        "`category` " .
+      "LEFT JOIN " .
+        "`category_description` " .
+      "ON " .
+        "`category`.`guid`=`category_description`.`category_guid` " .
+      "WHERE " .
+        "`category_description`.`language_code`='" . $this->db->escape( $language_code ). "' AND " .
+        "`category`.`parent_guid`='" . $this->db->escape( $category_guid ). "' ";
+
+    // Perform SQL query
+    $query = $this->db->query( $sql );
+
+    // Return properties description
+    return( $query->rows );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Get Categories
+  //----------------------------------------------------------------------------
+
+  public function Get_Categories( $language_code = 'XX' )
+  {
+
+    // Compose SQL query
+    $sql =
+      "SELECT " .
+        " * " .
+      "FROM " .
+        "`category` " .
+      "LEFT JOIN " .
+        "`category_description` " .
+      "ON " .
+        "`category`.`guid`=`category_description`.`category_guid` " .
+      "WHERE " .
+        "`category_description`.`language_code`='" . $this->db->escape( $language_code ). "' ";
+
+    // Perform SQL query
+    $query = $this->db->query( $sql );
+
+    // Return properties description
+    return( $query->rows );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Get list of categories
+  //----------------------------------------------------------------------------
+
+  public function Get_List_Of_Categories(
+    $page_length = 30,
+    $page_number = 1,
+    $search = '',
+    $language_code = 'XX'
+  )
+  {
+
+    //--------------------------------------------------------------------------
+    // Compose SQL query
+    //--------------------------------------------------------------------------
+
+    $sql =
+      "SELECT " .
+        "category.guid AS guid, " .
+        "category.status AS status, " .
+        "category_description.name AS name " .
+      "FROM " .
+        "category " .
+      "LEFT JOIN " .
+        "category_description " .
+      "ON " .
+        "category.guid=category_description.category_guid " .
+      "WHERE " .
+        "category_description.name  LIKE '%" . $this->db->escape( $search ) . "%' AND " .
+        "category_description.language_code='" . $this->db->escape( $language_code ) . "' " .
+      "LIMIT " . $this->db->escape( $page_length ) . " " .
+      "OFFSET " . $this->db->escape( $page_length * ( $page_number - 1 ) ) . ";";
+
+    // Query database
+    $results = $this->db->query( $sql );
+
+    // Return data
+    return( $results->rows );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Get Category description
+  //----------------------------------------------------------------------------
+
+  public function Get_Category_Description( $category_guid = '' )
+  {
+
+    // Compose SQL query
+    $sql =
+      "SELECT " .
+        "`category_description`.`name` AS name, " .
+        "`category_description`.`description` AS description, " .
+        "`category_description`.`description_short` AS description_short, " .
+        "`category_description`.`language_code` AS language_code " .
+      "FROM " .
+        "`category_description` " .
+      "WHERE " .
+        "`category_description`.`category_guid`='" . $this->db->escape( $category_guid ) . "'";
+
+    // Perform SQL query
+    $query = $this->db->query( $sql );
+
+    // Return group
+    return( $query->rows );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Edit Category information
+  //----------------------------------------------------------------------------
+
+  public function Edit_Category( $data = [] )
+  {
+
+    // Compose SQL query
+    $sql =
+      "UPDATE " .
+        "`category` " .
+      "SET " .
+        "`category`.`name`='" . $this->db->escape( $data[ 'name_en' ] ) . "', " .
+        "`category`.`status`='" . $this->db->escape( $data[ 'status' ] ) . "' " .
+      "WHERE " .
+        "`category`.`guid`='" . $this->db->escape( $data[ 'guid' ] ) . "'";
+
+    // Perform SQL query
+    $this->db->query( $sql );
+
+//    $this->log->Log_Debug( 'sql' .  $sql);
+
+    // Get list of languages
+    $languages = $this->language->Get_Languages();
+
+    foreach( $languages as $language )
+    {
+
+      if( isset( $data[ 'name_' . $language[ 'code' ] ] ) === true )
+      {
+
+        // Compose SQL query
+        $sql =
+        "UPDATE " .
+          "`category_description` " .
+        "SET " .
+          "`category_description`.`name`='" . $this->db->escape( $data['name_' . $language[ 'code' ] ] ) . "' " .
+        "WHERE " .
+          "`category_description`.`language_code`='". $this->db->escape( $language[ 'guid' ] ) . "'" . " AND " .
+          "`category_description`.`category_guid`='" . $this->db->escape( $data[ 'guid' ] ) . "' ";
+
+//        $this->log->Log_Debug( 'sql' .  $sql);
+
+        // Query database
+        $this->db->query( $sql );
+
+      }
+
+    }
+
+    // Return group
+    return( true );
+
+  }
+  
+  // //----------------------------------------------------------------------------
+  // // Get Categories To Move
+  // //----------------------------------------------------------------------------
+
+  // public function Get_Categories_To_Move($category_guid='00000000000000000000000000000000', $language_code = 'XX' )
+  // {
+
+  //   // Compose SQL query
+  //   $sql =
+  //     "SELECT " .
+  //       " * " .
+  //     "FROM " .
+  //       "`category` " .
+  //     "LEFT JOIN " .
+  //       "`category_description` " .
+  //     "ON " .
+  //       "`category`.`guid`=`category_description`.`category_guid` " .
+  //     "WHERE " .
+  //       "`category_description`.`language_code`='" . $this->db->escape( $language_code ). "' AND " .
+  //       "`category_description`.`category_guid`='" . $this->db->escape( $category_guid ). "' AND " .
+  //       "`category`.`parent_guid`!='" . $this->db->escape( $category_guid ) . "' " ;
+
+  //   // Perform SQL query
+  //   $query = $this->db->query( $sql );
+
+  //   // Return properties description
+  //   return( $query->rows );
+
+  // }
+  //----------------------------------------------------------------------------
+  // Move Category 
+  //----------------------------------------------------------------------------
+
+  public function Move_Category( $data = [] )
+  {
+
+    // Compose SQL query
+    $sql =
+      "UPDATE " .
+        "`category` " .
+      "SET " .
+        "`category`.`parent_guid`='" . $this->db->escape( $data[ 'parent_guid' ] ) . "' " .
+      "WHERE " .
+        "`category`.`guid`='" . $this->db->escape( $data[ 'guid' ] ) . "'";
+
+    // Perform SQL query
+    $this->db->query( $sql );
+
+    // Return group
+    return( true );
+
+  }
+
+ //----------------------------------------------------------------------------
+  // Change Category Status
+  //----------------------------------------------------------------------------
+
+  public function Change_Category_Status( $category_guid='00000000000000000000000000000000', $status='inactive' )
+  {
+
+    // Compose SQL query
+    $sql =
+      "UPDATE " .
+        "`category` " .
+      "SET " .
+        "`category`.`status`='" . $this->db->escape( $status ) . "' " .
+      "WHERE " .
+        "`category`.`guid`='" . $this->db->escape( $category_guid ) . "'";
+
+    // Perform SQL query
+    $this->db->query( $sql );
+
+    // Return group
+    return( true );
+
+  }
+
+
+  //----------------------------------------------------------------------------
+/*
+  public function getCategoryFilters($category_id)
+  {
+    $implode = array();
+
+    $query = $this->db->query( "SELECT filter_id FROM category_filter WHERE category_id = '" . (int)$category_id . "'" );
+
+    foreach ($query->rows as $result) {
+      $implode[] = (int)$result['filter_id'];
+    }
+
+
+    $filter_group_data = array();
+
+    if ($implode) {
+      $filter_group_query = $this->db->query("SELECT DISTINCT f.filter_group_id, fgd.name, fg.sort_order FROM filter f LEFT JOIN filter_group fg ON (f.filter_group_id = fg.filter_group_id) LEFT JOIN filter_group_description fgd ON (fg.filter_group_id = fgd.filter_group_id) WHERE f.filter_id IN (" . implode(',', $implode) . ") AND fgd.language_id = '0' GROUP BY f.filter_group_id ORDER BY fg.sort_order, LCASE(fgd.name)");
+
+      foreach ($filter_group_query->rows as $filter_group) {
+        $filter_data = array();
+
+        $filter_query = $this->db->query("SELECT DISTINCT f.filter_id, fd.name FROM filter f LEFT JOIN filter_description fd ON (f.filter_id = fd.filter_id) WHERE f.filter_id IN (" . implode(',', $implode) . ") AND f.filter_group_id = '" . (int)$filter_group['filter_group_id'] . "' AND fd.language_id = '0' ORDER BY f.sort_order, LCASE(fd.name)");
+
+        foreach ($filter_query->rows as $filter) {
+          $filter_data[] = array(
+            'filter_id' => $filter['filter_id'],
+            'name'      => $filter['name']
+          );
+        }
+
+        if ($filter_data) {
+          $filter_group_data[] = array(
+            'filter_group_id' => $filter_group['filter_group_id'],
+            'name'            => $filter_group['name'],
+            'filter'          => $filter_data
+          );
+        }
+      }
+    }
+
+    return $filter_group_data;
+  }
+*/
+}
+//------------------------------------------------------------------------------
+// End of file
+//------------------------------------------------------------------------------
+?>

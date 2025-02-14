@@ -1,0 +1,61 @@
+/*----------------------------------------------------------------------------*/
+/* Account subsystem                                                          */
+/*----------------------------------------------------------------------------*/
+
+.account-area{
+    display: grid;
+    grid-template-columns: 2fr 10fr;
+    gap: var(--global-gap);
+}
+
+.header-list>h1:not(:first-child){
+    display: none;
+}
+
+.menu__link
+{
+    display: inline-block;
+    border: 1px solid var(--global-border-color);
+    border-radius: var(--global-border-radius);
+    padding: 12px 24px;
+    font-size: var(--global-text-font-size);
+    font-weight: normal;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.menu__link_selected
+{
+    display: inline-block;
+    border: 1px solid var(--global-header-footer-background-color);
+    border-radius: var(--global-border-radius);
+    padding: 12px 24px;
+    background: var(--global-header-footer-background-color);
+    font-size:  var(--global-text-font-size);
+    font-weight: normal;
+    color: var(--global-header-footer-text-color);
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.newsletter{
+    height: 100%;
+    justify-content: space-between;
+}
+.newsletter>button{
+    align-self: end;
+    justify-self: end;
+}
+@media screen and (max-width: 700px) {
+    .account-area{
+        display: flex;
+        flex-direction: column;
+    }
+    .menu__links{
+        display: grid;
+        grid-template-columns: repeat( auto-fit, minmax(140px, 1fr) );
+    }
+}

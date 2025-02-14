@@ -1,0 +1,22 @@
+/*----------------------------------------------------------------------------*/
+/* Workplace Import system                                                   */
+/*----------------------------------------------------------------------------*/
+
+.units-table{
+    grid-template-columns: 0.4fr 0.4fr 0.5fr 1fr 1fr;
+}
+
+.units-table>span:nth-last-child(-n+5){
+    border: none;
+}
+#import-menu{
+    display: flex;
+    width: 100%;
+    align-items: center;
+}
+#file{
+    width: 100%;
+}
+.not-valid{
+    background-color: red;
+}

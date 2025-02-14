@@ -1,0 +1,64 @@
+/*----------------------------------------------------------------------------*/
+/* Workplace items subsystem                                                  */
+/*----------------------------------------------------------------------------*/
+
+
+#pages{
+    display: flex;
+    flex-direction: row;
+    gap: var(--global-gap);
+    justify-content: center;
+}
+
+#search_field{
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--global-text-font-size)*0.3);
+    align-items: left;
+    width: 100%;
+}
+
+#search{
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.main-area{
+    display: flex;
+    flex-direction: column;
+    gap: var(--global-gap);
+}
+
+.page__link
+{
+    display: inline-block;
+    border: 1px solid var(--global-border-color);
+    border-radius: var(--global-border-radius);
+    padding: 12px 24px;
+    font-size: var(--global-text-font-size);
+    font-weight: normal;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.page__link_selected
+{
+    display: inline-block;
+    border: 1px solid var(--global-header-footer-background-color);
+    border-radius: var(--global-border-radius);
+    padding: 12px 24px;
+    background: var(--global-header-footer-background-color);
+    font-size:  var(--global-text-font-size);
+    font-weight: normal;
+    color: var(--global-header-footer-text-color);
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.items-table {
+  grid-template-columns: 1fr 7fr 7fr 1fr;
+}

@@ -1,0 +1,14 @@
+/*----------------------------------------------------------------------------*/
+/* Languages subsystem                                                        */
+/*----------------------------------------------------------------------------*/
+
+.languages-list {
+    display: grid;
+    grid-template-columns: repeat( auto-fit, minmax(100px, 1fr) );
+    gap: var(--global-gap);
+    justify-content: space-between;
+}
+
+.button{
+    width: 100%;
+}

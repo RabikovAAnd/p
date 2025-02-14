@@ -1,0 +1,220 @@
+
+$(document).ready(function () {
+  $("a").on("mousedown", function () {
+    if (event.button == 0) {
+      window.location = this.href
+    }
+
+  });
+
+  $('.table-menu-element').on("click", function () {
+    if (!$(event.target).hasClass("table-button-menu")) {
+      if ($(event.target).prop("tagName") != 'A' && $(event.target).prop("tagName") != 'BUTTON') {
+        if ($(this).children('.table-button-menu').is(":visible")) {
+          $(this).children('.table-button-menu').hide();
+        } else {
+          $(this).children('.table-button-menu').show();
+        }
+      }
+    }
+  });
+});
+
+
+function File_Form(url, extraData = []) {
+
+  event.preventDefault();
+  if (event.button == 0) {
+    let sendData = $('.input-send');
+    // prepare data
+    var data = new FormData();
+
+    for (let i = 0; i < sendData.length; i++) {
+      console.log('sendData' + $(sendData[i]).val())
+      if ($(sendData[i]).attr('type') === 'checkbox') {
+        data.append($(sendData[i]).attr('id'), $(sendData[i]).is(':checked'))
+      } else if ($(sendData[i]).attr('type') === 'datetime-local') {
+        if ($(sendData[i]).val()) {
+          let datetime = new Date($(sendData[i]).val())
+          data.append($(sendData[i]).attr('id'), encodeURIComponent(datetime.toISOString()));
+        } else {
+          data.append($(sendData[i]).attr('id'), "");
+        }
+      } else if ($(sendData[i]).attr('type') === 'file') {
+        data.append($(sendData[i]).attr('id'), $(sendData[i])[0].files[0]);
+      }
+      else {
+        data.append($(sendData[i]).attr('id'), encodeURIComponent($(sendData[i]).val()))
+      }
+      console.log('sendData' + $(sendData[i]).val())
+    }
+    if (extraData.length > 0) {
+      for (let i = 0; i < extraData.length; i++) {
+        data.append(extraData[i][0], encodeURIComponent(extraData[i][1]));
+      }
+    }
+
+    for (var p of data.entries()) {
+      let name = p[0];
+      let value = p[1];
+
+      console.log(name, value)
+    }
+
+    Send_File_Data(data, url);
+  }
+}
+
+
+function Send_File_Data(data, url) {
+
+  console.log(data);
+  let button = event.target;
+  $.ajax({
+    type: 'POST',
+    url: url,
+    data: data,
+    processData: false,
+    dataType: 'json',
+    contentType: false,
+    enctype: 'multipart/form-data',
+
+    beforeSend: function () {
+      $('input').removeClass('input-error');
+      $('textarea').removeClass('input-error');
+      $('select').removeClass('input-error');
+      $('.error-alert').empty();
+    },
+    success: function (json) {
+      if (json['redirect_url']) {
+        if (json['redirect_url'] !== '') {
+          window.location.replace(json['redirect_url']);
+        }
+      }
+      console.log(json['return_code'])
+      console.log('error ', json['error'])
+      if (json['return_code']) {
+        if (json['animation']) {
+          Button_Animation(button, json['animation']);
+        }
+        if (json['delete']) {
+          console.log(json['delete'])
+          $('#' + json['delete']).remove()
+        }
+      } else {
+        if (json['error']) {
+          console.log('error ', json['error'].length)
+          if (json['error'].length !== 0) {
+            let errors = Object.entries(json['error']);
+            console.log(json['error'])
+            for (let i = 0; i < errors.length; i++) {
+              console.log(errors[i][0].length)
+              $('[id=' + errors[i][0] + ']').addClass('input-error');
+
+              $('.error-alert').append('<a href=' + window.location.href.split("#")[0] + '#' + errors[i][0] + '>' + errors[i][1] + '<a><br/>')
+            }
+          }
+        }
+
+      }
+
+    },
+    error: function (jqXHR, exception, json) {
+      
+      console.log(json['delete'])
+      $('.error-alert').append('Server error: ' + jqXHR['status']);
+      console.log('XHR: ' + JSON.stringify(jqXHR));
+      console.log('exception: ' + exception);
+    }
+
+  });
+}
+
+
+function Set_Quantity() {
+  let button = event.target
+  let item = $(button).closest(".item");
+  let id = item.attr('id')
+  let item_quantity = item.find('.item__item-quantity');
+  let itemFeatures = item.find('.item__features');
+  let item_unit_price = item.find('.item__unit_price');
+  let item__price = item.find('.item__price');
+  let item__net = item.find('.item__net');
+  let item__vat = item.find('.item__vat');
+  let item__total = item.find('.item__total');
+  let quantity = Number($(item_quantity).val());
+
+  // Bug: Please fix
+  let cart = $('.cart__features');
+  let cart__net = cart.find('.cart__net');
+  let cart__vat = cart.find('.cart__vat');
+  let cart__total = cart.find('.cart__total');
+
+  if (button.dataset.action === "minus") {
+    console.log('dec: ' + quantity)
+    quantity = quantity - 1;
+  }
+
+  if (button.dataset.action === "plus") {
+    console.log('inc: ' + quantity)
+    quantity = quantity + 1;
+  }
+
+  if (button.dataset.action === "input") {
+    console.log('set: ' + quantity)
+  }
+
+  console.log('guid=' + id)
+  console.log('quantity=' + quantity)
+
+  $.ajax({
+    url: 'index.php?route=cart/show/set_item_quantity',
+    type: 'post',
+    data: 'quantity=' + quantity
+      + '&guid=' + id,
+    dataType: 'json',
+
+    success: function (json) {
+      console.log('return_code: ' + json['return_code']);
+      console.log('JSON: ' + JSON.stringify(json));
+      if (json['return_code']) {
+        item_unit_price.text(json['line']['price']);
+        $(item_quantity).val(json['line']['quantity'])
+        item__price.text(json['line']['price']);
+        item__net.text(json['line']['net']);
+        item__vat.text(json['line']['vat']);
+        item__total.text(json['line']['total']);
+        cart__net.text(json['cart']['net']);
+        cart__vat.text(json['cart']['vat']);
+        cart__total.text(json['cart']['total']);
+        $('#cart-icon-count').text(json['line_quantity']);
+        console.log('line_quantity=' + json['line_quantity'])
+      }
+
+    },
+    error: function (jqXHR, exception, json) {
+      console.log('XHR: ' + JSON.stringify(jqXHR));
+      console.log('exception: ' + exception);
+    }
+
+  });
+
+
+}
+
+function Button_Animation(button, animation_text) {
+  let button_width = $(button).css("width")
+  $(button).animate({ backgroundColor: '#FF6725' }, 200, function () {
+
+    $(this).text(animation_text[1]);
+    $(this).css("width", button_width);
+  })
+    .animate({ backgroundColor: '#FF6725' }, 300)
+    .animate({ backgroundColor: '#0000FF' }, 300, function () {
+      $(this).text(animation_text[0]);
+    })
+}
+
+//------------------------------------------------------------------------------
+// End Of File
+//------------------------------------------------------------------------------

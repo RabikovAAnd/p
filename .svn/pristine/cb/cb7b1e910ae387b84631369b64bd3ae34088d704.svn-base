@@ -1,0 +1,250 @@
+<?php
+// ANVILEX : ToDo
+// 1. Split insert new address and edit existing adress. See function getForm. Form name and button name must be differ.
+class ControllerAccountAddressForm extends Controller
+{
+
+  private $error = array();
+
+  //----------------------------------------------------------------------------
+
+  public function index()
+  {
+
+    // Test for fustomer not logged in
+    if ($this->customer->Is_Logged() === false) 
+    {
+
+      //------------------------------------------------------------------------
+      // Customer not logged in
+      //------------------------------------------------------------------------
+
+//      $this->session->data['redirect'] = $this->url->link('account/address', '', 'SSL');
+
+      $this->response->Redirect($this->url->link('account/login', '', 'SSL'));
+
+    } 
+    else 
+    {
+
+      //------------------------------------------------------------------------
+      // Customer logged in
+      //------------------------------------------------------------------------
+
+      // Load messages
+      $this->messages->Load($this->data, 'account', 'address_form', 'index', $this->language->Get_Language_Code());
+      
+      $this->data['address_href'] = $this->url->link( 'account/address', '', 'SSL' );
+
+      $this->data['countries'] = $this->location->Get_Countries( $this->language->Get_Language_Code() );
+      $this->data['zones'] = $this->location->Get_Zones( $this->language->Get_Language_Code() );
+
+      $this->data['account_address_form_save_button_href'] = $this->url->link( 'account/address_form/add', '', 'SSL' );
+
+      //------------------------------------------------------------------------
+      // Set page data
+      //------------------------------------------------------------------------
+
+      // Set document properties
+      $this->response->setTitle($this->messages->Get_Message('document_title_text'));
+      $this->response->setDescription($this->messages->Get_Message('document_description_text'));
+      $this->response->setKeywords('');
+      $this->response->setRobots('index, follow');
+
+      // Add styles
+      $this->response->addStyle('catalog/view/stylesheet/account/account.css');
+      $this->response->addStyle('catalog/view/stylesheet/account/address.css');
+
+      // Set page configuration
+      $this->children = array(
+        'common/footer',
+        'account/menu',
+        'common/header'
+      );
+
+      // Render page
+      $this->response->Set_HTTP_Output($this->Render( 'account/address_form.tpl' ) );
+
+    }
+
+  }
+
+  //----------------------------------------------------------------------------
+
+  protected function parametersExists(): bool
+  {
+
+    return (
+      $this->request->Is_POST_Parameter_Exists('country_id') &&
+      $this->request->Is_POST_Parameter_Exists('zone_id') &&
+      $this->request->Is_POST_Parameter_Exists('postcode') &&
+      $this->request->Is_POST_Parameter_Exists('city') &&
+      $this->request->Is_POST_Parameter_Exists('street') &&
+      $this->request->Is_POST_Parameter_Exists('house') &&
+      $this->request->Is_POST_Parameter_Exists('building') &&
+      $this->request->Is_POST_Parameter_Exists('apartment')
+    );
+
+  }
+
+  //----------------------------------------------------------------------------
+
+  protected function dataVerification()
+  {
+    // Load messages
+    $this->messages->Load($this->data, 'account', 'address_form', 'dataVerification', $this->language->Get_Language_Code());
+
+//
+//        if (($this->request->Get_POST_Parameter_As_String('customer_id') == '')
+//            || ( !is_numeric($this->request->Get_POST_Parameter_As_String('customer_id')))) {
+//            $this->error['customer_id'] = $this->data['account_address_form_' . 'customer_id_error'];
+//        }
+    if (($this->request->Get_POST_Parameter_As_String('country_id') == '0')
+      || (!is_numeric($this->request->Get_POST_Parameter_As_String('country_id')))) {
+      $this->error['country_id'] = $this->data['account_address_form_' . 'country_id_error'];
+    }
+
+    if (($this->request->Get_POST_Parameter_As_String('zone_id') == '0')
+      || (!is_numeric($this->request->Get_POST_Parameter_As_String('zone_id')))) {
+      $this->error['zone_id'] = $this->data['account_address_form_' . 'zone_id_error'];
+    }
+    if ($this->request->Get_POST_Parameter_As_String('postcode') == '') {
+      $this->error['postcode'] = $this->data['account_address_form_' . 'postcode_error'];
+    }
+    if ($this->request->Get_POST_Parameter_As_String('city') == '') {
+      $this->error['city'] = $this->data['account_address_form_' . 'city_error'];
+    }
+    if ($this->request->Get_POST_Parameter_As_String('street') == '') {
+      $this->error['street'] = $this->data['account_address_form_' . 'street_error'];
+    }
+    if ($this->request->Get_POST_Parameter_As_String('house') == '') {
+      $this->error['house'] = $this->data['account_address_form_' . 'house_error'];
+    }
+
+    return $this->error;
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Add new address
+  //----------------------------------------------------------------------------
+
+  public function add()
+  {
+
+    // Init json data
+    $json = array();
+
+    // Test for fustomer logged in
+    if ($this->customer->Is_Logged() === false) {
+
+      //------------------------------------------------------------------------
+      // Customer not logged in
+      //------------------------------------------------------------------------
+
+      // ???
+//      $this->session->data['redirect'] = $this->url->link('account/address', '', 'SSL');
+
+      // Set redirect link
+      $json['redirect_url'] = $this->url->link('account/login', '', 'SSL');
+
+      // Set error code
+      $json['return_code'] = false;
+
+    } else {
+
+      //------------------------------------------------------------------------
+      // Customer logged in
+      //------------------------------------------------------------------------
+      $json['return_code'] = false;
+      if ($this->parametersExists()) {
+
+        if (count($this->dataVerification()) === 0) {
+
+//              $data = $this->data['address'];
+
+          $data['country_id'] = $this->request->post['country_id'];
+          $data['zone_id'] = $this->request->post['zone_id'];
+          $data['postcode'] = $this->request->post['postcode'];
+          $data['city'] = $this->request->post['city'];
+          $data['street'] = $this->request->post['street'];
+          $data['house'] = $this->request->post['house'];
+          $data['building'] = $this->request->post['building'];
+          $data['apartment'] = $this->request->post['apartment'];
+
+          $this->load->model('account/address');
+
+          $json['return_code'] = $this->model_account_address->Add($this->customer->Get_GUID(), $data);
+          $json['redirect_url'] = $this->url->link( 'account/address', '', 'SSL' );
+        } else {
+          $json['error'] = $this->dataVerification();
+        }
+
+      }
+    }
+
+    // Send json data
+    $this->response->Set_Json_Output($json);
+
+  }
+
+  //----------------------------------------------------------------------------
+
+  public function country()
+  {
+
+    $json = array();
+
+
+    $country_info = $this->location->Get_Country_Info($this->request->get['country_id']);
+
+    if ($country_info) {
+
+      $json = array(
+        'country_id' => $country_info['country_id'],
+        'name' => $country_info['name'],
+        'iso_code_2' => $country_info['iso_code_2'],
+        'iso_code_3' => $country_info['iso_code_3'],
+        'address_format' => $country_info['address_format'],
+        'postcode_required' => $country_info['postcode_required'],
+        'zone' => $this->location->Get_Country_Zones($this->request->get['country_id']),
+        'status' => $country_info['status']
+      );
+    }
+
+    $this->response->Set_Json_Output($json);
+  }
+
+  //----------------------------------------------------------------------------
+
+  public function set_zones()
+  {
+
+    $json = array();
+
+    $json['zone'] = $this->location->Get_Zones();
+
+    $this->response->Set_Json_Output($json);
+
+  }
+
+  //----------------------------------------------------------------------------
+
+  public function set_country_by_zone()
+  {
+    $json = array();
+
+    $zone_info = $this->location->Get_Country_Zone_Info($this->request->get['zone_id']);
+
+    $json['country_id'] = $zone_info['country_id'];
+
+    $this->response->Set_Json_Output($json);
+
+  }
+
+}
+
+//------------------------------------------------------------------------------
+// End of file
+//------------------------------------------------------------------------------
+?>

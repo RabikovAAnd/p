@@ -1,0 +1,136 @@
+<?php
+
+class ControllerNewsInfo extends Controller
+{
+
+  //----------------------------------------------------------------------------
+
+  public function index()
+  {
+
+    // Test for parameter setted
+    if ( $this->request->Is_GET_Parameter_Exists( 'news_id' ) == false )
+    {
+
+      //------------------------------------------------------------------------
+      // ERROR: News item not found
+      //------------------------------------------------------------------------
+
+      // Redirect to product not found page
+//      $this->response->Redirect( $this->url->link( 'language/language', '', '' ) );
+
+//      $this->data['heading_title'] = $this->language->get('text_error');
+
+//      $this->data['text_error'] = $this->language->get('text_error');
+
+      //------------------------------------------------------------------------
+      // Render page
+      //------------------------------------------------------------------------
+
+//      $this->response->setTitle( $this->language->get('text_error') );
+
+      // Add styles
+
+      // Configure page
+      $this->children = array(
+        'common/footer',
+        'common/header'
+      );
+
+      // Add error header
+      $this->response->Add_Header( $this->request->server[ 'SERVER_PROTOCOL' ] . '/1.1 404 Not Found' );
+
+      // Render page
+      $this->response->Set_HTTP_Output( $this->Render( 'error/not_found.tpl' ) );
+
+    } 
+    else 
+    {
+
+      //------------------------------------------------------------------------
+      // Parameter exists
+      //------------------------------------------------------------------------
+
+      // Extract news id parameter
+      $news_id = (int)$this->request->Get_GET_Parameter_As_String( 'news_id' );
+
+      // ANVILEX KM: Test news_id format. Must be numeric
+
+      // Load model
+      $this->load->model( 'news/news' );
+
+      // Get news information
+      $news_info = $this->model_news_news->Get_News_Item( $news_id, $this->language->Get_Language_Code() );
+
+      // Test news info validity
+      if ( $news_info['valid'] == false ) 
+      {
+
+        //----------------------------------------------------------------------
+        // ERROR: News item not found
+        //----------------------------------------------------------------------
+
+        $this->data['heading_title'] = $this->language->get('text_error');
+        $this->data['text_error'] = $this->language->get('text_error');
+
+        $this->response->setTitle( $this->language->get('text_error') );
+
+        // Add error header
+        $this->response->Add_Header( $this->request->server['SERVER_PROTOCOL'] . '/1.1 404 Not Found' );
+
+        // Configure page
+        $this->children = array(
+          'common/footer',
+          'common/header'
+        );
+
+        // Render page
+        $this->response->Set_HTTP_Output( $this->Render( 'error/not_found.tpl' ) );
+
+      } 
+      else 
+      {
+
+        // Add CSS file to document
+//        $this->response->addStyle( 'catalog/view/stylesheet/list.css' );
+
+        // Get image
+//      $image = $this->model_news_news->getNews_Item_Image( $result['id'] );
+
+        // Add news items to array
+        $this->data[ 'company_news_item_date' ] = date('d.m.Y', strtotime($news_info['creation_date']));
+        $this->data[ 'company_news_item_headline' ] = $news_info['headline'];
+        $this->data[ 'company_news_item_agenda' ] = $news_info['agenda'];
+        $this->data[ 'company_news_item_body' ] = $news_info['body'];
+
+        //----------------------------------------------------------------------
+        // Render page
+        //----------------------------------------------------------------------
+        
+        // Set document data
+        $this->response->setTitle( $news_info[ 'headline' ] );
+        $this->response->setDescription( $news_info[ 'agenda' ] );
+//      $this->response->setKeywords( $product_info['meta_keyword'] );
+        $this->response->setRobots( 'index, follow' );
+
+        // Set page configuration
+        $this->children = array(
+          'common/footer',
+          'common/header'
+        );
+
+      }
+
+      // Render page
+      $this->response->Set_HTTP_Output( $this->Render( 'news/info.tpl' ) );
+
+    }
+
+  }
+
+}
+
+//------------------------------------------------------------------------------
+// End of file
+//------------------------------------------------------------------------------
+?>

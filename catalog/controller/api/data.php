@@ -1,0 +1,108 @@
+<?php
+class ControllerApiData extends Controller
+{
+
+  //----------------------------------------------------------------------------
+  // Default index method
+  //----------------------------------------------------------------------------
+
+  public function index()
+  {
+
+    // Set documet properties
+//    $this->response->setTitle( $this->config->get('config_title') );
+//    $this->response->setDescription( $this->config->get('config_meta_description') );
+//    $this->response->setRobots( 'index, follow' );
+
+      // Request method decoder
+      switch ( $this->request->server[ 'REQUEST_METHOD' ] ) 
+      {
+        
+        // GET request
+        case 'GET':
+        {
+
+          // Add headers
+//          $this->response->Add_Header($this->request->server['SERVER_PROTOCOL'] . '/1.1 200 OK');
+    
+          // Extract request data
+          $data[ 'key' ] = $this->request->get[ 'key' ];
+          $data[ 'data' ] = $this->request->get[ 'data' ];
+
+          // Load model
+          $this->load->model( 'api/data' );
+
+          // Add data to tadatabe
+          $this->model_api_data->addData( $data );
+
+          // Leave decoder
+          break;
+
+        }
+        
+        // POST request
+        case 'POST':
+        {
+
+          // Add headers
+//          $this->response->Add_Header($this->request->server['SERVER_PROTOCOL'] . '/1.1 200 OK');
+
+          // Extract request data
+          $data[ 'key' ] = $this->request->post[ 'key' ];
+          $data[ 'data' ] = $this->request->post[ 'data' ];
+
+          // Load model
+          $this->load->model( 'api/data' );
+
+          // Add data to tadatabe
+          $this->model_api_data->addData( $data );
+          
+          // Leave decoder
+          break;
+    
+        }
+      
+        // Other requests
+        default:
+        {
+          
+          // Add headers
+          $this->response->Add_Header( $this->request->server[ 'SERVER_PROTOCOL' ] . '/1.1 400 Bad Request' );
+
+          // Leave decoder
+          break;
+        
+        }
+        
+      }
+
+    // Set page sections
+    $this->children = array(
+//      'catalog/catalog_teaser',
+//      'common/footer',
+//      'common/header'
+    );
+
+  }
+
+  //----------------------------------------------------------------------------
+
+  public function test()
+  {
+
+    $json = array();
+
+    $json[ 'success' ] = false;
+    $json[ 'error' ] = "Item not found.";
+
+    // Encode and send json data
+    $this->response->Set_Json_Output( $json );
+
+  }
+
+}
+
+//------------------------------------------------------------------------------
+// End of file
+//------------------------------------------------------------------------------
+?>

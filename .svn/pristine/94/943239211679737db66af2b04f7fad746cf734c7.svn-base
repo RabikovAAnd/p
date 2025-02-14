@@ -1,0 +1,43 @@
+.task-table {
+  grid-template-columns: 3fr 0.5fr 0.5fr 1fr 1fr 1fr 1fr;
+}
+
+.task-table-c1 {
+  grid-template-columns: 8fr 2fr 2fr 2fr 1fr;
+}
+
+
+.items-table {
+  grid-template-columns: 2fr 3fr 5fr;
+}
+
+.items-table>span:nth-last-child(-n+3) {
+  border: none;
+}
+
+.projects-table {
+  grid-template-columns: 1fr 9fr;
+}
+
+.projects-table>span:nth-last-child(-n+2) {
+  border: none;
+}
+
+.buttons:nth-last-child(-n+8) {
+  border: none;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-items: center;
+  gap: calc(var(--global-gap)/12);
+  grid-column: 1 / -1;
+  border-bottom: var(--global-border);
+  padding: calc(var(--global-gap)/12);
+}
+
+.buttons button {
+  padding: calc(var(--global-gap)/1.5);
+}

@@ -1,0 +1,12 @@
+.payment__type-value {
+    display: flex;
+    flex-direction: row;
+    margin: 0;
+    gap: var(--global-gap);
+}
+
+.active {
+    border-color: var(--global-color-active-button);
+    outline: 3px solid var(--global-color-active-button);
+    outline-offset: -2px;
+}

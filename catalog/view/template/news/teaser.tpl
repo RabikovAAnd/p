@@ -1,0 +1,32 @@
+<div id="column-news">
+
+    <a href="<?php echo $news_teaser_header_href; ?>">
+        <h1>
+            <?php echo $news_teaser_header; ?>
+        </h1>
+    </a>
+    <div class="news-teaser-container ">
+        <a class="news-teaser-main-news list" href="<?php echo $news_teaser_latest_news_href; ?>">
+            <h2> <?php echo $news_teaser_latest_news_headline; ?></h2>
+            <div>
+                <?php if ($news_teaser_latest_news_image !== ''){ ?>
+                    <img src="<?php echo $news_teaser_latest_news_image; ?>">
+                <?php } ?>
+                <?php echo $news_teaser_latest_news_body; ?>
+            </div>
+
+            <span class="date"><?php echo $news_teaser_latest_news_date; ?></span>
+
+        </a>
+        <div class="news-teaser-item">
+
+            <?php foreach ($news_teaser as $item) { ?>
+            <a class="news-list-item" href="<?php echo $item['href']; ?>">
+                <h2 class="news-list-item__headline"><?php echo $item[ 'headline' ]; ?></h2>
+                <span class="date"><?php echo $item['date']; ?></span>
+            </a>
+
+            <?php } ?>
+        </div>
+    </div>
+</div>

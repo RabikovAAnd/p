@@ -1,0 +1,83 @@
+<?php
+class ControllerWorkplaceCustomersInfo extends Controller
+{
+
+  //----------------------------------------------------------------------------
+  // Index method
+  //----------------------------------------------------------------------------
+
+  public function index()
+  {
+
+    // Test for customer GUID present and valid
+    if( $this->request->Is_GET_Parameter_GUID( 'guid' ) === false )
+    {
+      
+      //----------------------------------------------------------------------
+      // ERROR: Invalud customer GUID
+      //----------------------------------------------------------------------
+
+      // Redirect to error page
+      $this->response->Redirect( $this->url->link( 'workplace/customers/error', '', 'SSL' ) );
+
+    }
+    else
+    {
+
+      //------------------------------------------------------------------------
+      // Customer GUID present
+      //------------------------------------------------------------------------
+
+      // Load messages
+      $this->messages->Load( $this->data, 'workplace', 'customer_info', 'index', $this->language->Get_Language_Code() );
+
+      // Get customer GUID
+      $customer_guid = $this->request->Get_GET_Parameter_As_GUID( 'guid' );
+      
+      // Try to get customer information
+      $customer = $this->customer->Get_Contact_Information( $customer_guid );
+      
+      //! @todo ANVILEX KM: Check return code
+
+      // Assign customer data
+      $this->data[ 'customer' ] = $customer;
+
+      // Test for corporate customer
+      if ( $customer[ 'legal_entity' ] === '1' ) 
+      {
+        $this->data[ 'customer_info_edit_button_href' ] = $this->url->link( 'workplace/customers/corporate/edit', 'guid=' . $customer_guid, 'SSL' );
+      }
+      else
+      {
+        $this->data[ 'customer_info_edit_button_href' ] = $this->url->link( 'workplace/customers/individual/edit', 'guid=' . $customer_guid, 'SSL' );          
+      }
+      
+      //------------------------------------------------------------------------
+      // Render page
+      //------------------------------------------------------------------------
+
+      // Set document properties
+      $this->response->setTitle( $this->messages->Get_Message( 'document_title_text' ) );
+      $this->response->setDescription($this->messages->Get_Message( 'document_description_text' ) );
+      $this->response->setKeywords( '' );
+      $this->response->setRobots( 'index, follow' );
+
+      // Set page configuration
+      $this->children = array(
+        'common/footer',
+        'workplace/workplace_menu',
+        'common/header'
+      );
+
+      // Render page
+      $this->response->Set_HTTP_Output( $this->Render( 'workplace/customers/info.tpl' ) );
+    
+    }
+
+  }
+
+}
+//------------------------------------------------------------------------------
+// End of file
+//------------------------------------------------------------------------------
+?>

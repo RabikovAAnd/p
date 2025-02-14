@@ -1,0 +1,14 @@
+/*----------------------------------------------------------------------------*/
+/* Workplace customers subsystem                                              */
+/*----------------------------------------------------------------------------*/
+
+.endpoints-table {
+  grid-template-columns: 8fr 1fr;
+}
+
+.commercial-relationships-table {
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+.addresses-table {
+  grid-template-columns: 1fr 1fr 1fr;
+}

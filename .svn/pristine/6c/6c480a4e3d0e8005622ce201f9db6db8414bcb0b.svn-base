@@ -1,0 +1,86 @@
+<?php echo $common_header; ?>
+<div id="content">
+  <h1>
+    <?php echo $workplace_categories_move_header . " ". $current_category['name']; ?>
+  </h1>
+  <div class="account-area">
+    <?php echo $workplace_menu; ?>
+    <div class="main-area">
+      
+      <div class="info-content-block">
+        <div class="list">
+
+          <label class="input-text-field search-selector">
+            <?php echo $workplace_categories_move_category_label; ?>
+            <input 
+                    id="category_list"
+                    type="text"
+                    list="categories"
+                    title="<?php echo $workplace_categories_move_category_hint;  ?>"
+                    placeholder="<?php echo $workplace_categories_move_category_placeholder; ?>"
+                    required/>
+            <select id="parent_guid" class="input-send" size="10">
+              <?php foreach ($categories as $category) { ?>
+                <?php if ($category[ 'guid' ] != $current_category['guid']){ ?>
+              <option id="<?php echo $category[ 'guid' ]; ?>" value="<?php echo $category[ 'guid' ]; ?>"><?php echo $category[ 'name' ]; ?></option>
+              <?php } ?>
+              <?php } ?>
+            </select>
+          </label>
+
+          <div class="between">
+            <a href="<?php echo $cancel_button_href; ?>">
+              <button type="button">
+                <?php echo $workplace_categories_move_cancel_button_text; ?>
+              </button>
+            </a>
+            <button
+              onMouseDown="File_Form('<?php echo $move_button_href; ?>')">
+              <?php echo $workplace_categories_move_move_button_text; ?>
+            </button>
+          </div>
+        </div>
+        <span class="error-alert"></span>
+      </div>
+
+
+    </div>
+  </div>
+
+</div>
+<?php echo $common_footer; ?>
+
+<script>
+
+  $('#category_list').keyup(function () {
+    Search();
+  });
+  
+  function Search() {
+    $.ajax({
+      url: 'index.php?route=workplace/categories/move/Search',
+      type: 'POST',
+      dataType: 'json',
+      data: 'search=' + $('#category_list').val(),
+      success: function (json) {
+        
+        $('#parent_guid').html('')
+        if (json['return_code']) {
+          if (json['categories']) {
+            json['categories'].forEach((category) => {
+              if(category['guid']!="<?php echo $category[ 'guid' ]; ?>"){
+
+                $('#parent_guid').append('<option id="'+category['guid']+'" value="' + category['guid'] +'">' + category['name'] + '</option>');   
+              }       
+            })
+          }
+        }
+
+      },
+      error: function (jqXHR, exception, json) {
+        console.log('error ' + exception + ' ' + json['error']);
+      }
+    });
+  }
+  
+  </script>

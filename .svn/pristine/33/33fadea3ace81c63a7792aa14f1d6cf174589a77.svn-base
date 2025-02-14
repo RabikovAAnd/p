@@ -1,0 +1,5 @@
+.info-content-block>a{
+    margin-top: var(--global-gap);
+    width: min-content;
+    align-self: end;
+}

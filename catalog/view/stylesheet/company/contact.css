@@ -1,0 +1,81 @@
+/*----------------------------------------------------------------------------*/
+/* Contact subsystem                                                         */
+/*----------------------------------------------------------------------------*/
+
+
+.contact-input-form button{
+  margin: 0;
+  width: min-content;
+  align-self: end;
+}
+.contact-input-form label{
+  display: flex;
+  flex-direction: column;
+}
+
+.send-message{
+  display: flex;
+  justify-content: space-between;
+  gap: var(--global-gap);
+}
+.send-message>div{
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+  justify-content: center;
+  gap: calc(var(--global-gap)*0.5);
+}
+
+.send-message div label{
+  display: flex;
+  flex-direction: row;
+}
+.contact__captcha{
+  display: flex;
+  flex-direction: column;
+
+}
+.contact__captcha>div{
+  display: flex;
+  flex-direction: row;
+  margin-top: calc(var(--global-text-font-size)*0.3);
+}
+#captcha_image{
+  height: auto;
+  border-radius: var(--global-border-radius);
+  border: var(--global-border);
+}
+
+
+#refresh{
+  position: relative;
+  height: calc( var(--global-text-font-size));
+  right:  calc(var(--global-text-font-size) + 3px);
+  top: 3px;
+  color: #FFFFFF;
+  cursor:pointer;
+}
+
+.code-form{
+  display: flex;
+  flex-direction: column;
+  gap: var(--global-gap);
+}
+
+.code-form label{
+  display: flex;
+  align-items: center;
+  gap: var(--global-gap);
+  justify-content: space-between;
+}
+
+.code-form__buttons{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+}
+
+/*----------------------------------------------------------------------------*/
+/* End of file                                                                */
+/*----------------------------------------------------------------------------*/

@@ -1,0 +1,71 @@
+<?php
+class ControllerCommonHome extends Controller
+{
+
+  //----------------------------------------------------------------------------
+  // Index method
+  //----------------------------------------------------------------------------
+
+  public function index()
+  {
+
+/*
+    // ???? Move it to database
+    $this->response->addLink( 'https://fr.anvilex.com', 'alternate', 'fr' );
+    $this->response->addLink( 'https://uk.anvilex.com', 'alternate', 'uk' );
+//    $this->response->addLink( 'https://pt.anvilex.com','alternate','pt' );
+//    $this->response->addLink( 'https://cs.anvilex.com','alternate','cs' );
+    $this->response->addLink( 'https://it.anvilex.com', 'alternate', 'it' );
+//    $this->response->addLink( 'https://nl.anvilex.com','alternate','nl' );
+//    $this->response->addLink( 'https://ko.anvilex.com','alternate','ko' );
+    $this->response->addLink( 'https://de.anvilex.com', 'alternate', 'de' );
+    $this->response->addLink( 'https://ru.anvilex.com', 'alternate', 'ru' );
+//    $this->response->addLink( 'https://th.anvilex.com','alternate','th' );
+//    $this->response->addLink( 'https://sv.anvilex.com','alternate','sv' );
+//    $this->response->addLink( 'https://tr.anvilex.com','alternate','tr' );
+//    $this->response->addLink( 'https://da.anvilex.com','alternate','da' );
+    $this->response->addLink( 'https://www.anvilex.com', 'alternate', 'en' );
+    $this->response->addLink( 'https://es.anvilex.com', 'alternate', 'es' );
+//    $this->response->addLink( 'https://ja.anvilex.com','alternate','ja' );
+//    $this->response->addLink( 'https://no.anvilex.com','alternate','no' );
+//    $this->response->addLink( 'https://zh.anvilex.com','alternate','zh' );
+//    $this->response->addLink( 'https://pl.anvilex.com','alternate','pl' );
+    $this->response->addLink( 'https://www.anvilex.com', 'alternate', 'x-default' );
+*/
+
+    //--------------------------------------------------------------------------
+    // Render page
+    //--------------------------------------------------------------------------
+
+    // Load language
+    $this->messages->Load($this->data, 'common', 'home', 'index', $this->language->Get_Language_Code());
+
+    // Set document properties
+    $this->response->setTitle($this->messages->Get_Message('document_title_text'));
+    $this->response->setDescription($this->messages->Get_Message('document_description_text'));
+    $this->response->setKeywords( '' );
+    $this->response->setRobots( 'index, follow' );
+  
+    // Add styles
+    $this->response->addStyle( 'catalog/view/stylesheet/common/header.css' );
+
+    // Set page sections
+    $this->children = array(
+//      'common/home_slideshow', // ANVILEX KM: Add this part later
+      'company/teaser',
+      'catalog/teaser',
+//      'services/teaser', // ANVILEX KM: Add this part later
+      'news/teaser',
+      'news/subscribe',
+//      'common/debug',
+      'common/footer',
+      'common/header'
+    );
+
+  }
+
+}
+//------------------------------------------------------------------------------
+// End of file
+//------------------------------------------------------------------------------
+?>

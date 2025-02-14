@@ -1,0 +1,35 @@
+/*----------------------------------------------------------------------------*/
+/* Company teaser on the start page                                           */
+/*----------------------------------------------------------------------------*/
+
+.company-teaser {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr) );
+    gap: var(--global-gap);
+    margin:  var(--global-gap) 0;
+}
+
+.company-teaser-item {
+    border: var(--global-border);
+    border-radius: var(--global-border-radius);
+    text-decoration: none;
+    padding: var(--global-gap);
+}
+
+.company-teaser-company-about{
+    display: grid;
+    grid-template-columns: max-content auto;
+    gap: var(--global-gap);
+}
+
+.company-teaser-company-img{
+    width: clamp(100px,10vw,400px);
+    height: clamp(100px,10vw,400px);
+}
+.company-teaser-item-text {
+    border: none;
+    font-size: var(--global-text-font-size);
+    font-weight: normal;
+    color: var(--global-text-color);
+    text-align: justify;
+}

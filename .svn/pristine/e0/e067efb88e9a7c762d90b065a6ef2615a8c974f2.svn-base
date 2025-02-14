@@ -1,0 +1,58 @@
+<?php
+class ModelItemsProperties extends Model
+{
+ 
+
+  //----------------------------------------------------------------------------
+  // Remove property item 
+  //----------------------------------------------------------------------------
+
+  public function Remove_Property( $property_guid = '00000000000000000000000000000000', $item_guid = '00000000000000000000000000000000' )
+  {
+
+    // Compose SQL query
+    $sql =
+      "DELETE FROM " .
+        "`product_properties` " .
+      "WHERE " .
+        "`product_properties`.`property_guid`='" . $this->db->escape( $property_guid ) . "' AND " .
+        "`product_properties`.`product_guid`='". $this->db->escape( $item_guid ) . "'";
+        $this->log->Log_Debug( 'sql' .  $sql);
+    // Query database
+    $this->db->query( $sql );
+
+    // Return success code
+    return( true );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Edit property observed item
+  //----------------------------------------------------------------------------
+
+  public function Edit_Item_Property( $item_guid = '', $property_guid  = '', $property_value  = '' )
+  {
+
+    // Compose SQL query
+    $sql =
+      "UPDATE " .
+        "product_properties " .
+      "SET " .
+        "value='" . $this->db->escape( $property_value ) . "' " .
+      "WHERE " .
+        "`product_properties`.`product_guid`='" . $this->db->escape( $item_guid ) . "' AND " .
+        "`product_properties`.`property_guid`='". $this->db->escape( $property_guid ) . "'";
+
+    // Query database
+    $this->db->query( $sql );
+
+    // Return success code
+    return( true );
+
+  }
+
+}
+//------------------------------------------------------------------------------
+// End of file
+//------------------------------------------------------------------------------
+?>

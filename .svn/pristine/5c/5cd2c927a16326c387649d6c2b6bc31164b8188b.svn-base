@@ -1,0 +1,168 @@
+<?php
+class Units
+{
+  
+  private $db;
+
+  //----------------------------------------------------------------------------
+  // Constructor
+  //----------------------------------------------------------------------------
+
+	public function __construct( $registry ) 
+	{
+
+    // Get reference to global objects
+		$this->db = $registry->get( 'db' );
+
+  }
+
+  //----------------------------------------------------------------------------
+/*
+  public function convert( $value, $from, $to ) 
+  {
+    
+		if ($from == $to) 
+		{
+      		return $value;
+		}
+		
+		if (isset($this->lengths[$from])) 
+		{
+			$from = $this->lengths[$from]['value'];
+		} 
+		else 
+		{
+			$from = 0;
+		}
+		
+		if (isset($this->lengths[$to])) {
+			$to = $this->lengths[$to]['value'];
+		} else {
+			$to = 0;
+		}		
+		
+      	return $value * ($to / $from);
+  	}
+*/
+
+  //----------------------------------------------------------------------------
+/*
+	public function format($value, $length_class_id, $decimal_point = '.', $thousand_point = ',') 
+	{
+	  
+		if (isset($this->lengths[$length_class_id])) {
+    		return number_format($value, 2, $decimal_point, $thousand_point) . $this->lengths[$length_class_id]['unit'];
+		} else {
+			return number_format($value, 2, $decimal_point, $thousand_point);
+		}
+	
+	}
+*/
+  //----------------------------------------------------------------------------
+  // Get unit abbreviation
+  //----------------------------------------------------------------------------
+
+	public function getUnitAbbreviation( $unit_id, $language_code = 'XX' ) 
+	{
+
+    // Compose SQL query
+    $sql = 
+      "SELECT " .
+        "units_description.abbreviation " .
+      "FROM " .
+        "units_description " .
+      "LEFT JOIN " .
+        "units " .
+      "ON " .
+        "units_description.unit_id=units.id " .
+      "WHERE " .
+        "units.id=" . (int)$unit_id . " AND " .
+        "units_description.language_code='" . $language_code . "'";
+
+    // Query database
+    $result = $this->db->query( $sql );
+
+    // Test record quantity
+    if ( $result->num_rows != 1 )
+    {
+
+      // Set default value
+      $unit_abbreviation = '';
+
+    }
+    else
+    {
+
+      // Get unit abbrevation
+      $unit_abbreviation = $result->row[ 'abbreviation' ];
+
+    }
+
+    // Return unit abbrevation
+    return( $unit_abbreviation );
+
+	}
+ //----------------------------------------------------------------------------
+  // Get unit information
+  //----------------------------------------------------------------------------
+
+	public function Get_Unit_Info( $unit_id, $language_code = 'XX' ) 
+	{
+
+    // Compose SQL query
+    $sql = 
+      "SELECT * " .
+      "FROM " .
+        "units_description " .
+      "LEFT JOIN " .
+        "units " .
+      "ON " .
+        "units_description.unit_id=units.id " .
+      "WHERE " .
+        "units.id=" . $this->db->escape((int)$unit_id) . " AND " .
+        "units_description.language_code='" . $this->db->escape($language_code) . "'";
+
+    // Query database
+    $query = $this->db->query( $sql );
+     // Test for item exists
+     if ( $query->num_rows != 1 )
+     {
+ 
+       //------------------------------------------------------------------------
+       // ERROR: unit not found
+       //------------------------------------------------------------------------
+ 
+       // Set default data
+       $data[ 'return_code' ] = false;
+       $data[ 'data' ] = array();
+     
+     }
+     else
+     {
+      //------------------------------------------------------------------------
+      // unit found
+      //------------------------------------------------------------------------
+
+      // Set product data
+      $data[ 'return_code' ] = true;
+      $data[ 'data' ][ 'unit_id' ] =  $query->row[ 'unit_id' ];
+      $data[ 'data' ][ 'abbreviation' ] =  $query->row[ 'abbreviation' ];
+      $data[ 'data' ][ 'unit_declination_0' ] =  $query->row[ 'unit_declination_0' ];
+      $data[ 'data' ][ 'name_declination_0' ] = $query->row[ 'name_declination_0' ];
+      $data[ 'data' ][ 'unit_declination_1' ] = $query->row[ 'unit_declination_1' ];
+      $data[ 'data' ][ 'name_declination_1' ] = $query->row[ 'name_declination_1' ];
+      $data[ 'data' ][ 'unit_declination_2' ] = $query->row[ 'unit_declination_2' ];
+      $data[ 'data' ][ 'name_declination_2' ] = $query->row[ 'name_declination_2' ];
+      $data[ 'data' ][ 'unit_declination_3' ] = $query->row[ 'unit_declination_3' ];
+      $data[ 'data' ][ 'name_declination_3' ] = $query->row[ 'name_declination_3' ];
+      
+    }
+    // Return unit information
+    return($data );
+
+	}
+}
+//------------------------------------------------------------------------------
+// End of file
+//------------------------------------------------------------------------------
+?>

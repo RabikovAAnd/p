@@ -1,0 +1,191 @@
+<?php echo $common_header; ?>
+
+<div id="content">
+  <h1><?php echo $workplace_add_customer_header; ?></h1>
+
+<div class="account-area">
+  <?php echo $workplace_menu; ?>
+  <div class="info-content-block">
+    <form class="list" method="post" enctype="multipart/form-data">
+      <div class="info-content-block">
+        <h2><?php echo  $workplace_add_customer_account_data_header; ?></h2>
+        <label id="checkbox_legal_entity" class="checkbox-field">
+          <input type="checkbox"
+                 class="input-send"
+                 id="legal_entity"
+                 title="<?php echo $workplace_add_customer_entity_checkbox_hint; ?>"
+                 name="legal_entity">
+          <span><?php echo  $workplace_add_customer_entity_checkbox_text; ?></span>
+        </label>
+        <div class="content">
+      
+      
+          <label class="input-text-field">
+            <span><?php echo $workplace_add_customer_personal_data_email_label; ?></span>
+            <input type="email"
+                   id="email"
+                   name="email"
+                   autocomplete="additional-name"
+                   class="input-send"
+                   title="<?php echo $workplace_add_customer_personal_data_email_hint; ?>"
+                   placeholder="<?php echo $workplace_add_customer_personal_data_email_placeholder; ?>"
+                   min="3"
+                   max="96"
+                   required/>
+          </label>
+         
+        </div>
+      
+      </div>
+
+          <div class="company_info info-content-block" style="display: none">
+            <h2 class='company_info' style="display: none"><?php echo  $workplace_add_customer_company_data_header; ?></h2>
+            <div class="content ">
+              <label class="input-text-field">
+                <span>*<?php echo $workplace_add_customer_company_data_company_name_label; ?></span>
+                <input type="text"
+                       id="company_name"
+                       name="company"
+                       autocomplete="organization"
+                       class="input-send"
+                       title="<?php echo $workplace_add_customer_company_data_company_name_hint; ?>"
+                       placeholder="<?php echo $workplace_add_customer_company_data_company_name_placeholder; ?>"/>
+              </label>
+              <label class="input-text-field">
+                <span><?php echo $workplace_add_customer_company_data_company_register_id_label; ?></span>
+                <input type="text"
+                       id="company_register_id"
+                       name="company_register_id"
+                       title="<?php echo $workplace_add_customer_company_data_company_register_id_hint; ?>"
+                       class="input-send"
+                       required/>
+              </label>
+              <label class="input-text-field">
+                <span><?php echo $workplace_add_customer_company_data_company_tax_id_label; ?></span>
+                <input type="text"
+                       id="company_tax_id"
+                       name="company_tax_id"
+                       title="<?php echo $workplace_add_customer_company_data_company_tax_id_hint; ?>"
+                       class="input-send"
+                       required/>
+              </label>
+            </div>
+      
+          </div>
+          <div class="info-content-block">
+            <h2><?php echo  $workplace_add_customer_personal_data_header; ?></h2>
+            <div class="content">
+              <label class="input-text-field">
+                <span>*<?php echo $workplace_add_customer_personal_data_lastname_label; ?></span>
+                <input type="text"
+                       id="lastname"
+                       name="lastname"
+                       autocomplete="family-name"
+                       title="<?php echo $workplace_add_customer_personal_data_lastname_hint; ?>"
+                       placeholder="<?php echo $workplace_add_customer_personal_data_lastname_placeholder; ?>"
+                       class="cart_contact_table_input_name input-send"
+                       min="2"
+                       max="32"
+                       required>
+              </label>
+              <label class="input-text-field">
+                <span>*<?php echo $workplace_add_customer_personal_data_firstname_label; ?></span>
+                <input type="text"
+                       id="firstname"
+                       name="firstname"
+                       autocomplete="given-name"
+                       title="<?php echo $workplace_add_customer_personal_data_firstname_hint; ?>"
+                       placeholder="<?php echo  $workplace_add_customer_personal_data_firstname_placeholder; ?>"
+                       class="cart_contact_table_input_name input-send"
+                       min="2"
+                       max="32"
+                       required>
+              </label>
+              <label class="input-text-field">
+                <span><?php echo  $workplace_add_customer_personal_data_middlename_label; ?></span>
+                <input type="text"
+                       id="middlename"
+                       name="middlename"
+                       autocomplete="email"
+                       title="<?php echo $workplace_add_customer_personal_data_middlename_hint; ?>"
+                       placeholder="<?php echo  $workplace_add_customer_personal_data_middlename_placeholder; ?>"
+                       class="cart_contact_table_input_name input-send"
+                       min="2"
+                       max="32">
+              </label>
+              <label class="input-text-field">
+                <span><?php echo $workplace_add_customer_personal_data_telephone_label; ?></span>
+                <input type="tel"
+                       id="telephone"
+                       name="telephone"
+                       autocomplete="tel"
+                       class="input-send"
+                       title="<?php echo  $workplace_add_customer_personal_data_telephone_hint; ?>"
+                       placeholder="+XXX (XXX) XX-XX-XX"
+                       min="2"
+                       max="32"
+                       pattern="/[0-9+-()]/v" />
+              </label>
+            </div>
+          </div>
+          <div class="info-content-block">
+            <h2><?php echo "Roles"/*$workplace_add_customer_personal_data_header*/; ?></h2>
+            <div class="list">
+              <label class="checkbox-field">
+                <input 
+                  type="checkbox"
+                  class="input-send"
+                  id="consumer_role"
+                  title="<?php echo $workplace_add_customer_entity_checkbox_hint; ?>"
+                  name="consumer_role">
+                <span><?php echo "Consumer";/*$workplace_add_customer_entity_checkbox_text;*/ ?></span>
+              </label>
+              <label class="checkbox-field">
+                <input 
+                  type="checkbox"
+                  class="input-send"
+                  id="manufacturer_role"
+                  title="<?php echo $workplace_add_customer_entity_checkbox_hint; ?>"
+                  name="manufacturer_role">
+                <span><?php echo "Manufacturer";/*$workplace_add_customer_entity_checkbox_text;*/ ?></span>
+              </label>
+              <label class="checkbox-field">
+                <input 
+                  type="checkbox"
+                  class="input-send"
+                  id="supplier_role"
+                  title="<?php echo $workplace_add_customer_entity_checkbox_hint; ?>"
+                  name="supplier_role">
+                <span><?php echo "Supplier";/*$workplace_add_customer_entity_checkbox_text;*/ ?></span>
+              </label>
+            
+            </div>
+          </div>
+
+          <div class="end">
+            <button type="submit"
+                    title="<?php echo  $workplace_add_customer_register_button_hint; ?>"
+                    onMouseDown="File_Form('<?php echo  $workplace_add_customer_button_href; ?>')">
+              <?php echo $workplace_add_customer_register_button_text; ?>
+            </button>
+          </div>
+
+        </form>
+        <span class="error-alert"></span>
+  </div>
+</div>
+
+</div>
+<?php echo $common_footer; ?>
+  
+<script type="text/javascript">
+
+  $('#legal_entity').on('change', function (event) {
+    if ($('#legal_entity').is(':checked')) {
+      $('.company_info').show()
+    } else {
+      $('.company_info').hide()
+    }
+  });
+
+</script>

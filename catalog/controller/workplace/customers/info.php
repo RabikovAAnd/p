@@ -1,0 +1,210 @@
+<?php
+class ControllerWorkplaceCustomersInfo extends Controller
+{
+
+  //----------------------------------------------------------------------------
+  // Index method
+  //----------------------------------------------------------------------------
+
+  public function index()
+  {
+
+    // Test for customer GUID present and valid
+    if( $this->request->Is_GET_Parameter_GUID( 'guid' ) === false )
+    {
+
+      //----------------------------------------------------------------------
+      // ERROR: Invalud customer GUID
+      //----------------------------------------------------------------------
+
+      // Redirect to error page
+      $this->response->Redirect( $this->url->link( 'workplace/customers/error', '', 'SSL' ) );
+
+    }
+    else
+    {
+
+      //------------------------------------------------------------------------
+      // Customer GUID present
+      //------------------------------------------------------------------------
+
+      // Load messages
+      $this->messages->Load( $this->data, 'workplace', 'customer_info', 'index', $this->language->Get_Language_Code() );
+
+      // Load data models
+      $this->load->model( 'endpoints/endpoints' );
+      $this->load->model( 'orders/orders' );
+      $this->load->model( 'address/address' );
+
+      // Get customer GUID
+      $customer_guid = $this->request->Get_GET_Parameter_As_GUID( 'guid' );
+
+      // Try to get customer information
+      $customer = $this->customer->Get_Contact_Information( $customer_guid );
+
+      //! @todo ANVILEX KM: Check return code
+
+      // Assign customer data
+      $this->data[ 'customer' ] = $customer;
+      $this->data[ 'registration_country' ] = $this->location->Get_Country_By_ISO2( $this->data[ 'customer' ]['registration_country'], $this->language->Get_Language_Code() );
+
+      // Test for corporate customer
+      if ( $customer[ 'legal_entity' ] === '1' )
+      {
+        $this->data[ 'customer_info_edit_button_href' ] = $this->url->link( 'workplace/customers/corporate/edit', 'guid=' . $customer_guid, 'SSL' );
+      }
+      else
+      {
+        $this->data[ 'customer_info_edit_button_href' ] = $this->url->link( 'workplace/customers/individual/edit', 'guid=' . $customer_guid, 'SSL' );
+      }
+
+      // Endpoints data
+      $endpoints = $this->model_endpoints_endpoints->Get_Endpoints();
+
+      // Process endpoints
+      foreach ( $endpoints as $endpoint )
+      {
+
+        // Set endpoint data
+        $this->data[ 'endpoints' ][] = array(
+          'element_href' => 'endpoint' . $endpoint[ 'guid' ],
+          'guid' => $endpoint[ 'guid' ],
+          'name' => $endpoint[ 'name' ],
+          'access' => $this->model_endpoints_endpoints->Is_Exist_Customer_Endpoint( $customer_guid, $endpoint[ 'guid' ]),
+          'allow_button_href' => $this->url->link( 'workplace/customers/endpoints/allow/Allow', 'customer_guid=' .  $customer_guid.'&endpoint_guid=' . $endpoint[ 'guid' ], 'SSL' ),              
+          'remove_button_href' => $this->url->link( 'workplace/customers/endpoints/prohibit/Prohibit', 'customer_guid=' .  $customer_guid.'&endpoint_guid=' . $endpoint[ 'guid' ], 'SSL' )              
+        );
+
+      }
+
+      // Orders data
+      $orders = $this->model_orders_orders->Get_Orders($customer_guid);
+
+      foreach ( $orders as $order )
+      {
+
+        $supplier_type = '';
+
+        if ( $order['type'] === 'selling' )
+        {
+          $supplier_type = $this->data['workplace_customer_info_selling_label'];
+        }
+
+        if ( $order['type'] === 'purchase' )
+        {
+          $supplier_type = $this->data['workplace_customer_info_purchase_label'];
+        }
+
+        $this->data['orders'][] = array(
+          'order_id' => $order['id'],
+          'status' => $order['status'],
+          'extern_number' => $order['extern_number'],
+          'type' => $supplier_type,
+          'date' => $order['date'],
+          'href' => $this->url->link('workplace/customers/interactions/info', 'id=' . $order['id'], 'SSL'),
+        );
+
+      }
+
+      // Orders data
+      $supplier_orders = $this->model_orders_orders->Get_Supplier_Orders($customer_guid);
+
+      foreach ($supplier_orders as $supplier_order)
+      {
+
+        $supplier_type = '';
+
+        if ($supplier_order['type'] === 'selling')
+        {
+          $supplier_type = $this->data['workplace_customer_info_selling_label'];
+        }
+
+        if ($supplier_order['type'] === 'purchase')
+        {
+          $supplier_type = $this->data['workplace_customer_info_purchase_label'];
+        }
+
+        $this->data['orders'][] = array(
+          'order_id' => $supplier_order['id'],
+          'status' => $supplier_order['status'],
+          'extern_number' => $supplier_order['extern_number'],
+          'type' => $supplier_type,
+          'date' => $supplier_order['date'],
+          'href' => $this->url->link('workplace/customers/interactions/info', 'id=' . $supplier_order['id'], 'SSL'),
+        );
+
+      }
+
+      $adresses = $this->model_address_address->Get_Addresses($customer_guid);
+
+      foreach ($adresses as $address)
+      {
+
+        $country_name = $this->location->Get_Country_Info( $address['country_id'] )['name'];
+        $zone_name = $this->location->Get_Country_Zone_Info( $address['zone_id'] )['name'];
+
+        $address_text = $address['street'] . ' ' . $address['house'];
+        if ($address['building'] != '') {
+          $address_text = $address_text . ', ' . $address['building'];
+        }
+        if ($address['apartment'] != '') {
+          $address_text = $address_text . ', ' . $address['apartment'];
+        }
+        if ($address['postcode'] != '') {
+          $address_text = $address_text . ', ' . $address['postcode'];
+        }
+        if ($address['city'] != '') {
+          $address_text = $address_text . ' ' . $address['city'];
+        }
+        if ($country_name != '') {
+          $address_text = $address_text . ', ' . $country_name;
+        }
+        $this->data['addresses'][] = array(
+          'guid' => $address['guid'],
+          'edit_href' => $this->url->link('workplace/customers/address/edit', 'guid=' . $address['guid'] . '&customer_guid=' . $customer_guid, 'SSL'),
+          'country_name' => $country_name,
+          'zone_name' => $zone_name,
+          'postcode' => $address['postcode'],
+          'city' => $address['city'],
+          'street' => $address['street'],
+          'house' => $address['house'],
+          'building' => $address['building'],
+          'apartment' => $address['apartment'],
+          'active' => $address['active'],
+
+          'address_text' => $address_text,
+        );
+
+      }
+
+      // Set links
+      $this->data['create_address_button_href'] = $this->url->link('workplace/customers/address/create', 'guid=' . $customer_guid, 'SSL');
+      $this->data['create_request_button_href'] = $this->url->link('workplace/customers/interactions/request/create', 'guid=' . $customer_guid, 'SSL');
+      $this->data['create_offer_button_href'] = $this->url->link('workplace/customers/interactions/offer/create', 'guid=' . $customer_guid, 'SSL');
+
+      //------------------------------------------------------------------------
+      // Render page
+      //------------------------------------------------------------------------
+
+      // Set document properties
+      $this->response->setTitle($this->messages->Get_Message('document_title_text'));
+      $this->response->setDescription($this->messages->Get_Message('document_description_text'));
+      $this->response->setKeywords('');
+      $this->response->setRobots('index, follow');
+
+      // Set page configuration
+      $this->children = array(
+        'common/footer',
+        'workplace/menu',
+        'common/header'
+      );
+
+    }
+
+  }
+
+}
+//------------------------------------------------------------------------------
+// End of file
+//------------------------------------------------------------------------------
+?>

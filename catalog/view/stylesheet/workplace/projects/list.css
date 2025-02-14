@@ -1,0 +1,36 @@
+/*----------------------------------------------------------------------------*/
+/* Workplace Items subsystem                                                          */
+/*----------------------------------------------------------------------------*/
+
+#pages {
+  display: flex;
+  flex-direction: row;
+  gap: var(--global-gap);
+  justify-content: center;
+}
+
+#search_field {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--global-text-font-size)*0.3);
+  align-items: left;
+  width: 100%;
+}
+
+#search {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.main-area {
+  display: flex;
+  flex-direction: column;
+  gap: var(--global-gap);
+}
+
+/* .projects-table>span:nth-last-child(-n+3){
+    border: none;
+} */
+.projects-table {
+  grid-template-columns: 1fr 7fr 1fr;
+}

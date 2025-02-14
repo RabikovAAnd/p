@@ -1,0 +1,6 @@
+2024-12-09 6:02:53 - DEBUG: SYSTEM : System prepared for request processing.
+2024-12-09 6:02:54 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/home.tpl
+2024-12-09 6:02:54 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/company/teaser.tpl
+2024-12-09 6:02:58 - DEBUG: SYSTEM : System prepared for request processing.
+2024-12-09 6:02:58 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/home.tpl
+2024-12-09 6:02:58 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/company/teaser.tpl

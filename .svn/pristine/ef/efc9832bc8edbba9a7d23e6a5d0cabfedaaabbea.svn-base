@@ -1,0 +1,13 @@
+
+
+.contact-data__address {
+    display: flex;
+    flex-direction: column;
+    gap: var(--global-gap);
+}
+
+.contact-data__address div{
+    display: grid;
+    grid-template-columns: repeat( auto-fit, minmax(130px, 1fr) );
+    gap: var(--global-gap);
+}

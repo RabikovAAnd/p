@@ -1,0 +1,432 @@
+<?php
+class ModelAccountAddress extends Model 
+{
+
+  //----------------------------------------------------------------------------
+  // Get adresses by customer guid
+  //----------------------------------------------------------------------------
+
+  public function Get_Addresses( $customer_guid )
+  {
+
+    $address_data = array();
+
+    // Compose SQL query
+    $sql =
+      "SELECT " .
+        "* " .
+      "FROM " .
+        "`addresses` " .
+      "WHERE " .
+        "`addresses`.`customer_guid`='" . $customer_guid . "'";
+
+    // Execute SQL query
+    $query = $this->db->query( $sql );
+
+    if( $query->num_rows == 0 )
+    {
+
+//      $address_data = [];
+
+    }
+    else
+    {
+      
+      foreach ( $query->rows as $result )
+      {
+
+        $country_query = $this->db->query("SELECT * FROM country WHERE country_id = '" . (int)$result['country_id'] . "'");
+
+        if ($country_query->num_rows)
+        {
+          $country = $country_query->row['name'];
+          $iso_code_2 = $country_query->row['iso_code_2'];
+          $iso_code_3 = $country_query->row['iso_code_3'];
+          $address_format = $country_query->row['address_format'];
+        }
+        else
+        {
+          $country = '';
+          $iso_code_2 = '';
+          $iso_code_3 = '';
+          $address_format = '';
+        }
+
+        $zone_query = $this->db->query("SELECT * FROM zone WHERE zone_id = '" . (int)$result['zone_id'] . "'");
+
+        if ($zone_query->num_rows)
+        {
+          $zone = $zone_query->row[ 'name' ];
+          $zone_code = $zone_query->row[ 'code' ];
+        }
+        else
+        {
+          $zone = '';
+          $zone_code = '';
+        }
+
+        $address_data[ $result[ 'address_id' ] ] = array(
+//          'address_id' => $result[ 'address_id' ],
+          'guid' => $result[ 'guid' ],
+          'apartment' => $result['apartment' ],
+          'building' => $result[ 'building' ],
+          'street' => $result[ 'street' ],
+          'house' => $result[ 'house' ],
+          'postcode' => $result[ 'postcode' ],
+          'city' => $result[ 'city' ],
+          'zone_id' => $result[ 'zone_id' ],
+          'zone' => $zone,
+          'zone_code' => $zone_code,
+          'country_id' => $result[ 'country_id' ],
+          'country' => $country,
+          'iso_code_2' => $iso_code_2,
+          'iso_code_3' => $iso_code_3,
+          'address_format' => $address_format,
+          'active' => $result[ 'active' ]
+        );
+
+      }
+
+    }
+
+    return( $address_data );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Get address
+  //----------------------------------------------------------------------------
+
+  public function Get_Address( $guid )
+  {
+
+    $data = array();
+    
+    $sql = "SELECT DISTINCT * FROM addresses WHERE guid = '" . $guid . "'";
+    
+    $address_query = $this->db->query( $sql );
+
+    if ( $address_query->num_rows != 1)
+    {
+      
+      $data = array(
+        
+        'valid'     => false,
+        'guid'     => '',
+        'apartment'        => '',
+        'building'     =>  '',
+        'street'      =>  '',
+        'house'      =>  '',
+        'postcode'       =>  '',
+        'city'           =>  '',
+        'zone_id'        => '',
+        'zone'           =>  '',
+        'zone_code'      =>  '',
+        'country_id'     =>  '',
+        'country'        =>  '',
+        'iso_code_2'     => '',
+        'iso_code_3'     =>  '',
+        'address_format' =>  '',
+      );
+      
+    } else{
+      $country_query = $this->db->query( "SELECT * FROM country WHERE country_id = '" . (int)$address_query->row['country_id'] . "'" );
+
+      if ($country_query->num_rows) 
+      {
+        $country = $country_query->row['name'];
+        $iso_code_2 = $country_query->row['iso_code_2'];
+        $iso_code_3 = $country_query->row['iso_code_3'];
+        $address_format = $country_query->row['address_format'];
+      } 
+      else 
+      {
+        $country = '';
+        $iso_code_2 = '';
+        $iso_code_3 = '';
+        $address_format = '';
+      }
+
+      $zone_query = $this->db->query( "SELECT * FROM zone WHERE zone_id = '" . (int)$address_query->row['zone_id'] . "'" );
+
+      if ($zone_query->num_rows) 
+      {
+        $zone = $zone_query->row['name'];
+        $zone_code = $zone_query->row['code'];
+      } 
+      else 
+      {
+        $zone = '';
+        $zone_code = '';
+      }
+
+      $data = array(
+        
+        'valid'     => true,
+        'guid'     => $address_query->row[ 'guid' ],
+        'apartment'        => $address_query->row['apartment'],
+        'building'     => $address_query->row['building'],
+        'street'      => $address_query->row['street'],
+        'house'      => $address_query->row['house'],
+        'postcode'       => $address_query->row['postcode'],
+        'city'           => $address_query->row['city'],
+        'zone_id'        => $address_query->row['zone_id'],
+        'zone'           => $zone,
+        'zone_code'      => $zone_code,
+        'country_id'     => $address_query->row['country_id'],
+        'country'        => $country,
+        'iso_code_2'     => $iso_code_2,
+        'iso_code_3'     => $iso_code_3,
+        'address_format' => $address_format
+      );
+    }
+
+    // Return address data
+    return ( $data );
+    
+  }
+
+  //----------------------------------------------------------------------------
+  // Add address
+  //----------------------------------------------------------------------------
+
+  public function Add( $customer_guid, $data )
+  {
+    
+    // Generate address GUID
+    $guid = UUID_V4_T1();
+    
+    // Compose SQL query
+    $sql = 
+      "INSERT INTO " .
+        "addresses " .
+      "SET " .
+        "guid='" . $guid . "', " .
+        "customer_guid='" . $this->db->escape( $customer_guid ) . "', " .
+        "country_id='" . (int)$data['country_id'] . "', " .
+        "zone_id='" . (int)$data['zone_id'] . "', " .
+        "postcode='" . $this->db->escape($data['postcode']) . "', " .
+        "city='" . $this->db->escape($data['city']) . "', " .
+        "street='" . $this->db->escape($data['street']) . "', " .
+        "house='" . $this->db->escape($data['house']) . "', " .
+        "building='" . $this->db->escape($data['building']) . "', " .
+        "apartment='" . $this->db->escape($data['apartment']) . "'";
+
+    // Query database
+    $this->db->query( $sql );
+
+    // Set success code
+    $return_code = true;
+
+    // Return success/error
+    return( $return_code );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Update address
+  //----------------------------------------------------------------------------
+
+  public function Update( $customer_guid, $address_guid, $data )
+  {
+
+    // Compose SQL query
+    $sql = 
+      "UPDATE " .
+        "addresses " .
+      "SET " .
+        "country_id='" . $this->db->escape((int)$data['country_id']) . "', " .
+        "zone_id='" . $this->db->escape((int)$data['zone_id']) . "', " .
+        "postcode='" . $this->db->escape($data['postcode']) . "', " .
+        "city='" . $this->db->escape($data['city']) . "', " .
+        "street='" . $this->db->escape($data['street']) . "', " .
+        "house='" . $this->db->escape($data['house']) . "', " .
+        "building='" . $this->db->escape($data['building']) . "', " .
+        "apartment='" . $this->db->escape($data['apartment']) . "' " .
+      "WHERE ". 
+        "guid='" . $this->db->escape( $address_guid ) . "' AND " .
+        "customer_guid='" . $this->db->escape( $customer_guid ) . "'";
+
+    // Query database
+    $this->db->query( $sql );
+
+    // Set success code
+    $return_code = true;
+
+    // Return success/error code
+    return( $return_code );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Inactivate address
+  //----------------------------------------------------------------------------
+
+	public function Inactivate( $address_guid )
+	{
+
+    // Compose SQL query
+    $sql = 
+      "UPDATE " .
+        "`addresses` " .
+      "SET " .
+        "`active`='0' " .
+      "WHERE " .
+        "`guid`='" . $this->db->escape( $address_guid ) . "'";
+
+    // Query database
+    $this->db->query( $sql );
+
+    // Set success code
+    $return_code = true;
+
+    // Return success/error code
+    return( $return_code );
+	
+  }
+
+  //----------------------------------------------------------------------------
+/*
+    public function addAddress($data)
+    {
+
+        $this->db->query("INSERT INTO address SET customer_id = '" . (int)$this->customer->Get_ID() . "', firstname = '" . $this->db->escape($data['firstname']) . "', lastname = '" . $this->db->escape($data['lastname']) . "', company = '" . $this->db->escape($data['company']) . "', company_id = '" . $this->db->escape(isset($data['company_id']) ? $data['company_id'] : '') . "', tax_id = '" . $this->db->escape(isset($data['tax_id']) ? $data['tax_id'] : '') . "', address_1 = '" . $this->db->escape($data['address_1']) . "', address_2 = '" . $this->db->escape($data['address_2']) . "', postcode = '" . $this->db->escape($data['postcode']) . "', city = '" . $this->db->escape($data['city']) . "', zone_id = '" . (int)$data['zone_id'] . "', country_id = '" . (int)$data['country_id'] . "'");
+
+        $address_id = $this->db->getLastId();
+
+        if (!empty($data['default'])) {
+            $this->db->query("UPDATE customer SET address_id = '" . (int)$address_id . "' WHERE customer_id = '" . (int)$this->customer->Get_ID() . "'");
+        }
+
+        return $address_id;
+    }
+*/
+
+  //----------------------------------------------------------------------------
+/*
+	public function getAddress($address_id) 
+	{
+		$address_query = $this->db->query("SELECT DISTINCT * FROM address WHERE address_id = '" . (int)$address_id . "' AND customer_id = '" . (int)$this->customer->Get_ID() . "'");
+		
+		if ($address_query->num_rows) 
+		{
+			$country_query = $this->db->query("SELECT * FROM country WHERE country_id = '" . (int)$address_query->row['country_id'] . "'");
+			
+			if ($country_query->num_rows) {
+				$country = $country_query->row['name'];
+				$iso_code_2 = $country_query->row['iso_code_2'];
+				$iso_code_3 = $country_query->row['iso_code_3'];
+				$address_format = $country_query->row['address_format'];
+			} else {
+				$country = '';
+				$iso_code_2 = '';
+				$iso_code_3 = '';	
+				$address_format = '';
+			}
+			
+			$zone_query = $this->db->query("SELECT * FROM zone WHERE zone_id = '" . (int)$address_query->row['zone_id'] . "'");
+			
+			if ($zone_query->num_rows) {
+				$zone = $zone_query->row['name'];
+				$zone_code = $zone_query->row['code'];
+			} else {
+				$zone = '';
+				$zone_code = '';
+			}		
+			
+			$address_data = array(
+				'firstname'      => $address_query->row['firstname'],
+				'lastname'       => $address_query->row['lastname'],
+				'company'        => $address_query->row['company'],
+				'company_id'     => $address_query->row['company_id'],
+				'tax_id'         => $address_query->row['tax_id'],
+				'address_1'      => $address_query->row['address_1'],
+				'address_2'      => $address_query->row['address_2'],
+				'postcode'       => $address_query->row['postcode'],
+				'city'           => $address_query->row['city'],
+				'zone_id'        => $address_query->row['zone_id'],
+				'zone'           => $zone,
+				'zone_code'      => $zone_code,
+				'country_id'     => $address_query->row['country_id'],
+				'country'        => $country,	
+				'iso_code_2'     => $iso_code_2,
+				'iso_code_3'     => $iso_code_3,
+				'address_format' => $address_format
+			);
+			
+			return $address_data;
+		} else {
+			return false;	
+		}
+	}
+*/
+  //----------------------------------------------------------------------------
+/*
+	public function getAddresses() 
+	{
+		$address_data = array();
+		
+		$query = $this->db->query("SELECT * FROM address WHERE customer_id = '" . (int)$this->customer->Get_ID() . "'");
+	
+		foreach ($query->rows as $result) 
+		{
+			$country_query = $this->db->query("SELECT * FROM country WHERE country_id = '" . (int)$result['country_id'] . "'");
+			
+			if ($country_query->num_rows) 
+			{
+				$country = $country_query->row['name'];
+				$iso_code_2 = $country_query->row['iso_code_2'];
+				$iso_code_3 = $country_query->row['iso_code_3'];
+				$address_format = $country_query->row['address_format'];
+			} 
+			else 
+			{
+				$country = '';
+				$iso_code_2 = '';
+				$iso_code_3 = '';	
+				$address_format = '';
+			}
+			
+			$zone_query = $this->db->query("SELECT * FROM zone WHERE zone_id = '" . (int)$result['zone_id'] . "'");
+			
+			if ($zone_query->num_rows) 
+			{
+				$zone = $zone_query->row['name'];
+				$zone_code = $zone_query->row['code'];
+			} 
+			else 
+			{
+				$zone = '';
+				$zone_code = '';
+			}		
+		
+			$address_data[$result['address_id']] = array(
+				'address_id'     => $result['address_id'],
+				'firstname'      => $result['firstname'],
+				'lastname'       => $result['lastname'],
+				'company'        => $result['company'],
+				'company_id'     => $result['company_id'],
+				'tax_id'         => $result['tax_id'],				
+				'address_1'      => $result['address_1'],
+				'address_2'      => $result['address_2'],
+				'postcode'       => $result['postcode'],
+				'city'           => $result['city'],
+				'zone_id'        => $result['zone_id'],
+				'zone'           => $zone,
+				'zone_code'      => $zone_code,
+				'country_id'     => $result['country_id'],
+				'country'        => $country,	
+				'iso_code_2'     => $iso_code_2,
+				'iso_code_3'     => $iso_code_3,
+				'address_format' => $address_format
+			);
+		}		
+		
+		return $address_data;
+	}
+*/
+}
+//------------------------------------------------------------------------------
+// End of file
+//------------------------------------------------------------------------------
+?>

@@ -1,0 +1,1074 @@
+<?php
+class Customer
+{
+
+  //----------------------------------------------------------------------------
+  // Local objects
+  //----------------------------------------------------------------------------
+
+  private $config;
+  private $db;
+  private $request;
+  private $session;
+
+  //----------------------------------------------------------------------------
+  // Active customer related data
+  //----------------------------------------------------------------------------
+
+  private $customer_hash;
+  private $gender_id;
+  private $firstname;
+  private $lastname;
+  private $email;
+  private $phone;
+  private $fax;
+  private $newsletter;
+  private $address_id;
+
+  //----------------------------------------------------------------------------
+  // Constructor
+  //----------------------------------------------------------------------------
+
+  public function __construct( $registry )
+  {
+
+    $this->config = $registry->get( 'config' );
+    $this->db = $registry->get( 'db' );
+    $this->request = $registry->get( 'request' );
+    $this->session = $registry->get( 'session' );
+
+    //--------------------------------------------------------------------------
+
+    // Set customer hash value
+    $this->customer_hash = $this->request->Get_Request_Hash();
+
+    //--------------------------------------------------------------------------
+/*
+    // Test for customer not logged
+    if ( isset( $this->session->data[ 'customer_id' ] ) == false )
+    {
+
+      //------------------------------------------------------------------------
+      // Customer not logged
+      //------------------------------------------------------------------------
+
+      // Logout
+      $this->Logout();
+
+    }
+    else
+    {
+
+      //------------------------------------------------------------------------
+      // Customer logged
+      //------------------------------------------------------------------------
+
+      // Compose SQL query
+      $sql = "SELECT * FROM customer WHERE customer_id = '" . (int)$this->session->data[ 'customer_id' ] . "' AND status = '1'";
+
+      // Query database
+      $customer_query = $this->db->query( $sql );
+
+      // Test for customer present in database
+      if ( $customer_query->num_rows != 1 )
+      {
+
+        //----------------------------------------------------------------------
+        // Customer not found in database
+        //----------------------------------------------------------------------
+
+        // Logout
+        $this->Logout();
+
+      }
+      else
+      {
+
+        //----------------------------------------------------------------------
+        // Customer found in database
+        //----------------------------------------------------------------------
+
+        // Extract customer data
+        $this->gender_id = $customer_query->row[ 'gender_id' ];
+        $this->firstname = $customer_query->row[ 'firstname' ];
+        $this->lastname = $customer_query->row[ 'lastname' ];
+        $this->email = $customer_query->row[ 'email' ];
+        $this->phone = $customer_query->row[ 'phone' ];
+        $this->fax = $customer_query->row[ 'fax' ];
+        $this->newsletter = $customer_query->row[ 'newsletter' ];
+        $this->address_id = $customer_query->row[ 'address_id' ];
+
+        // Log customer IP
+        $this->Log_IP();
+
+      }
+
+    }
+*/
+  }
+
+  //----------------------------------------------------------------------------
+  // Create new customer
+  //----------------------------------------------------------------------------
+
+  public function Fix_Data_1()
+  {
+/*
+    // Compose SQL query
+    $sql =
+      "SELECT " .
+        "`customer`.`guid` AS guid, " .
+        "`customer`.`customer_id` AS id " .
+      "FROM " .
+        "`customer`";
+//      "WHERE " .
+//        "`orders`.`customer_guid`='00000000000000000000000000000000' " .
+//      "GROUP BY " .
+//        "`orders`.`customer_email` " .
+//      "LIMIT 500";
+
+    // Try to execute SQL query
+    $customers = $this->db->query( $sql );
+
+    foreach ( $customers->rows as $customer )
+    {
+
+      // Generate customer GUID
+//      $guid = UUID_V4_T1();
+
+      // Compose SQL query
+//      $sql =
+//        "INSERT INTO" .
+//          "`customer`" .
+//        "SET " .
+//          "`customer`.`guid`='" . $guid . "', " .
+//          "`customer`.`date_added`='" . $customer[ 'date' ] . "', " .
+//          "`customer`.`email`='" . $customer[ 'email' ] . "', " .
+//          "`customer`.`phone`='" . $customer[ 'phone' ] . "', " .
+//          "`customer`.`firstname`='" . $customer[ 'firstname' ] . "', " .
+//          "`customer`.`lastname`='" . $customer[ 'lastname' ] . "'";
+
+      // Try to execute SQL query
+//      $this->db->query( $sql );
+
+      // Compose SQL query
+      $sql =
+        "UPDATE" .
+          "`customer_ip`" .
+        "SET " .
+          "`customer_ip`.`customer_guid`='" . $customer[ 'guid' ] . "' " .
+        "WHERE " .
+          "`customer_ip`.`customer_guid`='" . $customer[ 'id' ] . "'";
+
+      // Try to execute SQL query
+      $this->db->query( $sql );
+
+    }
+*/
+  }
+
+  //----------------------------------------------------------------------------
+
+  public function Fix_Data()
+  {
+/*
+    // Compose SQL query
+    $sql =
+      "SELECT " .
+        "`product_description`.`product_id` AS id, " .
+        "`product`.`guid` AS guid " .
+      "FROM " .
+        "`product_description`" .
+      "LEFT JOIN " .
+        "`product`" .
+      "ON " .
+        "`product`.`product_id`=`product_description`.`product_id` " .
+      "WHERE " .
+        "`product_description`.`item_guid`='00000000000000000000000000000000' " .
+      "GROUP BY " .
+        "`product_description`.`product_id` " .
+      "LIMIT 1";
+
+    // Try to execute SQL query
+    $items = $this->db->query( $sql );
+
+    foreach ( $items->rows as $item )
+    {
+
+      // Generate customer GUID
+//      $guid = UUID_V4_T1();
+
+      // Compose SQL query
+      $sql =
+        "UPDATE " .
+          "`product_description`" .
+        "SET " .
+          "`product_description`.`item_guid`='" . $item[ 'guid' ] . "' " .
+        "WHERE " .
+          "`product_description`.`product_id`='" . $item[ 'id' ] . "'";
+
+      // Try to execute SQL query
+      $this->db->query( $sql );
+
+    }
+*/
+  }
+
+  //----------------------------------------------------------------------------
+  // Create new customer
+  //----------------------------------------------------------------------------
+
+  public function Create( $guid = '', $data = array() )
+  {
+
+    // Compose query
+    $sql =
+      "INSERT INTO " .
+        "`customer` " .
+      "SET " .
+        "`customer`.`guid`='" . $guid . "', " .
+        "`customer`.`firstname`='" . $this->db->escape( $data[ 'firstname' ] ) . "', " .
+        "`customer`.`middlename`='" . $this->db->escape( $data[ 'middlename' ] ) . "', " .
+        "`customer`.`lastname`='" . $this->db->escape( $data[ 'lastname' ] ) . "', " .
+        "`customer`.`email`='" . $this->db->escape( $data[ 'email' ] ) . "', " .
+        "`customer`.`phone`='" . $this->db->escape( $data[ 'phone' ] ) . "', " .
+        "`customer`.`legal_entity`='" . ( ( $data[ 'legal_entity' ] === true ) ? '1' : '0' ) . "', " .
+        "`customer`.`registration_country`='" . $this->db->escape( $data[ 'registration_country' ] ) . "', " .
+        "`customer`.`company_name`='" . $this->db->escape( $data[ 'company_name' ] ) . "', " .
+        "`customer`.`company_register_id`='" . $this->db->escape( $data[ 'company_register_id' ] ) . "', " .
+        "`customer`.`company_tax_id`='" . $this->db->escape( $data[ 'company_tax_id' ] ) . "', " .
+        "`customer`.`consumer`='" . ( ( $data[ 'consumer_role' ] === true ) ? 1 : 0 ) . "', " .
+        "`customer`.`manufacturer`='" . ( ( $data[ 'manufacturer_role' ] === true ) ? 1 : 0 ) . "', " .
+        "`customer`.`supplier`='" . ( ( $data[ 'supplier_role' ] === true ) ? 1 : 0 ) . "', " .
+        "`customer`.`newsletter`='" . ( ( $data[ 'newsletter' ] === true ) ? 1 : 0 ) . "', " .
+        "`customer`.`password`='" . $this->db->escape( password_hash( $data[ 'password' ], PASSWORD_DEFAULT ) ) . "', " .
+        "`customer`.`ip`='" . $this->db->escape( $this->request->server[ 'REMOTE_ADDR' ] ) . "', " .
+        "`customer`.`status`='1', " .
+        "`customer`.`approved`='1', " .
+        "`customer`.`date_added`=NOW()";
+
+    // Execute query
+    $result = $this->db->query( $sql );
+
+    //! @todo ANVILEX KM: Check result
+
+    // Return success code
+    return( true );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Update customer data
+  //----------------------------------------------------------------------------
+
+  public function Update( $guid = '', $data = array() )
+  {
+
+    // Test for legal entity
+    if( $data[ 'legal_entity' ] == '1' )
+    {
+
+      //------------------------------------------------------------------------
+      // Customer is a legal entity
+      //------------------------------------------------------------------------
+
+      // Compose SQL query
+      $sql =
+        "UPDATE " .
+          "`customer` " .
+        "SET " .
+          "`customer`.`company_name`='" . $this->db->escape( $data[ 'company_name' ] ) . "', " .
+          "`customer`.`company_register_id`='" . $this->db->escape( $data[ 'company_register_id' ] ) . "', " .
+          "`customer`.`company_tax_id`='" . $this->db->escape( $data[ 'company_tax_id' ] ) . "', " .
+          "`customer`.`firstname`='" . $this->db->escape( $data[ 'firstname' ] ) . "', " .
+          "`customer`.`registration_country`='" . $this->db->escape( $data[ 'registration_country' ] ) . "', " .
+          "`customer`.`middlename`='" . $this->db->escape( $data[ 'middlename' ] ) . "', " .
+          "`customer`.`lastname`='" . $this->db->escape( $data[ 'lastname' ] ) . "', " .
+          "`customer`.`phone`='" . $this->db->escape( $data[ 'phone' ] ) . "' " .
+        "WHERE " .
+          "`customer`.`guid` = '" . $this->db->escape( $guid ) . "';";
+
+    }
+    else
+    {
+
+      //------------------------------------------------------------------------
+      // Customer is end customer
+      //------------------------------------------------------------------------
+
+      // Compose SQL query
+      $sql =
+        "UPDATE " .
+          "`customer` " .
+        "SET " .
+          "`customer`.`company_name`='', " .
+          "`customer`.`company_register_id`='', " .
+          "`customer`.`company_tax_id`='', " .
+          "`customer`.`registration_country`='" . $this->db->escape( $data[ 'registration_country' ] ) . "', " .
+          "`customer`.`firstname`='" . $this->db->escape( $data[ 'firstname' ] ) . "', " .
+          "`customer`.`middlename`='" . $this->db->escape( $data[ 'middlename' ] ) . "', " .
+          "`customer`.`lastname`='" . $this->db->escape( $data[ 'lastname' ] ) . "', " .
+          "`customer`.`phone`='" . $this->db->escape( $data[ 'phone' ] ) . "' " .
+        "WHERE " .
+          "`customer`.`guid` = '" . $this->db->escape( $guid ) . "';";
+
+    }
+
+    // Query databse
+    $result = $this->db->query( $sql );
+
+    // Return success code
+    return( true );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Edit customer data
+  //----------------------------------------------------------------------------
+
+  public function Edit( $guid = '', $data = array() )
+  {
+
+    // Test for legal entity
+    if( $data[ 'legal_entity' ] == '1' )
+    {
+
+      //------------------------------------------------------------------------
+      // Customer is a legal entity
+      //------------------------------------------------------------------------
+
+      // Compose SQL query
+      $sql =
+        "UPDATE " .
+          "`customer` " .
+        "SET " .
+          "`customer`.`company_name`='" . $this->db->escape( $data[ 'company_name' ] ) . "', " .
+          "`customer`.`firstname`='" . $this->db->escape( $data[ 'firstname' ] ) . "', " .
+          "`customer`.`registration_country`='" . $this->db->escape( $data[ 'registration_country' ] ) . "', " .
+          "`customer`.`middlename`='" . $this->db->escape( $data[ 'middlename' ] ) . "', " .
+          "`customer`.`lastname`='" . $this->db->escape( $data[ 'lastname' ] ) . "', " .
+          "`customer`.`consumer`='" . ( ( $data[ 'consumer_role' ] === true ) ? 1 : 0 ) . "', " .
+          "`customer`.`manufacturer`='" . ( ( $data[ 'manufacturer_role' ] === true ) ? 1 : 0 ) . "', " .
+          "`customer`.`supplier`='" . ( ( $data[ 'supplier_role' ] === true ) ? 1 : 0 ) . "'" .
+        "WHERE " .
+          "`customer`.`guid` = '" . $this->db->escape( $guid ) . "';";
+
+
+    }
+    else
+    {
+
+      //------------------------------------------------------------------------
+      // Customer is end customer
+      //------------------------------------------------------------------------
+
+      // Compose SQL query
+      $sql =
+        "UPDATE " .
+          "`customer` " .
+        "SET " .
+          "`customer`.`registration_country`='" . $this->db->escape( $data[ 'registration_country' ] ) . "', " .
+          "`customer`.`firstname`='" . $this->db->escape( $data[ 'firstname' ] ) . "', " .
+          "`customer`.`middlename`='" . $this->db->escape( $data[ 'middlename' ] ) . "', " .
+          "`customer`.`lastname`='" . $this->db->escape( $data[ 'lastname' ] ) . "' " .
+        "WHERE " .
+          "`customer`.`guid` = '" . $this->db->escape( $guid ) . "';";
+
+    }
+
+    // Query databse
+    $result = $this->db->query( $sql );
+
+    // Return success code
+    return( true );
+
+  }
+  //----------------------------------------------------------------------------
+  // Get customer information
+  //----------------------------------------------------------------------------
+
+  public function Get_Contact_Information( $customer_guid = '' )
+  {
+
+    // Compose SQL query
+    $sql =
+      "SELECT " .
+        " * " .
+      "FROM " .
+        "`customer` " .
+      "WHERE " .
+        "`customer`.`guid`='" . $this->db->escape( $customer_guid ) . "'";
+
+    // Query database
+    $result = $this->db->query( $sql );
+
+    // Test record count
+    if ( $result->num_rows != 1 )
+    {
+
+      // Set default data
+      $contact_data[ 'valid' ] = false;
+      $contact_data[ 'contact_id' ] = 0;
+      $contact_data[ 'guid' ] = '';
+      $contact_data[ 'gender_id' ] = 0;
+      $contact_data[ 'legal_entity' ] = 0;
+      $contact_data[ 'firstname' ] = '';
+      $contact_data[ 'lastname' ] = '';
+      $contact_data[ 'email' ] = '';
+      $contact_data[ 'phone' ] = '';
+      $contact_data[ 'fax' ] = '';
+      $contact_data[ 'legal_entity' ] = false;
+      $contact_data[ 'company' ] = '';
+      $contact_data[ 'company_name' ] = '';
+      $contact_data[ 'company_id' ] = '';
+      $contact_data[ 'company_register_id' ] = '';
+      $contact_data[ 'company_tax_id' ] = '';
+      $contact_data[ 'tax_id' ] = '';
+      $contact_data[ 'date_added' ] = '0000-00-00 00:00:00';
+      $contact_data[ 'newsletter' ] = false;
+      $contact_data[ 'consumer' ] = false;
+      $contact_data[ 'manufacturer' ] = false;
+      $contact_data[ 'supplier' ] = false;
+      $contact_data[ 'registration_country' ] = '';
+
+    }
+    else
+    {
+
+      // Extract data
+      $contact_data[ 'valid' ] = true;
+      $contact_data[ 'contact_id' ] = $result->row[ 'customer_id' ];
+      $contact_data[ 'guid' ] = $result->row[ 'guid' ];
+      $contact_data[ 'gender_id' ] = $result->row[ 'gender_id' ];
+      $contact_data[ 'firstname' ] = $result->row[ 'firstname' ];
+      $contact_data[ 'lastname' ] = $result->row[ 'lastname' ];
+      $contact_data[ 'middlename' ] = $result->row[ 'middlename' ];
+      $contact_data[ 'email' ] = $result->row[ 'email' ];
+      $contact_data[ 'phone' ] = $result->row[ 'phone' ];
+      $contact_data[ 'fax' ] = $result->row[ 'fax' ];
+      $contact_data[ 'legal_entity' ] = $result->row[ 'legal_entity' ];
+      $contact_data[ 'company_name' ] = $result->row[ 'company_name' ];
+      $contact_data[ 'company_register_id' ] = $result->row[ 'company_register_id' ];
+      $contact_data[ 'company_tax_id' ] = $result->row[ 'company_tax_id' ];
+      $contact_data[ 'date_added' ] =$result->row[ 'date_added' ];
+      $contact_data[ 'newsletter' ] = $result->row[ 'newsletter' ];
+      $contact_data[ 'consumer' ] = $result->row[ 'consumer' ];
+      $contact_data[ 'manufacturer' ] = $result->row[ 'manufacturer' ];
+      $contact_data[ 'supplier' ] = $result->row[ 'supplier' ];
+      $contact_data[ 'registration_country' ] = $result->row[ 'registration_country' ];
+
+    }
+
+    // Return data
+    return( $contact_data );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Is customer referenced by email exists
+  //----------------------------------------------------------------------------
+
+  public function Is_Exists( $email = '' ) : bool
+  {
+
+    // Trim email address
+    $email = trim( utf8_strtolower( $email ) );
+
+    // Test for email address empty
+    if ( $email == '' )
+    {
+
+      //------------------------------------------------------------------------
+      // ERROR: Email address is empty
+      //------------------------------------------------------------------------
+
+      // Set error code
+      $return_code = false;
+
+    }
+    else
+    {
+
+      //------------------------------------------------------------------------
+      // Email address not empty
+      //------------------------------------------------------------------------
+
+      // Compose SQL query
+      $sql =
+        "SELECT " .
+          "`customer`.`guid` " .
+        "FROM " .
+          "`customer` " .
+        "WHERE " .
+          "`customer`.`email`='" . $this->db->escape( $email ) . "'" .
+        "LIMIT 1";
+
+      // Query database
+      $result = $this->db->query( $sql );
+
+      // Test record count
+      if ( $result->num_rows == 0 )
+      {
+
+        //----------------------------------------------------------------------
+        // Customer account not found
+        //----------------------------------------------------------------------
+
+        // Set error code
+        $return_code = false;
+
+      }
+      else
+      {
+
+        //----------------------------------------------------------------------
+        // Customer account found
+        //----------------------------------------------------------------------
+
+        // Set success code
+        $return_code = true;
+
+      }
+
+    }
+
+    // Return status
+    return( $return_code );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Customer login
+  //----------------------------------------------------------------------------
+
+  public function Login( $email, $password, $override = false )
+  {
+
+    // Trim email address
+    $email = trim( utf8_strtolower( $email ) );
+
+    // Local variables
+    $logged_status = false;
+
+    // Compose SQL query
+    $sql =
+      "SELECT " .
+        "`customer`.`guid`, " .
+        "`customer`.`password` " .
+      "FROM " .
+        "`customer` " .
+      "WHERE " .
+        "`customer`.`email`='" . $this->db->escape( $email ) . "' AND " .
+        "`customer`.`status`=1 AND " .
+        "`customer`.`approved`=1";
+
+    // Try to execute SQL query
+    $result = $this->db->query( $sql );
+
+    // Test amount of records
+    if ( $result->num_rows != 1 )
+    {
+
+      //------------------------------------------------------------------------
+      // ERROR: Login failed
+      //------------------------------------------------------------------------
+
+      // Logout
+      $this->Logout();
+
+      // Clear logged status
+      $logged_status = false;
+
+    }
+    else
+    {
+
+      //------------------------------------------------------------------------
+      // Regular customer detected by email
+      //------------------------------------------------------------------------
+
+      // Try to verify password
+      if( password_verify( $password, $result->row[ 'password' ] ) === false )
+      {
+
+        //--------------------------------------------------------------------
+        // ERROR: Invalud password
+        //--------------------------------------------------------------------
+
+        // Clear logged status
+        $logged_status = false;
+
+      }
+      else
+      {
+
+        //----------------------------------------------------------------------
+        // Custommer logged by email and password
+        //----------------------------------------------------------------------
+
+        // Store customer GUID in session
+        $this->session->data[ 'customer_guid' ] = $result->row[ 'guid' ];
+
+        // Log customer IP
+        $this->Log_IP();
+
+        // Set logged status
+        $logged_status = true;
+
+      }
+
+    }
+
+    // Return error code
+    return( $logged_status );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Logout method
+  //----------------------------------------------------------------------------
+
+  public function Logout()
+  {
+
+    // Unset customer guid
+    unset( $this->session->data[ 'customer_guid' ] );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Return logged status
+  //----------------------------------------------------------------------------
+
+  public function Is_Logged() : bool
+  {
+
+    // Test for customer GUID set
+    if ( isset( $this->session->data[ 'customer_guid' ] ) === false )
+    {
+
+      //------------------------------------------------------------------------
+      // Customer GUID not set, customer not logged in
+      //------------------------------------------------------------------------
+
+      // Return not logged status
+      return( false );
+
+    }
+    else
+    {
+
+      //------------------------------------------------------------------------
+      // Customer GUID set
+      //------------------------------------------------------------------------
+
+      // Test for GUID not empty
+      //! @todo ANVILEX KM: Verify GUID format
+      if( $this->session->data[ 'customer_guid' ] === '' )
+      {
+
+        //------------------------------------------------------------------------
+        // Customer GUID set but invalid, customer not logged in
+        //------------------------------------------------------------------------
+
+        // Return not logged status
+        return( false );
+
+      }
+      else
+      {
+
+        //------------------------------------------------------------------------
+        // Customer GUID set and valid, customer logged in
+        //------------------------------------------------------------------------
+
+        // Return logged status
+        return( true );
+
+      }
+
+    }
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Update customer ip table
+  //----------------------------------------------------------------------------
+
+  public function Log_IP()
+  {
+
+    // Compose QSL query
+    $sql =
+      "INSERT INTO " .
+        "customer_ip ( customer_guid, ip4, first_request_date, last_request_date, logins ) " .
+      "VALUES( '" . $this->Get_GUID() . "', " . $this->request->Get_Request_IP() . ", NOW(), NOW(), 1 ) " .
+      "ON DUPLICATE KEY UPDATE " .
+        "last_request_date=NOW(), " .
+        "logins=logins+1";
+
+    // Query database
+    $this->db->query( $sql );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Reset password
+  //----------------------------------------------------------------------------
+
+  public function Reset_Password( $email = '', $hash = '' ) : bool
+  {
+
+		// Trim email address
+		$email = trim( utf8_strtolower( $email ) );
+
+    // Test for email address empty
+    if ( $email === '' )
+    {
+
+      //------------------------------------------------------------------------
+      // ERROR: Email address is empty
+      //------------------------------------------------------------------------
+
+			// Set error code
+			$return_code = false;
+
+    }
+    else
+    {
+
+      //------------------------------------------------------------------------
+      // Email address not empty
+      //------------------------------------------------------------------------
+
+  		// Compose SQL query
+	  	$sql =
+        "UPDATE " .
+          "`customer` " .
+        "SET " .
+          "`customer`.`password`='', " .
+          "`customer`.`hash`='" . $this->db->escape( $hash ) . "', " .
+          "`customer`.`hash_datetime`=NOW()" .
+        "WHERE " .
+          "`customer`.`email`='" . $this->db->escape( $email ) . "' " .
+        "LIMIT 1";
+
+		  // Query database
+		  $result = $this->db->query( $sql );
+
+      //! @todo ANVILEX KM: Check result
+
+			// Set success code
+			$return_code = true;
+
+    }
+
+    // Return status
+    return( $return_code );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Is change password requesded
+  //----------------------------------------------------------------------------
+
+  public function Is_Change_Password_Requested( $hash = '' ) : bool
+  {
+
+    // Compose SQL query
+    $sql =
+      "SELECT " .
+        "`customer`.`guid` " .
+      "FROM " .
+        "`customer` " .
+      "WHERE " .
+        "`customer`.`hash`='" . $this->db->escape( $hash ) . "' AND " .
+        "`customer`.`status`=1 AND " .
+        "`customer`.`approved`=1 " .
+      "LIMIT 2";
+
+    // Try to execute SQL query
+    $result = $this->db->query( $sql );
+
+    // Test amount of records
+    if ( $result->num_rows != 1 )
+    {
+
+      // Set error code
+      $return_code = false;
+
+    }
+    else
+    {
+
+      // Set success code
+      $return_code = true;
+
+    }
+
+    // Return status
+    return( $return_code );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Update password
+  //----------------------------------------------------------------------------
+
+  public function Change_Password( $hash = '', $new_password = '' ) : bool
+  {
+
+    // Init return code
+    $return_code = false;
+
+    // Test for email address empty
+    if (
+      ( $new_password === '' ) ||
+      ( $hash === '' )
+    )
+    {
+
+      //------------------------------------------------------------------------
+      // ERROR: Email address is empty
+      //------------------------------------------------------------------------
+
+      // Set error code
+      $return_code = false;
+
+    }
+    else
+    {
+
+      //------------------------------------------------------------------------
+      // Email address not empty
+      //------------------------------------------------------------------------
+
+      // Compose SQL query
+      $sql =
+        "UPDATE " .
+          "`customer` " .
+        "SET " .
+          "`customer`.`password`='" . $this->db->escape( password_hash( $new_password, PASSWORD_DEFAULT ) ) . "', " .
+          "`customer`.`hash`='', " .
+          "`customer`.`hash_datetime`='0000-00-00 00:00:00' " .
+        "WHERE " .
+          "`customer`.`hash`='" . $this->db->escape( $hash ) . "' " .
+        "LIMIT 1";
+
+      // Query database
+      //! @todo ANVILEX KM: Check result
+      $this->db->query( $sql );
+
+      // Set success code
+      $return_code = true;
+
+    }
+
+    // Return status
+    return( $return_code );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Get customer GUID stored in session
+  //----------------------------------------------------------------------------
+
+  public function Get_GUID()
+  {
+
+    // Customer guid not setted
+    if ( isset( $this->session->data[ 'customer_guid' ] ) === false )
+    {
+
+      //------------------------------------------------------------------------
+      // Customer GUID not setted
+      //------------------------------------------------------------------------
+
+      // Send empty guid
+      $customer_guid = '';
+
+    }
+    else
+    {
+
+      //------------------------------------------------------------------------
+      // Customer GUID setted
+      //------------------------------------------------------------------------
+
+      // Get customer guid from session
+      $customer_guid = $this->session->data[ 'customer_guid' ];
+
+    }
+
+    // Return customer guid
+    return( $customer_guid );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // ANVILEX KM: Used by newsletter UPDATE
+  //----------------------------------------------------------------------------
+
+  public function Get_Customer_Id_by_Guid( $guid )
+  {
+
+    // Compose SQL query
+    $sql = "SELECT customer_id FROM customer WHERE guid='". $guid ."'";
+
+    // Query database
+    $result = $this->db->query( $sql );
+
+    // Return data
+    return( $result->row );
+  }
+
+  //----------------------------------------------------------------------------
+  //! @todo ANVILEX KM: Move to newsletter objects.
+
+	public function Edit_Newsletter( $data )
+	{
+
+		$sql = "UPDATE customer SET ";
+		$sql .= "newsletter='" . $this->db->escape($data['newsletter'] ? 1 : 0) . "'";
+		$sql .=" WHERE customer_id = '" . $this->db->escape($data['customer_id']) . "';";
+
+    $this->db->query( $sql );
+
+	}
+
+  //----------------------------------------------------------------------------
+  // ANVILEX KM: Used by newsletter UPDATE
+  //! @todo ANVILEX KM: Move to newsletter objects.
+
+  public function getNewsletter()
+  {
+
+    return $this->newsletter;
+
+  }
+
+  //----------------------------------------------------------------------------
+  // ANVILEX KM: Used by newsletter UPDATE
+  //! @todo ANVILEX KM: Move to newsletter objects.
+
+	public function editNewsletter( $newsletter )
+	{
+
+		$this->db->query("UPDATE customer SET newsletter = '" . (int)$newsletter . "' WHERE customer_id = '" . (int)$this->customer->Get_ID() . "'");
+
+	}
+
+  //----------------------------------------------------------------------------
+  //! @todo ANVILEX KM: Move to newsletter objects.
+
+	public function optinNewsletter( $contact_id, $hash )
+	{
+
+		$this->db->query("UPDATE customer SET newsletter = '1' WHERE customer_id = '" . (int)$contact_id . "' AND newsletter_hash='" . $hash . "'");
+		$this->db->query("INSERT INTO newsletter_history SET contact_id='" . (int)$contact_id . "', action='I', date_added=NOW()");
+
+	}
+
+  //----------------------------------------------------------------------------
+  //! @todo ANVILEX KM: Move to newsletter objects.
+
+	public function optoutNewsletter( $contact_id, $hash )
+	{
+
+		$this->db->query("UPDATE customer SET newsletter = '0' WHERE customer_id = '" . (int)$contact_id . "' AND newsletter_hash='" . $hash . "'");
+		$this->db->query("INSERT INTO newsletter_history SET contact_id='" . (int)$contact_id . "', action='O', date_added=NOW()");
+
+	}
+
+  //----------------------------------------------------------------------------
+  // ANVILEX KM: Used on orders
+
+  public function Get_Customer_By_GUID( $customer_guid )
+  {
+
+    $query = $this->db->query("SELECT * FROM customer WHERE guid = '" . (int)$customer_guid . "'");
+
+    return( $query->row );
+
+  }
+
+  //----------------------------------------------------------------------------
+
+	public function getCustomers( $data = array() )
+	{
+
+		$sql = "SELECT *, CONCAT(c.firstname, ' ', c.lastname) AS name FROM customer c ";
+
+		$implode = array();
+
+		if (isset($data['filter_name']) && !is_null($data['filter_name'])) {
+			$implode[] = "LCASE(CONCAT(c.firstname, ' ', c.lastname)) LIKE '" . $this->db->escape(utf8_strtolower($data['filter_name'])) . "%'";
+		}
+
+		if (isset($data['filter_email']) && !is_null($data['filter_email'])) {
+			$implode[] = "LCASE(c.email) = '" . $this->db->escape(utf8_strtolower($data['filter_email'])) . "'";
+		}
+
+		if (isset($data['filter_status']) && !is_null($data['filter_status'])) {
+			$implode[] = "c.status = '" . (int)$data['filter_status'] . "'";
+		}
+
+		if (isset($data['filter_approved']) && !is_null($data['filter_approved'])) {
+			$implode[] = "c.approved = '" . (int)$data['filter_approved'] . "'";
+		}
+
+		if (isset($data['filter_ip']) && !is_null($data['filter_ip'])) {
+			$implode[] = "c.customer_id IN (SELECT customer_id FROM customer_ip WHERE ip = '" . $this->db->escape($data['filter_ip']) . "')";
+		}
+
+		if (isset($data['filter_date_added']) && !is_null($data['filter_date_added'])) {
+			$implode[] = "DATE(c.date_added) = DATE('" . $this->db->escape($data['filter_date_added']) . "')";
+		}
+
+		if ($implode)
+		{
+			$sql .= " WHERE " . implode(" AND ", $implode);
+		}
+
+		$sort_data = array(
+			'name',
+			'c.email',
+			'c.status',
+			'c.ip',
+			'c.date_added'
+		);
+
+		if (isset($data['sort']) && in_array($data['sort'], $sort_data))
+		{
+			$sql .= " ORDER BY " . $data['sort'];
+		}
+		else
+		{
+			$sql .= " ORDER BY name";
+		}
+
+		if (isset($data['start']) || isset($data['limit']))
+		{
+			if ($data['start'] < 0)
+			{
+				$data['start'] = 0;
+			}
+
+			if ($data['limit'] < 1)
+			{
+				$data['limit'] = 20;
+			}
+
+			$sql .= " LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
+		}
+
+		$query = $this->db->query($sql);
+
+		return $query->rows;
+	}
+
+}
+//------------------------------------------------------------------------------
+// End of file
+//------------------------------------------------------------------------------
+?>

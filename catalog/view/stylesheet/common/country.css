@@ -1,0 +1,25 @@
+
+/*----------------------------------------------------------------------------*/
+/* Countries sybsystem                                                        */
+/*----------------------------------------------------------------------------*/
+
+.countries-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr) );
+    gap: var(--global-gap);
+    justify-items: center;
+    width: 100%;
+
+}
+
+.countries-first-letter{
+    font-weight: bold;
+    padding: var(--global-gap);
+    color: var( --global-text-color);
+    font-size: var(--global-container-headline-font-size);
+    text-align: right;
+}
+
+.button{
+    width: 100%;
+}

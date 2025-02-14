@@ -1,0 +1,14 @@
+/*----------------------------------------------------------------------------*/
+/* Workplace Edit task subsystem                                                          */
+/*----------------------------------------------------------------------------*/
+
+.buttons{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+label{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}

@@ -1,0 +1,24 @@
+.shipping__type-value {
+    display: flex;
+    flex-direction: row;
+    margin: 0;
+    gap: var(--global-gap);
+}
+.shipping__type-value>div{
+    display: flex;
+    flex-direction: column;
+    gap: var(--global-gap);
+}
+.shipping__type-methods{
+    display: flex;
+    flex-direction: column;
+}
+.shipping__type-img{
+    height: 75px;
+}
+
+.active {
+    border-color: var(--global-color-active-button);
+    outline: 3px solid var(--global-color-active-button);
+    outline-offset: -2px;
+}

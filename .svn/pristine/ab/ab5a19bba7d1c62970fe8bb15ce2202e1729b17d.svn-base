@@ -1,0 +1,63 @@
+<?php
+class YandexXMLGenerator {
+    private $db;
+
+    public function __construct($dbHost, $dbName, $dbUser, $dbPass) {
+        $this->db = new PDO("mysql:host=$dbHost;dbname=$dbName;charset=utf8", $dbUser, $dbPass);
+    }
+
+    public function generateXML() {
+        header('Content-Type: application/xml; charset=utf-8');
+
+        $products = $this->getProducts();
+
+        $xml = new SimpleXMLElement('<yml_catalog/>');
+        $xml->addAttribute('date', date('Y-m-d H:i:s'));
+
+        $shop = $xml->addChild('shop');
+        $shop->addChild('name', 'Anvilex');
+        $shop->addChild('company', 'Anvilex');
+        $shop->addChild('url', 'http://localhost/shop/');
+        $shop->addChild('currencyId', 'RUB');
+
+        $offers = $shop->addChild('offers');
+
+        foreach ($products as $product) {
+            $offer = $offers->addChild('offer');
+            $offer->addAttribute('id', $product['guid']);
+            $offer->addChild('name', $product['name']);
+            $offer->addChild('vendor', $product['vendor']);
+            $offer->addChild('url', $product['url']);
+            $offer->addChild('description', $product['description']);
+            $offer->addChild('param', $product['param']);
+            $offer->addChild('vendorCode', $product['vendorCode']);
+            $offer->addChild('store', 'false');
+            $offer->addChild('pickup', 'false');
+            $offer->addChild('delivery', 'false');
+            $offer->addChild('country_of_origin', $product['country_of_origin']);
+        }
+
+        echo $xml->asXML();
+    }
+
+    private function getProducts() {
+        $query = $this->db->query('
+            SELECT  
+                p.guid,  
+                pd.name,  
+                p.vendor,  
+                p.url,  
+                pd.description,  
+                pp.param,  
+                p.vendorCode,  
+                p.country_of_origin 
+            FROM product p 
+            JOIN product_description pd ON p.id = pd.product_id 
+            JOIN product_properties pp ON p.id = pp.product_id 
+        ');
+        return $query->fetchAll(PDO::FETCH_ASSOC);
+    }
+}
+
+$generator = new YandexXMLGenerator('localhost', 'your_database', 'username', 'password');
+$generator->generateXML();

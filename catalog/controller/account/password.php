@@ -1,0 +1,327 @@
+<?php
+
+class ControllerAccountPassword extends Controller
+{
+
+  //----------------------------------------------------------------------------
+  // Default method
+  //----------------------------------------------------------------------------
+
+  public function index()
+  {
+
+    // Test for customer not logged in
+    if ( $this->customer->Is_Logged() === true )
+    {
+
+      //------------------------------------------------------------------------
+      // Customer logged, regirect to account page
+      //------------------------------------------------------------------------
+
+      // Redirect to account
+      $this->response->Redirect( $this->url->link( 'account/account', '', 'SSL' ) );
+
+    }
+    else
+    {
+
+      //------------------------------------------------------------------------
+      // Customer not logged
+      //------------------------------------------------------------------------
+
+      // Test for parameter exists
+      if ( $this->request->Is_GET_Parameter_GUID( 'hash' ) === false )
+      {
+
+        //----------------------------------------------------------------------
+        // ERROR: Hash parameter not found, redirect
+        //----------------------------------------------------------------------
+
+        // Redirect to restore password
+        $this->response->Redirect( $this->url->link( 'account/forgotten', '', 'SSL' ) );
+
+      }
+      else
+      {
+
+        //----------------------------------------------------------------------
+        // Hash parameter found and valid
+        //----------------------------------------------------------------------
+
+        // Get hash
+        $hash = $this->request->Get_GET_Parameter_As_GUID( 'hash' );
+
+        // Test for password already changed
+        if ( $this->customer->Is_Change_Password_Requested( $hash ) === false )
+        {
+
+          //--------------------------------------------------------------------
+          // ERROR: Password chang request not found
+          //--------------------------------------------------------------------
+
+          // Redirect to restore password
+          $this->response->Redirect( $this->url->link( 'account/forgotten', '', 'SSL' ) );
+
+        }
+        else
+        {
+
+          //--------------------------------------------------------------------
+          // Password chang request found
+          //--------------------------------------------------------------------
+
+          // Load messages
+          $this->messages->Load( $this->data, 'account', 'password', 'index', $this->language->Get_Language_Code() );
+
+          // Set hash
+          $this->data[ 'hash' ] = $hash;
+
+          // Set links
+          $this->data[ 'save_changes_button_href' ] = $this->url->Link( 'account/password/save', '', 'SSL' );
+
+          //----------------------------------------------------------------------
+          // Render page
+          //----------------------------------------------------------------------
+
+          // Set document properties
+          $this->response->setTitle( $this->messages->Get_Message( 'document_title_text' ) );
+          $this->response->setDescription( $this->messages->Get_Message( 'document_description_text' ) );
+          $this->response->setKeywords( '' );
+          $this->response->setRobots( 'index, follow' );
+
+          // Add styles
+          $this->response->addStyle( 'catalog/view/stylesheet/account/account.css' );
+          $this->response->addStyle( 'catalog/view/stylesheet/account/password.css' );
+
+          // Set page template
+          $this->children = array(
+            'common/footer',
+            'common/header'
+          );
+
+        }
+
+      }
+
+    }
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Save password
+  //----------------------------------------------------------------------------
+  // Caller: AJAX
+  //----------------------------------------------------------------------------
+
+  public function save()
+  {
+
+    // Init json data
+    $json = array();
+
+    // Test for customer logged in
+    if ( $this->customer->Is_Logged() === true )
+    {
+
+      //------------------------------------------------------------------------
+      // ERROR: Custommer logged in
+      //------------------------------------------------------------------------
+
+      // Set redirect link
+      $json[ 'redirect_url' ] = $this->url->link( 'account/login', '', 'SSL' );
+
+      // Set error code
+      $json[ 'return_code' ] = false;
+
+    }
+    else
+    {
+
+      //------------------------------------------------------------------------
+      // Customer not logged in
+      //------------------------------------------------------------------------
+
+      // Load messages
+      $this->messages->Load( $this->data, 'account', 'password', 'Edit_Password', $this->language->Get_Language_Code() );
+
+      // Clear request data valid status
+      $request_data_valid = true;
+
+      //------------------------------------------------------------------------
+      // Hash
+      //------------------------------------------------------------------------
+
+      // Test for parameter exists
+      if ( $this->request->Is_POST_Parameter_GUID( 'hash' ) === false )
+      {
+
+        //----------------------------------------------------------------------
+        // ERROR: Hash parameter not found
+        //----------------------------------------------------------------------
+
+        // Set error message
+        $json[ 'error' ][ 'hash' ] = $this->data[ 'account_password_hash_error' ];
+
+        // Clear request data valid status
+        $request_data_valid = false;
+
+      }
+      else
+      {
+
+        //----------------------------------------------------------------------
+        // Hash parameter found
+        //----------------------------------------------------------------------
+
+        // Store customer data
+        $hash = $this->request->Get_POST_Parameter_As_GUID( 'hash' );
+
+        // Set request data valid sataus
+        $request_data_valid = $request_data_valid && true;
+
+      }
+
+      //------------------------------------------------------------------------
+      // Password
+      //------------------------------------------------------------------------
+
+      // Test for parameter exists
+      if ( $this->request->Is_POST_Parameter_Password( 'password', 8, 20 ) === false )
+      {
+
+        //----------------------------------------------------------------------
+        // ERROR: Password parameter not found
+        //----------------------------------------------------------------------
+
+        // Set error message
+        $json[ 'error' ][ 'password' ] = $this->data[ 'account_password_password_error' ];
+
+        // Clear request data valid sataus
+        $request_data_valid = false;
+
+      }
+      else
+      {
+
+        //----------------------------------------------------------------------
+        // Password parameter found and valid
+        //----------------------------------------------------------------------
+
+        // Store customer data
+        $new_password = trim( $this->request->Get_POST_Parameter_As_Password( 'password' ) );
+
+        // Set request data valid sataus
+        $request_data_valid = $request_data_valid && true;
+
+      }
+
+      //------------------------------------------------------------------------
+      // Confirm password
+      //------------------------------------------------------------------------
+
+      // Test for parameter exists
+      if ( $this->request->Is_POST_Parameter_Password( 'confirm', 8, 20 ) === false )
+      {
+
+        //----------------------------------------------------------------------
+        // ERROR: Password confirm parameter not found
+        //----------------------------------------------------------------------
+
+        // Set error message
+        //! @todo ANVILEX KM: Send other message
+        $json[ 'error' ][ 'confirm' ] = $this->data[ 'account_password_confirm_error' ];
+
+        // Clear request data valid sataus
+        $request_data_valid = false;
+
+      }
+      else
+      {
+
+        //----------------------------------------------------------------------
+        // Password confirm parameter found
+        //----------------------------------------------------------------------
+
+        // Get password confirm
+        $confirm_new_password = $this->request->Get_POST_Parameter_As_Password( 'confirm' );
+
+        // Test password validity
+        if ( $new_password != $confirm_new_password )
+        {
+
+          //--------------------------------------------------------------------
+          // ERROR: Password confirm invalid
+          //--------------------------------------------------------------------
+
+          // Set error message
+          $json[ 'error' ][ 'confirm' ] = $this->data[ 'account_password_confirm_error' ];
+
+          // Clear request data valid sataus
+          $request_data_valid = false;
+
+        }
+        else
+        {
+
+          //--------------------------------------------------------------------
+          // Password valid
+          //--------------------------------------------------------------------
+
+          // Set request data valid sataus
+          $request_data_valid = $request_data_valid && true;
+
+        }
+
+      }
+
+      //--------------------------------------------------------------------------
+      // Process request
+      //--------------------------------------------------------------------------
+
+      // Is request data valid
+      if ( $request_data_valid === false )
+      {
+
+        //------------------------------------------------------------------------
+        // ERROR: Parameters not valid
+        //------------------------------------------------------------------------
+
+        // Set error code
+        $json[ 'return_code' ] = false;
+
+      }
+      else
+      {
+
+        //--------------------------------------------------------------------
+        // Parameters present and valid, set new password and login
+        //--------------------------------------------------------------------
+
+        $this->session->data[ 'password_success' ] = 'success';
+
+        // Change password
+        $this->customer->Change_Password( $hash, $new_password );
+
+        // Login using email and password
+//        $this->customer->login( $customer_data[ 'email' ], $new_password ] );
+
+        // Set redirect link
+        $json[ 'redirect_url' ] = $this->url->link( 'account/password_success', '', 'SSL' );
+
+        // Set success code
+        $json[ 'return_code' ] = true;
+
+      }
+
+    }
+
+    // Encode and send json data
+    $this->response->Set_Json_Output( $json );
+
+  }
+
+}
+//------------------------------------------------------------------------------
+// End of files
+//------------------------------------------------------------------------------
+?>

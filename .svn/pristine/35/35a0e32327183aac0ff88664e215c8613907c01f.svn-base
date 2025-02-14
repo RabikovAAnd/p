@@ -1,0 +1,151 @@
+<?php
+class ModelCustomersSuppliers extends Model 
+{
+
+  //----------------------------------------------------------------------------
+  // Get customer information
+  //----------------------------------------------------------------------------
+
+	public function Add_Supplier( $supplier_guid, $item_guid )
+	{
+
+		// Compose SQL query
+    $sql =
+    "INSERT INTO " .
+      "suppliers_items " .
+    "SET " .
+      "supplier_guid='" . $this->db->escape( $supplier_guid ) . "', " .
+      "item_guid='" . $this->db->escape( $item_guid ) . "' " ;
+
+		// Query database
+		$this->db->query( $sql );
+
+		// Return data
+		return( true);
+
+	}
+  
+  //----------------------------------------------------------------------------
+
+  public function Get_Item_Suppliers ($item_guid )
+	{
+
+		// Compose SQL query
+    $sql =
+     "SELECT * " .
+     "FROM " .
+      "suppliers_items " .
+    "WHERE " .
+      "item_guid='" . $this->db->escape( $item_guid ) . "' " ;
+
+		// Query database
+		$result=$this->db->query( $sql );
+
+		// Return data
+		return($result->rows);
+  } 
+
+  //----------------------------------------------------------------------------
+
+  public function Is_Exist_Item_Supplier ($supplier_guid, $item_guid)
+	{
+
+		// Compose SQL query
+    $sql =
+     "SELECT * " .
+     "FROM " .
+      "suppliers_items " .
+    "WHERE " .
+      "item_guid='" . $this->db->escape( $item_guid ) . "' AND " .
+      "supplier_guid='" . $this->db->escape( $supplier_guid ) . "' ";
+
+
+      $this->log->Log_Debug( 'sql ' . $sql);
+    // Query database
+    $result = $this->db->query( $sql );
+    $this->log->Log_Debug( 'num_rows' . $result->num_rows);
+    // Test record count
+    if ( $result->num_rows == 0 )
+    {
+
+      //------------------------------------------------------------------------
+      // Project not found
+      //------------------------------------------------------------------------
+
+      // Set project not found status
+      $item_found = false;
+
+    }
+    else
+    {
+
+      //------------------------------------------------------------------------
+      // Project found
+      //------------------------------------------------------------------------
+
+      // Set project found status
+      $item_found = true;
+
+    }
+
+    // Return data
+    return( $item_found );
+
+  }
+
+  //----------------------------------------------------------------------------
+
+  public function Delete_Item_Supplier( $item_guid, $supplier_guid )
+  {
+
+    // Compose SQL query
+    $sql =
+      "DELETE FROM " .
+        "`suppliers_items` " .
+      "WHERE " .
+        "`suppliers_items`.`item_guid`='" . $this->db->escape( $item_guid ) . "' AND " .
+        "`suppliers_items`.`supplier_guid`='" . $this->db->escape( $supplier_guid ) . "'";
+
+    $this->log->Log_Debug( 'sql ' . $sql );
+
+    // Query database
+    $this->db->query( $sql );
+
+    // Return success code
+    return( true );
+
+  }
+
+  //----------------------------------------------------------------------------
+
+  public function Get_List_Of_Suppliers( $page_length = 30, $search = '')
+  {
+   
+    $sql =
+      "SELECT " .
+        "`customer`.guid AS guid, " .
+        "`customer`.lastname AS lastname, " .
+        "`customer`.firstname AS name, " .
+        "`customer`.company_name AS company_name " .
+      "FROM " .
+        "`customer` " .
+      "WHERE " . 
+      "(customer.lastname LIKE '%" . $this->db->escape( $search ) . "%' OR " .
+      "customer.company_name LIKE '%" . $this->db->escape( $search ) . "%' OR " .
+      "customer.firstname LIKE '%" . $this->db->escape( $search ) . "%') AND " .
+      "`customer`.`supplier` = 1 " .
+      "LIMIT " . $this->db->escape( $page_length );
+      $this->log->Log_Debug(   $sql);
+    // Query database
+    $result = $this->db->query( $sql );
+
+
+    // Return data
+    return( $result->rows );
+  }
+}
+
+//------------------------------------------------------------------------------
+// End of file
+//------------------------------------------------------------------------------
+?>

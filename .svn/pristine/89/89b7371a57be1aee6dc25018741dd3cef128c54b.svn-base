@@ -1,0 +1,86 @@
+<?php
+class ControllerAccountOrderSuccess extends Controller
+{
+
+  private $error = array();
+
+  //----------------------------------------------------------------------------
+  // Default method
+  //----------------------------------------------------------------------------
+
+  public function index()
+  {
+
+    // Test for customer logged in
+    if ( $this->customer->Is_Logged() == false )
+    {
+
+      //------------------------------------------------------------------------
+      // Customer not logged in
+      //------------------------------------------------------------------------
+
+      // Redirect to login page
+      $this->response->Redirect( $this->url->link( 'account/login', '', 'SSL' ) );
+
+    }
+    else
+    {
+
+      //------------------------------------------------------------------------
+      // Customer logged in
+      //------------------------------------------------------------------------
+
+      // Test for parameter set
+      if (!isset( $this->session->data[ 'order_success' ] ) )
+      {
+
+        //----------------------------------------------------------------------
+        // Parameter not set
+        //----------------------------------------------------------------------
+
+        // Redirect to error page
+        $this->response->Redirect( $this->url->link( 'error/not_found', '', 'SSL' ) );
+
+      }
+      else
+      {
+
+        //----------------------------------------------------------------------
+        // Parameter set
+        //----------------------------------------------------------------------
+
+        // Load messages
+        $this->messages->Load( $this->data, 'account', 'order_success', 'index', $this->language->Get_Language_Code() );
+
+        unset( $this->session->data[ 'order_success' ] );
+        // $this->cart->Clear();
+
+        //----------------------------------------------------------------------
+        // Render page
+        //----------------------------------------------------------------------
+
+        // Set document properties
+        $this->response->setTitle( $this->messages->Get_Message( 'document_title_text' ) );
+        $this->response->setDescription( $this->messages->Get_Message( 'document_description_text' ) );
+        $this->response->setKeywords('');
+        $this->response->setRobots('index, follow');
+
+        // Add styles
+
+        // Set page template
+        $this->children = array(
+          'common/footer',
+          'common/header'
+        );
+
+      }
+
+    }
+
+  }
+
+}
+//------------------------------------------------------------------------------
+// End of file
+//------------------------------------------------------------------------------
+?>

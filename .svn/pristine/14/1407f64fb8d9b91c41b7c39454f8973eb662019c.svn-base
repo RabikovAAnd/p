@@ -1,0 +1,121 @@
+<?php
+
+//------------------------------------------------------------------------------
+// Controller class for generating Yandex Sitemap
+//------------------------------------------------------------------------------
+
+class ControllerFeedsYandexSitemap extends Controller 
+{
+  public function index()
+  {
+    // Load required models
+    $this->load->model('categories/categories');
+    $this->load->model('items/items');
+    $this->load->model('manufacturers/manufacturers');
+
+    // Initialize sitemap XML output
+    $sitemapIndex = '<?xml version="1.0" encoding="UTF-8"?>';
+    $sitemapIndex .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+
+    // 1. Add public categories
+    $categories = $this->model_categories_categories->getAllCategories();
+    $categorySitemap = $this->generateCategorySitemap($categories);
+    $this->saveSitemapFile('categories.xml', $categorySitemap);
+    $sitemapIndex .= '<sitemap><loc>' . HTTPS_SERVER . 'sitemap/categories.xml</loc></sitemap>';
+
+    // 2. Add product links
+    $products = $this->model_items_items->getAllProducts();
+    $productSitemap = $this->generateProductSitemap($products);
+    $this->saveSitemapFile('products.xml', $productSitemap);
+    $sitemapIndex .= '<sitemap><loc>' . HTTPS_SERVER . 'sitemap/products.xml</loc></sitemap>';
+
+    // 3. Add manufacturer links
+    $manufacturers = $this->model_manufacturers_manufacturers->getAllManufacturers();
+    $manufacturerSitemap = $this->generateManufacturerSitemap($manufacturers);
+    $this->saveSitemapFile('manufacturers.xml', $manufacturerSitemap);
+    $sitemapIndex .= '<sitemap><loc>' . HTTPS_SERVER . 'sitemap/manufacturers.xml</loc></sitemap>';
+
+    // 4. Finalize and save sitemap index
+    $sitemapIndex .= '</sitemapindex>';
+    $this->saveSitemapFile('sitemap_index.xml', $sitemapIndex);
+
+    // Output sitemap index link
+    $this->response->addHeader('Content-Type: application/xml; charset=utf-8');
+    $this->response->setOutput($sitemapIndex);
+  }
+
+  public function categories()
+  {
+
+    // Load required models
+    $this->load->model('categories/categories');
+
+    $categories = $this->model_categories_categories->getAllCategories();
+
+    $output = '<?xml version="1.0" encoding="UTF-8"?>';
+    $output .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+    foreach ($categories as $category) 
+    {
+      $output .= '<url>';
+      $output .= '<loc>' . $this->url->link('catalog/categories', 'category_guid=' . $category['guid']) . '</loc>';
+      $output .= '</url>';
+    }
+    $output .= '</urlset>';
+
+    // Output sitemap index link
+    $this->response->addHeader('Content-Type: application/xml; charset=utf-8');
+    $this->response->setOutput($output);
+
+  }
+  
+  
+  private function generateCategorySitemap($categories)
+  {
+    $output = '<?xml version="1.0" encoding="UTF-8"?>';
+    $output .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+    foreach ($categories as $category) {
+      $output .= '<url>';
+      $output .= '<loc>' . $this->url->link('catalog/categories', 'category_guid=' . $category['guid']) . '</loc>';
+      $output .= '</url>';
+    }
+    $output .= '</urlset>';
+    return $output;
+  }
+
+  private function generateProductSitemap($products)
+  {
+    $output = '<?xml version="1.0" encoding="UTF-8"?>';
+    $output .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+    foreach ($products as $product) {
+      $output .= '<url>';
+      $output .= '<loc>' . $this->url->link('items/info', 'guid=' . $product['guid']) . '</loc>';
+      $output .= '</url>';
+    }
+    $output .= '</urlset>';
+    return $output;
+  }
+
+  private function generateManufacturerSitemap($manufacturers)
+  {
+    $output = '<?xml version="1.0" encoding="UTF-8"?>';
+    $output .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+    foreach ($manufacturers as $manufacturer) {
+      $output .= '<url>';
+      $output .= '<loc>' . $this->url->link('manufacturers/info', 'manufacturer_id=' . $manufacturer['id']) . '</loc>';
+      $output .= '</url>';
+    }
+    $output .= '</urlset>';
+    return $output;
+  }
+
+  private function saveSitemapFile($filename, $content)
+  {
+    $path = DIR_SITEMAP . $filename;
+    file_put_contents($path, $content);
+  }
+}
+
+//------------------------------------------------------------------------------
+// End of file
+//------------------------------------------------------------------------------
+?>

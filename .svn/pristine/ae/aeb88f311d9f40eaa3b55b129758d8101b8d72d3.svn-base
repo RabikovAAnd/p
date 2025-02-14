@@ -1,0 +1,127 @@
+<?php
+class ModelItemsSubitemsAlternatives extends Model
+{
+
+  //----------------------------------------------------------------------------
+  // Is Alternative already exist
+  //----------------------------------------------------------------------------
+
+
+  public function Is_Exist_Alternative_Subitem( $alternative_guid = '', $subitem_guid = '' )
+  {
+
+    // Compose SQL query
+    $sql =
+    "SELECT " .
+      "* " .
+    "FROM " .
+      "item_subitem_alternatives " .
+    "WHERE " .
+      "item_guid='" . $this->db->escape( $alternative_guid ) . "' AND " .
+      "subitem_index_guid='" . $this->db->escape( $subitem_guid ) . "'";
+
+    // Query database
+    $result = $this->db->query( $sql );
+
+    // Test record count
+    if ( $result->num_rows == 0 )
+    {
+
+      //------------------------------------------------------------------------
+      // Alternative not found
+      //------------------------------------------------------------------------
+
+      // Set alternative not found status
+      $item_found = false;
+
+    }
+    else
+    {
+
+      //------------------------------------------------------------------------
+      // Alternative found
+      //------------------------------------------------------------------------
+
+      // Set alternative found status
+      $item_found = true;
+
+    }
+
+    // Return data
+    return( $item_found );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Add Alternative to subitem
+  //----------------------------------------------------------------------------
+
+  public function Add_Alternative( $alternative_guid = '', $subitem_guid = ''  )
+  {
+
+    // Compose SQL query
+    $sql =
+      "INSERT INTO " .
+        "item_subitem_alternatives " .
+      "SET " .
+        "subitem_index_guid='" . $this->db->escape( $subitem_guid ) . "', " .
+        "item_guid='" . $this->db->escape( $alternative_guid ) . "'"; 
+
+    // Query database
+    $this->db->query( $sql );
+
+    // Return success code
+    return( true );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Delete alternatives
+  //----------------------------------------------------------------------------
+
+  public function Delete_Alternatives($subitem_index_guid = '')
+  {
+
+ 
+    // Compose SQL query
+    $sql =
+      "DELETE FROM" .
+        "`item_subitem_alternatives` " .
+      "WHERE " .
+        "`item_subitem_alternatives`.`subitem_index_guid`='" . $this->db->escape($subitem_index_guid) . "' ";
+
+    // Query database
+    $this->db->query($sql);
+
+    // Return success code
+    return (true);
+
+  }
+  //----------------------------------------------------------------------------
+  // Get subitem alternatives
+  //----------------------------------------------------------------------------
+
+  public function Get_Subitem_Alternatives( $subitem_guid = '' )
+  {
+
+    // Compose SQL query
+    $sql =
+      "SELECT " .
+        "`item_subitem_alternatives`.`item_guid` AS guid " .
+      "FROM " .
+        "`item_subitem_alternatives` " .
+      "WHERE " .
+        "`item_subitem_alternatives`.`subitem_index_guid`='" . $subitem_guid . "'";
+
+    // Quiery database
+    $result = $this->db->query( $sql );
+
+    // Return data
+    return( $result->rows );
+
+  }
+}
+//------------------------------------------------------------------------------
+// End of file
+//------------------------------------------------------------------------------
+?>

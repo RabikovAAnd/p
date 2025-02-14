@@ -1,0 +1,33 @@
+<?php
+class ModelCustomersOrders extends Model
+{
+ 
+    //----------------------------------------------------------------------------
+  // Get customer orders
+  //----------------------------------------------------------------------------
+
+  public function Get_Customer_Orders($customer_guid = '')
+  {
+
+    // Compose SQL query
+    $sql =
+      "SELECT " .
+        " * " .
+      "FROM " .
+        "orders " .
+      "WHERE " .
+        "`orders`.`customer_guid`='" . $this->db->escape( $customer_guid). "'  ";
+
+    // Perform SQL query
+    $query = $this->db->query( $sql );
+
+    // Return properties description
+    return( $query->rows );
+
+  }
+
+}
+//------------------------------------------------------------------------------
+// End of file
+//------------------------------------------------------------------------------
+?>

@@ -1,0 +1,63 @@
+/*----------------------------------------------------------------------------*/
+/* Categories subsystem                                                       */
+/*----------------------------------------------------------------------------*/
+
+
+
+.info-content-block{
+    margin: 0;
+}
+.catalog-item-info {
+
+    gap: var(--global-gap);
+    width: auto;
+
+    padding: 0;
+
+    display:grid;
+    grid-template-columns: 1fr 9fr 2fr;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.description{
+    padding: var(--global-gap) 0;
+}
+.features{
+    border-left: 1px solid var(--global-border-color);
+    width: auto;
+    overflow-wrap: break-word;
+    padding: var(--global-gap);
+}
+.categories-container h2, h3{
+    text-align: left;
+    align-self: flex-start;
+    justify-content: left;
+    margin: 0;
+}
+.categories-container ul{
+    padding: 0;
+}
+.catalog-item-info img {
+    display: flex;
+    align-items: center;
+    padding: var(--global-gap);
+    height: 90px;
+    width: 100px;
+    max-width: 160px;
+    max-height: 150px;
+    align-self: center;
+}
+
+@media screen and (max-width: 700px) {
+    .catalog-item-info {
+        display: flex;
+        flex-direction: column;
+    }
+    .description{
+        padding: var(--global-gap);
+    }
+
+}
+/*----------------------------------------------------------------------------*/
+/* End Of File                                                                */
+/*----------------------------------------------------------------------------*/

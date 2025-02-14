@@ -1,0 +1,580 @@
+<?php
+class ControllerWorkplaceProjectsAddItem extends Controller
+{
+  private $error = array();
+  public $page_length = 30;
+  public $current_page = 1;
+
+  //----------------------------------------------------------------------------
+  // Index method
+  //----------------------------------------------------------------------------
+
+  public function index()
+  {
+
+    // Test for customer logged in
+    if ( $this->customer->Is_Logged() === false )
+    {
+
+      //------------------------------------------------------------------------
+      // ERROR: Customer not logged in
+      //------------------------------------------------------------------------
+
+      // Redirect to login page
+      $this->response->Redirect( $this->url->link( 'account/login', '', 'SSL' ) );
+
+    }
+    else
+    {
+
+      //------------------------------------------------------------------------
+      // Customer logged in
+      //------------------------------------------------------------------------
+
+      // Test for project GUID parameter exists
+      if ( $this->request->Is_GET_Parameter_GUID( 'guid' ) === false )
+      {
+
+        //----------------------------------------------------------------------
+        // ERROR: project GUID parameter not found
+        //----------------------------------------------------------------------
+
+        //! @todo ANVILEX KM: Redirect to item not found page
+        $this->response->Redirect( $this->url->link( 'workspace/projects/info', '', 'SSL' ) );
+
+      }
+      else
+      {
+
+        // Load messages
+        $this->messages->Load( $this->data, 'workplace', 'add_item', 'index', $this->language->Get_Language_Code() );
+
+        // Load data models
+        $this->load->model( 'items/items' );
+        $this->load->model( 'projects/projects' );
+
+        $this->data[ 'project' ] = $this->model_projects_projects->Get_Information($this->request->Get_GET_Parameter_As_GUID( 'guid' ));
+
+        // Get item count
+        $this->data[ 'item_count' ] = $this->model_items_items->Search_Items_Count();
+
+        // Calculate page count
+        $this->data[ 'page_count' ] = intdiv( $this->data[ 'item_count' ], $this->page_length );
+
+        // Get items
+        $items = $this->model_items_items->Get_List_Of_Items(
+          $this->page_length,
+          1,
+          '',
+          false,
+          true,
+          false,
+          '',
+          $this->language->Get_Language_Code()
+        );
+
+        // Iterate over all items
+        foreach ( $items as $item )
+        {
+
+          // Set item data
+          $this->data[ 'items' ][] = array(
+            'guid' => $item[ 'guid' ],
+            'item_href' => $this->url->link( 'workplace/items/info', 'guid=' . $item[ 'guid' ], 'SSL' ),
+            'mpn' => $item[ 'mpn' ],
+            'manufacturer_name' => $item[ 'manufacturer_name' ]
+          );
+
+        }
+
+        // Set link
+        $this->data[ 'workplace_add_item_button_href' ] = $this->url->link( 'workplace/projects/add_item/Add', '', 'SSL' );
+
+        //------------------------------------------------------------------------
+        // Render page
+        //------------------------------------------------------------------------
+
+        // Set document properties
+        $this->response->setTitle( $this->messages->Get_Message( 'document_title_text' ) );
+        $this->response->setDescription( $this->messages->Get_Message( 'document_description_text' ) );
+        $this->response->setKeywords( '' );
+        $this->response->setRobots( 'index, follow' );
+
+        // Set page configuration
+        $this->children = array(
+          'common/footer',
+          'workplace/workplace_menu',
+          'common/header'
+        );
+
+        // Render page
+        $this->response->Set_HTTP_Output( $this->Render( 'workplace/projects/items/add.tpl' ) );
+
+      }
+
+    }
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Search query
+  //----------------------------------------------------------------------------
+  // Caller: AJAX
+  //----------------------------------------------------------------------------
+
+  public function search()
+  {
+
+    // Initialise json data
+    $json = array();
+
+    // Test for customer logged in
+    if ( $this->customer->Is_Logged() === false )
+    {
+
+      //------------------------------------------------------------------------
+      // ERROR: Customer not logged in
+      //------------------------------------------------------------------------
+
+      // Set redirect link to login page
+      $json[ 'redirect_url' ] = $this->url->link( 'account/login', '', 'SSL' );
+
+      // Set error code
+      $json[ 'return_code' ] = false;
+
+    }
+    else
+    {
+
+      //------------------------------------------------------------------------
+      // Customer logged in
+      //------------------------------------------------------------------------
+
+      // Test for parameters not valid
+      if ( 
+        ( $this->request->Is_POST_Parameter_Exists( 'search' ) === false ) ||
+        ( $this->request->Is_POST_Parameter_Boolean( 'id' ) === false ) ||
+        ( $this->request->Is_POST_Parameter_Boolean( 'mpn' ) === false ) ||
+        ( $this->request->Is_POST_Parameter_Boolean( 'description' ) === false ) || 
+        ( $this->request->Is_POST_Parameter_Exists( 'manufacturer' ) === false ) ||
+        ( $this->request->Is_POST_Parameter_Positive_Integer( 'page' ) === false ) 
+      )
+      {
+        
+        //----------------------------------------------------------------------
+        // ERROR: Parameter not found
+        //----------------------------------------------------------------------
+
+        // Set error code
+        $json[ 'return_code' ] = false;
+
+      }
+      else
+      {
+
+        //----------------------------------------------------------------------
+        // All parameters found, continue processing
+        //----------------------------------------------------------------------
+
+        // Load data models
+        $this->load->model( 'items/items' );
+
+        // Get item count
+        $this->data[ 'item_count' ] = $this->model_items_items->Search_Items_Count(
+          $this->request->Get_POST_Parameter_As_String( 'search' ),
+          $this->request->Get_POST_Parameter_As_Boolean( 'id' ),
+          $this->request->Get_POST_Parameter_As_Boolean( 'mpn' ),
+          $this->request->Get_POST_Parameter_As_Boolean( 'description' ),
+          $this->request->Get_POST_Parameter_As_String( 'manufacturer' ),
+          $this->language->Get_Language_Code() 
+        );
+
+        $json[ 'item_count' ] = $this->data[ 'item_count' ];
+        $json[ 'page_count' ] = intdiv( $this->data[ 'item_count' ], $this->page_length );
+
+        // Get list of items
+        $items =  $this->model_items_items->Get_List_Of_Items(
+          $this->page_length,
+          $this->request->Get_POST_Parameter_As_Integer( 'page' ),
+          $this->request->Get_POST_Parameter_As_String( 'search' ),
+          $this->request->Get_POST_Parameter_As_Boolean( 'id' ),
+          $this->request->Get_POST_Parameter_As_Boolean( 'mpn' ),
+          $this->request->Get_POST_Parameter_As_Boolean( 'description' ),
+          $this->request->Get_POST_Parameter_As_String( 'manufacturer' ),
+          $this->language->Get_Language_Code()
+        );
+
+        // Process each item in the list
+        foreach ( $items as $item )
+        {
+
+          $json[ 'items' ][] = array(
+            'guid' => $item[ 'guid' ],
+            'item_href' => $this->url->link( 'workplace/items/info', 'guid=' . $item[ 'guid' ], 'SSL' ),
+            'mpn' => $item[ 'mpn' ],
+            'description' => $item[ 'description' ],
+            'manufacturer_name' => $item[ 'manufacturer_name' ]
+          );
+
+        }
+
+        // Set success code
+        $json[ 'return_code' ] = true;
+
+      }
+
+    }
+
+    // Render page
+    $this->response->Set_Json_Output( $json );
+
+  }
+
+  //----------------------------------------------------------------------------
+  //
+  //----------------------------------------------------------------------------
+  // Caller: AJAX
+  //----------------------------------------------------------------------------
+  // Note: Method not used !!!
+  
+  public function Set_Page()
+  {
+
+    // Initialise json data
+    $json = array();
+
+    // Test for customer logged in
+    if ( $this->customer->Is_Logged() === false )
+    {
+
+      //------------------------------------------------------------------------
+      // ERROR: Customer not logged in
+      //------------------------------------------------------------------------
+
+      // Set redirect link to login page
+      $json[ 'redirect_url' ] = $this->url->link( 'account/login', '', 'SSL' );
+
+      // Set error code
+      $json[ 'return_code' ] = false;
+
+    }
+    else
+    {
+
+      //------------------------------------------------------------------------
+      // Customer logged in
+      //------------------------------------------------------------------------
+
+      $json[ 'return_code' ] = false;
+      
+      if ( 
+        $this->request->Is_GET_Parameter_Exists( 'search' ) && 
+        $this->request->Is_GET_Parameter_Exists( 'page_id' )
+      )
+      {
+      
+        // Load data models
+        $this->load->model( 'items/items' );
+        
+        // Get items
+        $search_items_count = $this->model_items_items->Search_Items_Count( $this->request->Get_GET_Parameter_As_String( 'search' ) );
+        
+        if( $search_items_count > 0 )
+        {
+          
+          $json[ 'page_count' ] = intdiv( $search_items_count, $this->page_length );
+          
+          // Get list of items
+          $items = $this->model_items_items->Get_List_Of_Items(
+            $this->page_length, 
+            $this->request->Get_GET_Parameter_As_String( 'search' ), 
+            $this->request->Get_GET_Parameter_As_String( 'page_id' )
+          );
+          
+          // Process each item
+          foreach ( $items as $item )
+          {
+            
+            $json[ 'items' ][] = array(
+              'guid' => $item[ 'guid' ],
+              'item_href' => $this->url->link( 'workplace/items/info', 'guid=' . $item[ 'guid' ], 'SSL' ),
+              'mpn' => $item[ 'mpn' ],
+              'manufacturer_name' => $item[ 'manufacturer_name' ],
+//              'manufacturer_id' => $item[ 'manufacturer_id' ],
+            );
+
+          }
+          
+          // Set success code
+          $json[ 'return_code' ] = true;
+        
+        }
+
+      }
+
+    }
+
+    // Render page
+    $this->response->Set_Json_Output( $json );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Add item to project
+  //----------------------------------------------------------------------------
+  // Caller: AJAX
+  //----------------------------------------------------------------------------
+
+  public function Add()
+  {
+
+    // Test for customer not logged in
+    if ( $this->customer->Is_Logged() === false )
+    {
+
+      //------------------------------------------------------------------------
+      // ERROR: Customer not logged in
+      //------------------------------------------------------------------------
+
+      // Redirect to login page
+      $this->response->Redirect( $this->url->link( 'account/login', '', 'SSL' ) );
+
+    }
+    else
+    {
+
+      //------------------------------------------------------------------------
+      // Custommer logged in
+      //------------------------------------------------------------------------
+
+      // Load messages
+      $this->messages->Load( $this->data, 'workplace', 'add_item', 'Add', $this->language->Get_Language_Code() );
+
+      // Load data models
+      $this->load->model( 'items/items' );
+      $this->load->model( 'projects/projects' );
+
+      // Init json data
+      $json = array();
+
+      $json[ 'return_code' ] = false;
+
+      // Init unit data
+      $data = array();
+      
+
+      // Clear request data valid status
+      $request_data_valid = true;
+      
+
+      //------------------------------------------------------------------------
+      // Check parameter: Project GUID
+      //------------------------------------------------------------------------
+
+      // Test for parameter exists
+      if( $this->request->Is_POST_Parameter_GUID( 'guid' ) === false )
+      {
+
+        //----------------------------------------------------------------------
+        // ERROR: Project GUID parameter not found
+        //----------------------------------------------------------------------
+
+        // Set error message text
+        $this->error[ 'guid' ] = $this->data[ 'workplace_add_item_guid_error' ];
+
+        // Clear request data valid status
+        $request_data_valid = false;
+
+      }
+      else
+      {
+        if( $this->model_projects_projects->Is_Exists_By_GUID($this->request->Get_POST_Parameter_As_GUID( 'guid' ))){
+          //----------------------------------------------------------------------
+          // Project GUID parameter found
+          //----------------------------------------------------------------------
+
+          $data['guid'] = $this->request->Get_POST_Parameter_As_GUID( 'guid' );
+
+          // Set request data valid status
+          $request_data_valid = $request_data_valid && true;
+        }else{
+            
+          //----------------------------------------------------------------------
+          // ERROR: Project GUID parameter not found
+          //----------------------------------------------------------------------
+
+          // Set error message text
+          $this->error[ 'guid' ] = $this->data[ 'workplace_add_item_guid_error' ];
+
+          // Clear request data valid status
+          $request_data_valid = false;
+        }
+        
+
+      }
+
+      //------------------------------------------------------------------------
+      // Check parameter: Item GUID
+      //------------------------------------------------------------------------
+
+      // Test for parameter exists
+      if( $this->request->Is_POST_Parameter_Exists( 'item_guid' ) === false )
+      {
+
+        //----------------------------------------------------------------------
+        // ERROR: Item parameter not found
+        //----------------------------------------------------------------------
+
+        // Set error message text
+        $this->error[ 'item_guid' ] = $this->data[ 'workplace_add_item_item_guid_error' ];
+
+        // Clear request data valid status
+        $request_data_valid = false;
+
+      }
+      else
+      {
+
+        //----------------------------------------------------------------------
+        // Item parameter found
+        //----------------------------------------------------------------------
+
+        // Get item information
+        $item = $this->model_items_items->Get_Information( $this->request->Get_POST_Parameter_As_GUID( 'item_guid' ), $this->language->Get_Language_Code());
+
+        // Test for information invalid
+        if( $item[ 'valid' ] === false )
+        {
+
+          //----------------------------------------------------------------------
+          // ERROR: Item not valid
+          //----------------------------------------------------------------------
+
+          // Set error message text
+          $this->error[ 'item_guid' ] = $this->data[ 'workplace_add_item_item_error' ];
+
+          // Clear request data valid status
+          $request_data_valid = false;
+
+        }
+        else
+        {
+
+          //--------------------------------------------------------------------
+          // Item found
+          //--------------------------------------------------------------------
+
+          $data[ 'item_guid' ]=$this->request->Get_POST_Parameter_As_GUID( 'item_guid' );
+
+          // Set request data valid status
+          $request_data_valid = $request_data_valid && true;
+
+        }
+
+      }
+
+      //------------------------------------------------------------------------
+      // Check for Project Item  already exist
+      //------------------------------------------------------------------------
+      if($request_data_valid){
+        if ( $this->model_projects_projects->Is_Exist_Project_Item($data['guid'], $data[ 'item_guid' ]  ))
+        {
+  
+          //----------------------------------------------------------------------
+          // ERROR: Project Item already exists
+          //----------------------------------------------------------------------
+  
+          // Set error message text
+          $this->error[ 'item_exists' ] = $this->data[ 'workplace_add_item_item_exists_error' ];
+  
+          // Clear request data valid status
+          $request_data_valid = false;
+  
+        }
+        else
+        {
+  
+          //----------------------------------------------------------------------
+          // Project Item  not exists
+          //----------------------------------------------------------------------
+  
+          // Set request data valid status
+          $request_data_valid = $request_data_valid && true;
+  
+        }
+      }
+      
+
+      //------------------------------------------------------------------------
+      // Try to add item
+      //------------------------------------------------------------------------
+
+      // Is request data valid
+      if ( $request_data_valid === false )
+      {
+
+        //----------------------------------------------------------------------
+        // ERROR: Parameters not valid
+        //----------------------------------------------------------------------
+
+        // Set error codes
+        $json[ 'error' ] = $this->error;
+
+        // Set error code
+        $json[ 'return_code' ] = false;
+
+      }
+      else
+      {
+
+        //----------------------------------------------------------------------
+        // Parameters present and valid, add item
+        //----------------------------------------------------------------------
+
+        // Add new item
+        $return_data = $this->model_projects_projects->Add_Item( $data['guid'], $data[ 'item_guid' ] );
+
+        // Test for error
+        if ( $return_data === false )
+        {
+          
+          //--------------------------------------------------------------------
+          // ERROR: Create item failed
+          //--------------------------------------------------------------------
+
+          // Set error message
+          $json[ 'error' ][ 'error' ] = 'Create and add item failed.';
+
+          // Set error code
+          $json[ 'return_code' ] = false;
+          
+        }
+        else
+        {
+
+          //--------------------------------------------------------------------
+          // ERROR: Create item failed
+          //--------------------------------------------------------------------
+
+          // Set redirect URL
+          $json[ 'redirect_url' ] = $this->url->link( 'workplace/projects/info', 'guid=' . $data[ 'guid' ] , 'SSL' );
+
+          // Set success code
+          $json[ 'return_code' ] = true;
+
+        }
+
+      }
+
+    // Encode and send json data
+    $this->response->Set_Json_Output( $json );
+
+    }
+
+  }
+
+}
+//------------------------------------------------------------------------------
+// End of file
+//------------------------------------------------------------------------------
+?>

@@ -1,0 +1,7 @@
+.properties-table {
+  grid-template-columns: 8fr 1fr;
+}
+
+.properties-table>span:nth-last-child(-n+2) {
+  border: none;
+}

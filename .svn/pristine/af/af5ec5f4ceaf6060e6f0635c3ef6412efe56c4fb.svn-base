@@ -1,0 +1,844 @@
+<?php
+class ControllerWorkplaceAddCustomer extends Controller
+{
+
+  //----------------------------------------------------------------------------
+  // Index method
+  //----------------------------------------------------------------------------
+
+  public function index()
+  {
+
+    // Load messages
+    $this->messages->Load( $this->data, 'workplace', 'add_customer', 'index', $this->language->Get_Language_Code() );
+
+    // Set links
+    $this->data[ 'workplace_add_customer_button_href' ] = $this->url->link( 'workplace/add_customer/Create_Customer', '', 'SSL' );
+
+    //------------------------------------------------------------------------
+    // Render page
+    //------------------------------------------------------------------------
+
+    // Set document properties
+    $this->response->setTitle( $this->messages->Get_Message( 'document_title_text' ) );
+    $this->response->setDescription( $this->messages->Get_Message( 'document_description_text' ) );
+    $this->response->setKeywords( '' );
+    $this->response->setRobots( 'index, follow' );
+    
+
+    // Set page configuration
+    $this->children = array(
+      'common/footer',
+      'workplace/workplace_menu',
+      'common/header'
+    );
+
+    // Render page
+    $this->response->Set_HTTP_Output( $this->Render( 'workplace/add_customer.tpl' ) );
+
+  }
+  
+  //----------------------------------------------------------------------------
+  // Create new customer
+  //----------------------------------------------------------------------------
+  // Caller: AJAX
+  //----------------------------------------------------------------------------
+
+  public function Create_Customer()
+  {
+    
+    // Init json data
+    $json = array();
+
+    // Test for customer not logged in
+    if ( $this->customer->Is_Logged() === false )
+    {
+
+      //------------------------------------------------------------------------
+      // ERROR: Customer not logged in
+      //------------------------------------------------------------------------
+
+      // Set redirect link
+      $json[ 'redirect_url' ] = $this->url->link( 'account/login', '', 'SSL' );
+
+      // Set error code
+      $json[ 'return_code' ] = false;
+
+    }
+    else
+    {
+
+      //------------------------------------------------------------------------
+      // Customer logged in
+      //------------------------------------------------------------------------
+
+      // Load messages
+      $this->messages->Load( $this->data, 'workplace', 'add_customer', 'Create_Customer', $this->language->Get_Language_Code() );
+
+      // Init customer data
+      $customer_data = array();
+
+      // Clear request data valid sataus
+      $request_data_valid = true;
+
+      //------------------------------------------------------------------------
+      // Legal entity
+      //------------------------------------------------------------------------
+
+      // Test for parameter exists
+      if( $this->request->Is_POST_Parameter_Boolean( 'legal_entity' ) === false )
+      {
+        
+        //----------------------------------------------------------------------
+        // ERROR: Legal entity parameter not found
+        //----------------------------------------------------------------------
+
+        // Set error message text
+        $json[ 'error' ][ 'legal_entity' ] = $this->data[ 'workplace_add_customer_legal_entity' ];
+
+        // Clear request data valid sataus
+        $request_data_valid = false;
+
+      }
+      else
+      {
+
+        //----------------------------------------------------------------------
+        // Legal entity parameter found
+        //----------------------------------------------------------------------
+
+        // Store customer data
+        $customer_data[ 'legal_entity' ] = $this->request->Get_POST_Parameter_As_Boolean( 'legal_entity' );
+
+        $this->data[ 'legal_entity' ] = $customer_data[ 'legal_entity' ];
+
+        // Set request data valid sataus
+        $request_data_valid = $request_data_valid && true;
+
+      }
+
+      //------------------------------------------------------------------------
+      // First name
+      //------------------------------------------------------------------------
+
+      // Test for parameter exists
+      if( $this->request->Is_POST_Parameter_Exists( 'firstname' ) === false )
+      {
+        
+        //----------------------------------------------------------------------
+        // ERROR: First name parameter not found
+        //----------------------------------------------------------------------
+        
+        // Set error message text
+        $json[ 'error' ][ 'firstname' ] = $this->data[ 'workplace_add_customer_firstname_error' ];
+
+        // Clear request data valid sataus
+        $request_data_valid = false;
+
+      }
+      else
+      {
+
+        //----------------------------------------------------------------------
+        // First name parameter found
+        //----------------------------------------------------------------------
+
+        // Store customer data
+        $customer_data[ 'firstname' ] = trim( $this->request->Get_POST_Parameter_As_String( 'firstname' ) );
+
+        // Test forst name validity
+        if ((!$this->request->Get_POST_Parameter_As_Boolean( 'legal_entity' )
+        && ( utf8_strlen( $customer_data[ 'firstname' ] ) < 1 )) || 
+          ( utf8_strlen( $customer_data[ 'firstname' ] ) > 32 ))
+        
+        {
+          
+          //--------------------------------------------------------------------
+          // ERROR: First name invalid
+          //--------------------------------------------------------------------
+         
+          // Set errer message text
+          $json[ 'error' ][ 'firstname' ] = $this->data[ 'workplace_add_customer_firstname_error' ];
+
+          // Clear request data valid sataus
+          $request_data_valid = false;
+ 
+        }
+        else
+        {
+          
+          //--------------------------------------------------------------------
+          // First name valid
+          //--------------------------------------------------------------------
+                
+          // Set request data valid sataus
+          $request_data_valid = $request_data_valid && true;
+
+        }
+        
+      }
+
+      //------------------------------------------------------------------------
+      // Last name
+      //------------------------------------------------------------------------
+      
+      // Test for parameter exists
+      if( $this->request->Is_POST_Parameter_Exists( 'lastname' ) === false )
+      {
+        
+        //----------------------------------------------------------------------
+        // ERROR: Last name parameter not found
+        //----------------------------------------------------------------------
+        
+        // Set error message text
+        $json[ 'error' ][ 'lastname' ] = $this->data[ 'workplace_add_customer_lastname_error' ];
+
+        // Clear request data valid sataus
+        $request_data_valid = false;
+
+      }
+      else
+      {
+
+        //----------------------------------------------------------------------
+        // Last name parameter found
+        //----------------------------------------------------------------------
+
+        // Store customer data
+        $customer_data[ 'lastname' ] = trim( $this->request->Get_POST_Parameter_As_String( 'lastname' ) );
+
+        // Test last name validity
+        if ((!$this->request->Get_POST_Parameter_As_Boolean( 'legal_entity' )
+        && ( utf8_strlen( $customer_data[ 'lastname' ] ) < 1 )) || 
+          ( utf8_strlen( $customer_data[ 'lastname' ] ) > 32 ))
+        {
+          
+          //--------------------------------------------------------------------
+          // ERROR: Last name invalid
+          //--------------------------------------------------------------------
+         
+          // Set errer message text
+          $json[ 'error' ][ 'lastname' ] = $this->data[ 'workplace_add_customer_lastname_error' ];
+
+          // Clear request data valid sataus
+          $request_data_valid = false;
+ 
+        }
+        else
+        {
+          
+          //--------------------------------------------------------------------
+          // Last name valid
+          //--------------------------------------------------------------------
+                
+          // Set request data valid sataus
+          $request_data_valid = $request_data_valid && true;
+
+        }
+        
+      }
+
+      //------------------------------------------------------------------------
+      // Middle name
+      //------------------------------------------------------------------------
+
+      // Test for parameter exists
+      if( $this->request->Is_POST_Parameter_Exists( 'middlename' ) === false )
+      {
+        
+        //----------------------------------------------------------------------
+        // ERROR: Middle name parameter not found
+        //----------------------------------------------------------------------
+        
+        // Set error message text
+        $json[ 'error' ][ 'middlename' ] = $this->data[ 'workplace_add_customer_middlename_error' ];
+
+        // Clear request data valid sataus
+        $request_data_valid = false;
+
+      }
+      else
+      {
+
+        //----------------------------------------------------------------------
+        // Middle name parameter found
+        //----------------------------------------------------------------------
+
+        // Store customer data
+        $customer_data[ 'middlename' ] = trim( $this->request->Get_POST_Parameter_As_String( 'middlename' ) );
+
+        // Test middle name validity
+        if ( utf8_strlen( $customer_data[ 'middlename' ] ) > 32 )
+        {
+          
+          //--------------------------------------------------------------------
+          // ERROR: Middle name invalid
+          //--------------------------------------------------------------------
+         
+          // Set errer message text
+          $json[ 'error' ][ 'middlename' ] = $this->data[ 'workplace_add_customer_middlename_error' ];
+
+          // Clear request data valid sataus
+          $request_data_valid = false;
+ 
+        }
+        else
+        {
+          
+          //--------------------------------------------------------------------
+          // Middle name valid
+          //--------------------------------------------------------------------
+                
+          // Set request data valid sataus
+          $request_data_valid = $request_data_valid && true;
+
+        }
+        
+      }
+      
+      //------------------------------------------------------------------------
+      // Email address
+      //------------------------------------------------------------------------
+      
+      // Test for parameter exists
+      if( $this->request->Is_POST_Parameter_Exists( 'email' ) === false )
+      {
+        
+        //----------------------------------------------------------------------
+        // ERROR: First name parameter not found
+        //----------------------------------------------------------------------
+        
+        // Set error message text
+        $json[ 'error' ][ 'email' ] = $this->data[ 'workplace_add_customer_email_not_exist_error' ];
+
+        // Clear request data valid sataus
+        $request_data_valid = false;
+
+      }
+      else
+      {
+
+        //----------------------------------------------------------------------
+        // Email parameter found
+        //----------------------------------------------------------------------
+
+        // Store customer data
+        $customer_data[ 'email' ] = trim( $this->request->Get_POST_Parameter_As_String( 'email' ) );
+
+        $mail = new Mail();
+        
+        if ( $customer_data[ 'email' ] != '' )
+        {
+        
+        // Test email format
+        if ( $mail->Is_Email_Valid( $customer_data[ 'email' ] ) === false )
+        {
+
+          //--------------------------------------------------------------------
+          // ERROR: Email is invalid
+          //--------------------------------------------------------------------
+          
+          // Set error message text
+          $json[ 'error' ][ 'email' ] = $this->data[ 'workplace_add_customer_' . $this->request->Post_Parameter_Is_Mail('email')['response'] ];
+          
+          // Clear request data valid sataus
+          $request_data_valid = false;
+
+        }
+        else
+        {
+          
+          //--------------------------------------------------------------------
+          // Email valid
+          //--------------------------------------------------------------------
+
+          // Check for customer already registered
+          if ( $this->customer->Is_Exists( $customer_data[ 'email' ] ) === true )
+          {
+
+            //------------------------------------------------------------------
+            // ERROR: User already registered
+            //------------------------------------------------------------------
+
+            // Set error message text
+            $json[ 'error' ][ 'email' ] = $this->data[ 'workplace_add_customer_email_exists_error' ];
+
+            // Clear request data valid sataus
+            $request_data_valid = false;
+
+          }
+          else
+          {
+          
+            //------------------------------------------------------------------
+            // Customer email not registered
+            //------------------------------------------------------------------
+
+            // Set request data valid sataus
+            $request_data_valid = $request_data_valid && true;
+
+          }
+
+        }
+
+        }
+        
+      }
+      
+      //------------------------------------------------------------------------
+      // Phone
+      //------------------------------------------------------------------------
+/*
+      // Test for parameter exists
+      if( $this->request->Is_POST_Parameter_Exists( 'telephone' ) === true )
+      {
+
+        //----------------------------------------------------------------------
+        // ERROR: Phone number parameter not found
+        //----------------------------------------------------------------------
+        
+        // Set error message text
+        $json[ 'error' ][ 'telephone' ] = $this->data[ 'workplace_add_customer_telephone_error' ];
+
+        // Clear request data valid sataus
+        $request_data_valid = false;
+
+      }
+      else
+      {
+
+        //----------------------------------------------------------------------
+        // Phone number parameter found
+        //----------------------------------------------------------------------
+
+        // Store customer data
+        $customer_data[ 'telephone' ] = trim( $this->request->Get_POST_Parameter_As_String( 'telephone' ) );
+
+        // Test phone number validity
+        if ( utf8_strlen( $customer_data[ 'telephone' ] ) > 32 )
+        {
+          
+          //--------------------------------------------------------------------
+          // ERROR: Phone number invalid
+          //--------------------------------------------------------------------
+         
+          // Set errer message text
+          $json[ 'error' ][ 'telephone' ] = $this->data[ 'workplace_add_customer_telephone_error' ];
+
+          // Clear request data valid sataus
+          $request_data_valid = false;
+ 
+        }
+        else
+        {
+          
+          //--------------------------------------------------------------------
+          // Phone number valid
+          //--------------------------------------------------------------------
+                
+          // Set request data valid sataus
+          $request_data_valid = $request_data_valid && true;
+
+        }
+        
+      }
+*/
+      //------------------------------------------------------------------------
+      // Company name
+      //------------------------------------------------------------------------
+      
+      if ( $customer_data[ 'legal_entity' ] === false )
+      {
+
+        //----------------------------------------------------------------------
+        // Private customer
+        //----------------------------------------------------------------------
+
+        // Clear company name
+        $customer_data[ 'company_name' ] = '';
+
+        // Set request data valid sataus
+        $request_data_valid = $request_data_valid && true;
+
+      }
+      else
+      {
+        
+        //----------------------------------------------------------------------
+        // Legal entity customer
+        //----------------------------------------------------------------------
+
+        // Test for parameter exists
+        if( $this->request->Is_POST_Parameter_Exists( 'company_name' ) === false )
+        {
+  
+          //----------------------------------------------------------------------
+          // ERROR: Company name parameter not found
+          //----------------------------------------------------------------------
+          
+          // Set error message text
+          $json[ 'error' ][ 'company_name' ] = $this->data[ 'workplace_add_customer_company_name_error' ];
+  
+          // Clear request data valid sataus
+          $request_data_valid = false;
+  
+        }
+        else
+        {
+          
+          //----------------------------------------------------------------------
+          // Company name parameter found
+          //----------------------------------------------------------------------
+  
+          // Store customer data
+          $customer_data[ 'company_name' ] = trim( $this->request->Get_POST_Parameter_As_String( 'company_name' ) );
+  
+          // Test company name validity
+          if  ( ( trim( $this->request->Get_POST_Parameter_As_String( 'company_name' ) ) < 1 ) || 
+             utf8_strlen( $customer_data[ 'company_name' ] ) > 64 )
+          {
+            
+            //--------------------------------------------------------------------
+            // ERROR: Company name invalid
+            //--------------------------------------------------------------------
+           
+            // Set errer message text
+            $json[ 'error' ][ 'company_name' ] = $this->data[ 'workplace_add_customer_company_name_error' ];
+  
+            // Clear request data valid sataus
+            $request_data_valid = false;
+   
+          }
+          else
+          {
+            
+            //--------------------------------------------------------------------
+            // Company name valid
+            //--------------------------------------------------------------------
+                   
+            // Set request data valid sataus
+            $request_data_valid = $request_data_valid && true;
+  
+          }
+          
+        }
+  
+      }
+      
+      //------------------------------------------------------------------------
+      // Company register ID
+      //------------------------------------------------------------------------
+
+      // Entity decoder
+      if ( $customer_data[ 'legal_entity' ] === false )
+      {
+
+        //----------------------------------------------------------------------
+        // Private customer
+        //----------------------------------------------------------------------
+
+        // Clear company register ID
+        $customer_data[ 'company_register_id' ] = '';
+
+        // Set request data valid sataus
+        $request_data_valid = $request_data_valid && true;
+
+      }
+      else
+      {
+        
+        //----------------------------------------------------------------------
+        // Legal entity customer
+        //----------------------------------------------------------------------
+
+        // Test for parameter exists
+        if( ! $this->request->Is_POST_Parameter_Exists( 'company_register_id' ) )
+        {
+  
+          //----------------------------------------------------------------------
+          // ERROR: Company name parameter not found
+          //----------------------------------------------------------------------
+          
+          // Set error message text
+          $json[ 'error' ][ 'company_register_id' ] = $this->data[ 'workplace_add_customer_company_register_id_error' ];
+  
+          // Clear request data valid sataus
+          $request_data_valid = false;
+  
+        }
+        else
+        {
+  
+          //----------------------------------------------------------------------
+          // Company register ID parameter found
+          //----------------------------------------------------------------------
+  
+          // Store customer data
+          $customer_data[ 'company_register_id' ] = trim( $this->request->Get_POST_Parameter_As_String( 'company_register_id' ) );
+  
+          // Test company register ID validity
+          if ( utf8_strlen( $customer_data[ 'company_register_id' ] ) > 32 )
+          {
+            
+            //--------------------------------------------------------------------
+            // ERROR: Company register ID invalid
+            //--------------------------------------------------------------------
+           
+            // Set errer message text
+            $json[ 'error' ][ 'company_register_id' ] = $this->data[ 'workplace_add_customer_company_register_id_error' ];
+  
+            // Clear request data valid sataus
+            $request_data_valid = false;
+   
+          }
+          else
+          {
+            
+            //--------------------------------------------------------------------
+            // Company register ID valid
+            //--------------------------------------------------------------------
+                    
+            // Set request data valid sataus
+            $request_data_valid = $request_data_valid && true;
+  
+          }
+          
+        }
+  
+      }
+
+      //------------------------------------------------------------------------
+      // Company tax ID
+      //------------------------------------------------------------------------
+
+      // Entity decoder
+      if ( $customer_data[ 'legal_entity' ] === false )
+      {
+
+        //----------------------------------------------------------------------
+        // Private customer
+        //----------------------------------------------------------------------
+
+        // Clear company tax ID
+        $customer_data[ 'company_tax_id' ] = '';
+
+        // Set request data valid sataus
+        $request_data_valid = $request_data_valid && true;
+
+      }
+      else
+      {
+        
+        //----------------------------------------------------------------------
+        // Legal entity customer
+        //----------------------------------------------------------------------
+
+        // Test for parameter exists
+        if( ! $this->request->Is_POST_Parameter_Exists( 'company_tax_id' ) )
+        {
+  
+          //----------------------------------------------------------------------
+          // ERROR: Company tax ID parameter not found
+          //----------------------------------------------------------------------
+          
+          // Set error message text
+          $json[ 'error' ][ 'company_tax_id' ] = $this->data[ 'workplace_add_customer_company_tax_id_error' ];
+  
+          // Clear request data valid sataus
+          $request_data_valid = false;
+  
+        }
+        else
+        {
+  
+          //----------------------------------------------------------------------
+          // Company tax ID parameter found
+          //----------------------------------------------------------------------
+  
+          // Store customer data
+          $customer_data[ 'company_tax_id' ] = trim( $this->request->Get_POST_Parameter_As_String( 'company_tax_id' ) );
+  
+          // Test company tax ID validity
+          if ( utf8_strlen( $customer_data[ 'company_tax_id' ] ) > 32 )
+          {
+            
+            //--------------------------------------------------------------------
+            // ERROR: Company tax ID invalid
+            //--------------------------------------------------------------------
+           
+            // Set errer message text
+            $json[ 'error' ][ 'company_tax_id' ] = $this->data[ 'workplace_add_customer_company_tax_id_error' ];
+  
+            // Clear request data valid sataus
+            $request_data_valid = false;
+   
+          }
+          else
+          {
+            
+            //--------------------------------------------------------------------
+            // Company tax ID valid
+            //--------------------------------------------------------------------
+                    
+            // Set request data valid sataus
+            $request_data_valid = $request_data_valid && true;
+  
+          }
+          
+        }
+  
+      }
+
+      //------------------------------------------------------------------------
+      // Consumer role
+      //------------------------------------------------------------------------
+
+      // Test for parameter exists
+      if( $this->request->Is_POST_Parameter_Boolean( 'consumer_role' ) === false )
+      {
+        
+        //----------------------------------------------------------------------
+        // ERROR: Consumer role parameter not found
+        //----------------------------------------------------------------------
+
+        // Set error message text
+        $json[ 'error' ][ 'consumer_role' ] = "Error";//$this->data[ 'workplace_add_customer_legal_entity' ];
+
+        // Clear request data valid sataus
+        $request_data_valid = false;
+
+      }
+      else
+      {
+
+        //----------------------------------------------------------------------
+        // Consumer role parameter found
+        //----------------------------------------------------------------------
+
+        // Store customer role
+        $customer_data[ 'consumer_role' ] = $this->request->Get_POST_Parameter_As_Boolean( 'consumer_role' );
+
+        // Set request data valid sataus
+        $request_data_valid = $request_data_valid && true;
+
+      }
+
+      //------------------------------------------------------------------------
+      // Manufacturer role
+      //------------------------------------------------------------------------
+
+      // Test for parameter exists
+      if( $this->request->Is_POST_Parameter_Boolean( 'manufacturer_role' ) === false )
+      {
+        
+        //----------------------------------------------------------------------
+        // ERROR: Manufacturer role parameter not found
+        //----------------------------------------------------------------------
+
+        // Set error message text
+        $json[ 'error' ][ 'manufacturer_role' ] = "Error";//$this->data[ 'workplace_add_customer_legal_entity' ];
+
+        // Clear request data valid sataus
+        $request_data_valid = false;
+
+      }
+      else
+      {
+
+        //----------------------------------------------------------------------
+        // Manufacturer role parameter found
+        //----------------------------------------------------------------------
+
+        // Store manufacturer role
+        $customer_data[ 'manufacturer_role' ] = $this->request->Get_POST_Parameter_As_Boolean( 'manufacturer_role' );
+
+        // Set request data valid sataus
+        $request_data_valid = $request_data_valid && true;
+
+      }
+
+      //------------------------------------------------------------------------
+      // Supplier role
+      //------------------------------------------------------------------------
+
+      // Test for parameter exists
+      if( $this->request->Is_POST_Parameter_Boolean( 'supplier_role' ) === false )
+      {
+        
+        //----------------------------------------------------------------------
+        // ERROR: Supplier role parameter not found
+        //----------------------------------------------------------------------
+
+        // Set error message text
+        $json[ 'error' ][ 'supplier_role' ] = "Error";//$this->data[ 'workplace_add_customer_legal_entity' ];
+
+        // Clear request data valid sataus
+        $request_data_valid = false;
+
+      }
+      else
+      {
+
+        //----------------------------------------------------------------------
+        // Supplier role parameter found
+        //----------------------------------------------------------------------
+
+        // Store manufacturer role
+        $customer_data[ 'supplier_role' ] = $this->request->Get_POST_Parameter_As_Boolean( 'supplier_role' );
+
+        // Set request data valid sataus
+        $request_data_valid = $request_data_valid && true;
+
+      }
+
+      //------------------------------------------------------------------------
+      // Process data
+      //------------------------------------------------------------------------
+      
+      // Is request data valid
+      if ( $request_data_valid === false )
+      {
+                
+        //------------------------------------------------------------------------
+        // ERROR: Parameters not valid
+        //------------------------------------------------------------------------
+      
+        // Set error code
+        $json[ 'return_code' ] = false;
+
+      }
+      else
+      {
+
+        //--------------------------------------------------------------------
+        // Parameters present and valid
+        //--------------------------------------------------------------------
+       
+        $customer_data[ 'newsletter' ] = false;
+
+        // Generate customer GUID
+        $guid = UUID_V4_T1();
+
+        // Create new customer
+        $this->customer->Create( $guid, $customer_data );
+
+        // Set redirect URL
+        $json[ 'redirect_url' ]= $this->url->link( 'workplace/customers/info', 'guid=' . $guid, 'SSL' );
+
+        // Set success code
+        $json[ 'return_code' ] = true;
+
+      }
+
+    }
+
+    // Encode and send json data
+    $this->response->Set_Json_Output( $json );
+
+  }
+
+}
+//------------------------------------------------------------------------------
+// End of file
+//------------------------------------------------------------------------------
+?>

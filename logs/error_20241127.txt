@@ -1,0 +1,89 @@
+2024-11-27 11:15:18 - DEBUG: SYSTEM : System prepared for request processing.
+2024-11-27 11:15:18 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/home.tpl
+2024-11-27 11:15:18 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/company/teaser.tpl
+2024-11-27 11:15:18 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/catalog/teaser.tpl
+2024-11-27 11:15:19 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/news/teaser.tpl
+2024-11-27 11:15:19 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/news/subscribe.tpl
+2024-11-27 11:15:19 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/footer.tpl
+2024-11-27 11:15:19 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/header.tpl
+2024-11-27 11:15:19 - DEBUG: SYSTEM : Request dispatched.
+2024-11-27 11:24:56 - DEBUG: SYSTEM : System prepared for request processing.
+2024-11-27 11:24:56 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/home.tpl
+2024-11-27 11:24:56 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/company/teaser.tpl
+2024-11-27 11:24:56 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/catalog/teaser.tpl
+2024-11-27 11:24:56 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/news/teaser.tpl
+2024-11-27 11:24:56 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/news/subscribe.tpl
+2024-11-27 11:24:56 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/footer.tpl
+2024-11-27 11:24:56 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/header.tpl
+2024-11-27 11:24:56 - DEBUG: SYSTEM : Request dispatched.
+2024-11-27 11:25:02 - DEBUG: SYSTEM : System prepared for request processing.
+2024-11-27 11:25:02 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/catalog/products.tpl
+2024-11-27 11:25:02 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/footer.tpl
+2024-11-27 11:25:02 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/header.tpl
+2024-11-27 11:25:02 - DEBUG: SYSTEM : Request dispatched.
+2024-11-27 11:25:02 - DEBUG: SYSTEM : System prepared for request processing.
+2024-11-27 11:25:02 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/catalog/products.tpl
+2024-11-27 11:25:02 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/footer.tpl
+2024-11-27 11:25:02 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/header.tpl
+2024-11-27 11:25:03 - DEBUG: SYSTEM : Request dispatched.
+2024-11-27 11:25:05 - DEBUG: SYSTEM : System prepared for request processing.
+2024-11-27 11:25:05 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/home.tpl
+2024-11-27 11:25:05 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/company/teaser.tpl
+2024-11-27 11:25:05 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/catalog/teaser.tpl
+2024-11-27 11:25:05 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/news/teaser.tpl
+2024-11-27 11:25:05 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/news/subscribe.tpl
+2024-11-27 11:25:05 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/footer.tpl
+2024-11-27 11:25:05 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/header.tpl
+2024-11-27 11:25:05 - DEBUG: SYSTEM : Request dispatched.
+2024-11-27 11:27:21 - DEBUG: SYSTEM : System prepared for request processing.
+2024-11-27 11:27:21 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/account/login.tpl
+2024-11-27 11:27:21 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/footer.tpl
+2024-11-27 11:27:21 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/header.tpl
+2024-11-27 11:27:21 - DEBUG: SYSTEM : Request dispatched.
+2024-11-27 11:27:21 - DEBUG: SYSTEM : System prepared for request processing.
+2024-11-27 11:27:21 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/account/login.tpl
+2024-11-27 11:27:21 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/footer.tpl
+2024-11-27 11:27:21 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/header.tpl
+2024-11-27 11:27:21 - DEBUG: SYSTEM : Request dispatched.
+2024-11-27 11:30:04 - DEBUG: SYSTEM : System prepared for request processing.
+2024-11-27 11:30:04 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/company/careers.tpl
+2024-11-27 11:30:04 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/footer.tpl
+2024-11-27 11:30:04 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/header.tpl
+2024-11-27 11:30:04 - DEBUG: SYSTEM : Request dispatched.
+2024-11-27 11:30:05 - DEBUG: SYSTEM : System prepared for request processing.
+2024-11-27 11:30:05 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/company/careers.tpl
+2024-11-27 11:30:05 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/footer.tpl
+2024-11-27 11:30:05 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/header.tpl
+2024-11-27 11:30:05 - DEBUG: SYSTEM : Request dispatched.
+2024-11-27 11:30:07 - DEBUG: SYSTEM : System prepared for request processing.
+2024-11-27 11:30:07 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/account/login.tpl
+2024-11-27 11:30:07 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/footer.tpl
+2024-11-27 11:30:07 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/header.tpl
+2024-11-27 11:30:07 - DEBUG: SYSTEM : Request dispatched.
+2024-11-27 11:30:08 - DEBUG: SYSTEM : System prepared for request processing.
+2024-11-27 11:30:08 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/home.tpl
+2024-11-27 11:30:08 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/company/teaser.tpl
+2024-11-27 11:30:08 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/catalog/teaser.tpl
+2024-11-27 11:30:08 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/news/teaser.tpl
+2024-11-27 11:30:08 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/news/subscribe.tpl
+2024-11-27 11:30:08 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/footer.tpl
+2024-11-27 11:30:08 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/header.tpl
+2024-11-27 11:30:08 - DEBUG: SYSTEM : Request dispatched.
+2024-11-27 11:34:08 - DEBUG: SYSTEM : System prepared for request processing.
+2024-11-27 11:34:08 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/home.tpl
+2024-11-27 11:34:08 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/company/teaser.tpl
+2024-11-27 11:34:08 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/catalog/teaser.tpl
+2024-11-27 11:34:08 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/news/teaser.tpl
+2024-11-27 11:34:08 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/news/subscribe.tpl
+2024-11-27 11:34:08 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/footer.tpl
+2024-11-27 11:34:08 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/header.tpl
+2024-11-27 11:34:08 - DEBUG: SYSTEM : Request dispatched.
+2024-11-27 11:34:12 - DEBUG: SYSTEM : System prepared for request processing.
+2024-11-27 11:34:12 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/home.tpl
+2024-11-27 11:34:12 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/company/teaser.tpl
+2024-11-27 11:34:12 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/catalog/teaser.tpl
+2024-11-27 11:34:12 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/news/teaser.tpl
+2024-11-27 11:34:12 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/news/subscribe.tpl
+2024-11-27 11:34:12 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/footer.tpl
+2024-11-27 11:34:12 - DEBUG: Render1: C:/xampp/htdocs/shop/catalog/view/template/common/header.tpl
+2024-11-27 11:34:12 - DEBUG: SYSTEM : Request dispatched.

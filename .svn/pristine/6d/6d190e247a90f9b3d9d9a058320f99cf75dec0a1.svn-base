@@ -1,0 +1,459 @@
+<?php
+class ControllerWorkplaceCustomersIndividualCreate extends Controller
+{
+
+  //----------------------------------------------------------------------------
+  // Index method
+  //----------------------------------------------------------------------------
+
+  public function index()
+  {
+
+    // Load messages
+    $this->messages->Load( $this->data, 'workplace', 'add_individual', 'index', $this->language->Get_Language_Code() );
+
+    // Set links
+    $this->data[ 'workplace_add_individual_create_button_href' ] = $this->url->link( 'workplace/customers/individual/create/create', '', 'SSL' );
+
+    // Get list of countries
+    $this->data['countries'] = $this->location->Get_Countries($this->language->Get_Language_Code());
+
+    //------------------------------------------------------------------------
+    // Render page
+    //------------------------------------------------------------------------
+
+    // Set document properties
+    $this->response->setTitle( $this->messages->Get_Message( 'document_title_text' ) );
+    $this->response->setDescription( $this->messages->Get_Message( 'document_description_text' ) );
+    $this->response->setKeywords( '' );
+    $this->response->setRobots( 'index, follow' );
+
+    // Set page configuration
+    $this->children = array(
+      'common/footer',
+      'workplace/workplace_menu',
+      'common/header'
+    );
+
+    // Render page
+    $this->response->Set_HTTP_Output( $this->Render( 'workplace/customers/individual/create.tpl' ) );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Create new customer
+  //----------------------------------------------------------------------------
+  // Caller: AJAX
+  //----------------------------------------------------------------------------
+
+  public function Create()
+  {
+
+    // Init json data
+    $json = array();
+
+    // Test for customer not logged in
+    if ( $this->customer->Is_Logged() === false )
+    {
+
+      //------------------------------------------------------------------------
+      // ERROR: Customer not logged in
+      //------------------------------------------------------------------------
+
+      // Set redirect link
+      $json[ 'redirect_url' ] = $this->url->link( 'account/login', '', 'SSL' );
+
+      // Set error code
+      $json[ 'return_code' ] = false;
+
+    }
+    else
+    {
+
+      //------------------------------------------------------------------------
+      // Customer logged in
+      //------------------------------------------------------------------------
+
+      // Load messages
+      $this->messages->Load( $this->data, 'workplace', 'add_individual', 'create', $this->language->Get_Language_Code() );
+
+      // Init customer data
+      $customer_data = array();
+
+      // Clear request data valid sataus
+      $request_data_valid = true;
+
+      //------------------------------------------------------------------------
+      // Email address
+      //------------------------------------------------------------------------
+
+      // Test for parameter exists
+      if( $this->request->Is_POST_Parameter_Exists( 'email' ) === false )
+      {
+
+        //----------------------------------------------------------------------
+        // ERROR: First name parameter not found
+        //----------------------------------------------------------------------
+
+        // Set error message text
+        $json[ 'error' ][ 'email' ] = $this->data[ 'workplace_add_individual_email_not_exist_error' ];
+
+        // Clear request data valid sataus
+        $request_data_valid = false;
+
+      }
+      else
+      {
+
+        //----------------------------------------------------------------------
+        // Email parameter found
+        //----------------------------------------------------------------------
+
+        // Store customer data
+        $customer_data[ 'email' ] = trim( $this->request->Get_POST_Parameter_As_String( 'email' ) );
+
+        $mail = new Mail();
+
+        if ( $customer_data[ 'email' ] != '' )
+        {
+
+          // Test email format
+          if ( $mail->Is_Email_Valid( $customer_data[ 'email' ] ) === false )
+          {
+
+            //--------------------------------------------------------------------
+            // ERROR: Email is invalid
+            //--------------------------------------------------------------------
+
+            // Set error message text
+            $json[ 'error' ][ 'email' ] = $this->data[ 'workplace_add_individual_' . $this->request->Post_Parameter_Is_Mail('email')['response'] ];
+
+            // Clear request data valid sataus
+            $request_data_valid = false;
+
+          }
+          else
+          {
+
+            //--------------------------------------------------------------------
+            // Email valid
+            //--------------------------------------------------------------------
+
+            // Check for customer already registered
+            if ( $this->customer->Is_Exists( $customer_data[ 'email' ] ) === true )
+            {
+
+              //------------------------------------------------------------------
+              // ERROR: User already registered
+              //------------------------------------------------------------------
+
+              // Set error message text
+              $json[ 'error' ][ 'email' ] = $this->data[ 'workplace_add_individual_email_exists_error' ];
+
+              // Clear request data valid sataus
+              $request_data_valid = false;
+
+            }
+            else
+            {
+
+              //------------------------------------------------------------------
+              // Customer email not registered
+              //------------------------------------------------------------------
+
+            }
+
+          }
+
+        }
+
+      }
+
+      //------------------------------------------------------------------------
+      // Registration country
+      //------------------------------------------------------------------------
+
+      // Test for parameter exists
+      if ($this->request->Get_POST_Parameter_As_String('registration_country') === false)
+      {
+
+        //----------------------------------------------------------------------
+        // ERROR: Registration country parameter not found
+        //----------------------------------------------------------------------
+
+        // Set error message text
+        $json['error']['registration_country'] = $this->data['workplace_add_individual_registration_country_error'];
+
+        // Clear request data valid sataus
+        $request_data_valid = false;
+
+      } 
+      else 
+      {
+        
+        if ($this->request->Get_POST_Parameter_As_String('registration_country') !='') 
+        {
+        
+          //----------------------------------------------------------------------
+          // Registration country parameter found
+          //----------------------------------------------------------------------
+        
+          if ($this->location->Is_Country_ISO2_Code_Exists($this->request->Get_POST_Parameter_As_String('registration_country')) === false) 
+          {
+
+            //----------------------------------------------------------------------
+            // ERROR: ISO2 Code parameter not found
+            //----------------------------------------------------------------------
+
+            // Set error message text
+            $json['error']['registration_country'] = $this->data['workplace_add_individual_registration_country_error'];
+
+            // Clear request data valid sataus
+            $request_data_valid = false;
+          
+          }
+          else 
+          {
+
+            // Store customer data
+            $customer_data['registration_country'] = $this->request->Get_POST_Parameter_As_String('registration_country');
+          
+          }
+        
+        }
+        else
+        {
+          
+          // Set error message text
+          $json['error']['registration_country'] = $this->data['workplace_add_individual_registration_country_error'];
+        
+        }
+
+      }
+
+      //------------------------------------------------------------------------
+      // First name
+      //------------------------------------------------------------------------
+
+      // Test for parameter exists
+      if( $this->request->Is_POST_Parameter_Exists( 'firstname' ) === false )
+      {
+
+        //----------------------------------------------------------------------
+        // ERROR: First name parameter not found
+        //----------------------------------------------------------------------
+
+        // Set error message text
+        $json[ 'error' ][ 'firstname' ] = $this->data[ 'workplace_add_individual_firstname_error' ];
+
+        // Clear request data valid sataus
+        $request_data_valid = false;
+
+      }
+      else
+      {
+
+        //----------------------------------------------------------------------
+        // First name parameter found
+        //----------------------------------------------------------------------
+
+        // Store customer data
+        $customer_data[ 'firstname' ] = trim( $this->request->Get_POST_Parameter_As_String( 'firstname' ) );
+
+        // Test first name validity
+        if (
+          ( $customer_data[ 'firstname' ] == '' ) ||
+          ( utf8_strlen( $customer_data[ 'firstname' ] ) > 32 )
+        )
+        {
+
+          //--------------------------------------------------------------------
+          // ERROR: First name invalid
+          //--------------------------------------------------------------------
+
+          // Set errer message text
+          $json[ 'error' ][ 'firstname' ] = $this->data[ 'workplace_add_individual_firstname_error' ];
+
+          // Clear request data valid sataus
+          $request_data_valid = false;
+
+        }
+        else
+        {
+
+          //--------------------------------------------------------------------
+          // First name valid
+          //--------------------------------------------------------------------
+
+        }
+
+      }
+
+      //------------------------------------------------------------------------
+      // Last name
+      //------------------------------------------------------------------------
+
+      // Test for parameter exists
+      if( $this->request->Is_POST_Parameter_Exists( 'lastname' ) === false )
+      {
+
+        //----------------------------------------------------------------------
+        // ERROR: Last name parameter not found
+        //----------------------------------------------------------------------
+
+        // Set error message text
+        $json[ 'error' ][ 'lastname' ] = $this->data[ 'workplace_add_individual_lastname_error' ];
+
+        // Clear request data valid sataus
+        $request_data_valid = false;
+
+      }
+      else
+      {
+
+        //----------------------------------------------------------------------
+        // Last name parameter found
+        //----------------------------------------------------------------------
+
+        // Store customer data
+        $customer_data[ 'lastname' ] = trim( $this->request->Get_POST_Parameter_As_String( 'lastname' ) );
+
+        // Test last name validity
+        if (
+          ( $customer_data[ 'lastname' ] == '' ) ||
+          ( utf8_strlen( $customer_data[ 'lastname' ] ) > 32 )
+        )
+        {
+
+          //--------------------------------------------------------------------
+          // ERROR: Last name invalid
+          //--------------------------------------------------------------------
+
+          // Set errer message text
+          $json[ 'error' ][ 'lastname' ] = $this->data[ 'workplace_add_individual_lastname_error' ];
+
+          // Clear request data valid sataus
+          $request_data_valid = false;
+
+        }
+        else
+        {
+
+          //--------------------------------------------------------------------
+          // Last name valid
+          //--------------------------------------------------------------------
+
+        }
+
+      }
+
+      //------------------------------------------------------------------------
+      // Middle name
+      //------------------------------------------------------------------------
+
+      // Test for parameter exists
+      if( $this->request->Is_POST_Parameter_Exists( 'middlename' ) === false )
+      {
+
+        //----------------------------------------------------------------------
+        // ERROR: Middle name parameter not found
+        //----------------------------------------------------------------------
+
+        // Set error message text
+        $json[ 'error' ][ 'middlename' ] = $this->data[ 'workplace_add_individual_middlename_error' ];
+
+        // Clear request data valid sataus
+        $request_data_valid = false;
+
+      }
+      else
+      {
+
+        //----------------------------------------------------------------------
+        // Middle name parameter found
+        //----------------------------------------------------------------------
+
+        // Store customer data
+        $customer_data[ 'middlename' ] = trim( $this->request->Get_POST_Parameter_As_String( 'middlename' ) );
+
+        // Test middle name validity
+        if ( utf8_strlen( $customer_data[ 'middlename' ] ) > 32 )
+        {
+
+          //--------------------------------------------------------------------
+          // ERROR: Middle name invalid
+          //--------------------------------------------------------------------
+
+          // Set errer message text
+          $json[ 'error' ][ 'middlename' ] = $this->data[ 'workplace_add_individual_middlename_error' ];
+
+          // Clear request data valid sataus
+          $request_data_valid = false;
+
+        }
+        else
+        {
+
+          //--------------------------------------------------------------------
+          // Middle name valid
+          //--------------------------------------------------------------------
+
+        }
+
+      }
+
+      //------------------------------------------------------------------------
+      // Process data
+      //------------------------------------------------------------------------
+
+      // Is request data valid
+      if ( $request_data_valid === false )
+      {
+
+        //------------------------------------------------------------------------
+        // ERROR: Parameters not valid
+        //------------------------------------------------------------------------
+
+        // Set error code
+        $json[ 'return_code' ] = false;
+
+      }
+      else
+      {
+
+        //--------------------------------------------------------------------
+        // Parameters present and valid
+        //--------------------------------------------------------------------
+
+        $customer_data[ 'legal_entity' ] = false;
+        $customer_data[ 'newsletter' ] = false;
+        $customer_data[ 'consumer_role' ] = true;
+        $customer_data[ 'manufacturer_role' ] = false;
+        $customer_data[ 'supplier_role' ] = false;
+
+        // Generate customer GUID
+        $guid = UUID_V4_T1();
+
+        // Create new customer
+        $this->customer->Create( $guid, $customer_data );
+
+        // Set redirect URL
+        $json[ 'redirect_url' ]= $this->url->link( 'workplace/customers/info', 'guid=' . $guid, 'SSL' );
+
+        // Set success code
+        $json[ 'return_code' ] = true;
+
+      }
+
+    }
+
+    // Encode and send json data
+    $this->response->Set_Json_Output( $json );
+
+  }
+
+}
+//------------------------------------------------------------------------------
+// End of file
+//------------------------------------------------------------------------------
+?>

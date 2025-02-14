@@ -1,0 +1,174 @@
+<?php
+class ModelVdcParametersParameters extends Model
+{
+
+  //----------------------------------------------------------------------------
+  // Get parameters list
+  //----------------------------------------------------------------------------
+
+  public function Get_List()
+  {
+
+    // Compose SQL query
+    $sql =
+      "SELECT " .
+        "`parameters`.`guid` AS guid, " .
+        "`parameters`.`parameter_id` AS parameter_id, " .
+        "`parameters`.`name` AS name, " .
+        "`parameters`.`name` AS description, " .
+        "`parameters`.`datatype_id` AS datatype_name, " .
+        "`parameters`.`unit_guid` AS units_name, " .
+        "`parameters`.`access_mode_guid` AS access_mode_name, " .
+        "`parameters`.`storage_type_guid` AS storage_type_name " .
+      "FROM " .
+        "`parameters` ";
+//      "WHERE ".
+//        "`parameters`.`customer_guid`='" . $this->db->escape( $customer_guid ) . "'";
+
+    // Query database
+//    $result = $this->db->query( $sql );
+    $result = $this->database->query( $sql );
+
+    // Return result
+    return( $result );
+
+  }
+
+  //----------------------------------------------------------------------------
+	// Add item at warehouse
+	//----------------------------------------------------------------------------
+/*	
+  public function Add( $data )
+  {
+	
+    // Test URL value
+    if ( ( isset ( $data[ 'mpn' ] ) == false ) ||
+         ( isset ( $data[ 'manufacturer' ] ) == false ) ||
+         ( isset ( $data[ 'quantity' ] ) == false ) ||
+         ( isset ( $data[ 'customer_id' ] ) == false ) )
+    {
+
+      //----------------------------------------------------------------------
+      // ERROR: Bad data
+      //----------------------------------------------------------------------
+
+			trigger_error( 'mpn: ' . $data[ 'mpn' ] );
+			trigger_error( 'mfg: ' . $data[ 'manufacturer' ] );
+			trigger_error( 'qty: ' . $data[ 'quantity' ] );
+			trigger_error( 'cid: ' . $data[ 'customer_id' ] );
+
+      // Set error code
+      $return_code = false;
+
+    }
+    else
+    {
+
+      // Compose SQL query
+      $sql = "INSERT INTO `warehouse` SET ";
+      $sql .= "`mpn`='" . $data[ 'mpn' ] . "', ";
+      $sql .= "`manufacturer`='" . $data[ 'manufacturer' ] . "', ";
+      $sql .= "`quantity`='" . (int)$data[ 'quantity' ] . "', ";
+      $sql .= "`customer_id`='" .(int) $data[ 'customer_id' ] . "', ";
+      $sql .= "`transaction_date`=NOW()";
+
+      // Query database
+      $this->db->query( $sql );
+
+      // Set success code
+      $return_code = true;
+
+    }
+
+    // Return status
+    return( $return_code );
+
+	}
+*/
+  //----------------------------------------------------------------------------
+  // Add website into database
+  //----------------------------------------------------------------------------
+/*
+  public function Add1( $target_warehouse_id = 0, $item_id = 0, $quantity = 0 )
+  {
+
+    // Test URL value
+    if ( ( isset ( $data[ 'target_warehouse_id' ] ) == false ) ||
+         ( isset ( $data[ 'source_warehouse_id' ] ) == false ) ||
+         ( isset ( $data[ 'item_id' ] ) == false ) ||
+         ( isset ( $data[ 'quantity' ] ) == false ) )
+    {
+
+      //----------------------------------------------------------------------
+      // ERROR: Bad data
+      //----------------------------------------------------------------------
+
+      // Set error code
+      $return_code = false;
+
+    }
+    else
+    {
+
+      // Compose SQL query
+      $sql = "INSERT INTO warehouse_transactions SET ";
+      $sql .= "item_id='" . (int)$data[ 'item_id' ] . "', ";
+      $sql .= "target_warehouse_id='" . (int)$data[ 'target_warehouse_id' ] . "', ";
+      $sql .= "sourse_warehouse_id='" . (int)$data[ 'source_warehouse_id' ] . "', ";
+      $sql .= "quantity='" . $data[ 'quantity' ] . "', ";
+      $sql .= "transaction_date=NOW()";
+
+      // Query database
+      $this->db->query( $sql );
+
+      // Set success code
+      $return_code = true;
+
+    }
+
+    // Return status
+    return( $return_code );
+    
+  }
+*/
+  //----------------------------------------------------------------------------
+  
+  //----------------------------------------------------------------------------
+  // Is exists
+  //----------------------------------------------------------------------------
+/*
+  public function Is_Exists( $url )
+  {
+
+    // Compose SQL query
+    $sql = "SELECT id FROM websites WHERE url='" . $this->db->escape( $url ) . "' LIMIT 1";
+
+    // Query database
+    $result = $this->db->query( $sql );
+
+    // Test record count
+    if ( $result->num_rows == 0 )
+    {
+
+      // Set error code
+      $return_code = false;
+
+    }
+    else
+    {
+
+      // Set success code
+      $return_code = true;
+        
+    }
+    
+    // Return status
+    return( $return_code );
+    
+  }
+*/	
+}
+//------------------------------------------------------------------------------
+// End of file
+//------------------------------------------------------------------------------
+?>

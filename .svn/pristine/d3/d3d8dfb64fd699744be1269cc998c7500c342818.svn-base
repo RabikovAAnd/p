@@ -1,0 +1,240 @@
+<?php
+class ModelItemsSubitemsSubitems extends Model
+{
+
+  //----------------------------------------------------------------------------
+  // 
+  //----------------------------------------------------------------------------
+
+
+  public function Get_Subitem_GUID( $subitem_index_guid = '' )
+  {
+
+    // Compose SQL query
+    $sql =
+      "SELECT " .
+      " subitem_guid " .
+      "FROM " .
+      "item_subitems " .
+    "WHERE " .
+      "subitem_index_guid='" . $this->db->escape( $subitem_index_guid ) . "' " ;
+
+    // Query database
+    $result = $this->db->query( $sql );
+
+    // Test record count
+    if ( $result->num_rows == 1 )
+    {
+
+      //------------------------------------------------------------------------
+      // subitem guid found
+      //------------------------------------------------------------------------
+
+      // Set alternative not found status
+       $subitem_guid =$result->row[0];
+
+    }
+    else
+    {
+
+      //------------------------------------------------------------------------
+      // subitem_guid not found
+      //------------------------------------------------------------------------
+
+      // Set subitem guid status
+
+      $subitem_guid = '00000000000000000000000000000000';
+    }
+
+    // Return data
+    return( $subitem_guid );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Add Alternative to subitem
+  //----------------------------------------------------------------------------
+
+  public function Add_Alternative( $alternative_guid = '', $subitem_index_guid = '' )
+  {
+
+    // Compose SQL query
+    $sql =
+      "INSERT INTO " .
+        "item_subitem_alternatives " .
+      "SET " .
+        "subitem_index_guid='" . $this->db->escape( $subitem_index_guid ) . "', " .
+        "item_guid='" . $this->db->escape( $alternative_guid ) . "'"; 
+
+    // Query database
+    $this->db->query( $sql );
+
+    // Return success code
+    return( true );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Get subitem referenced by Index_GUID existence status information
+  //----------------------------------------------------------------------------
+
+  public function Is_Exists_By_Index_GUID( $subitem_index_guid = '' )
+  {
+
+    // Compose SQL query
+    $sql =
+      "SELECT " .
+        "`item_subitems`.`subitem_guid` AS guid " .
+      "FROM " .
+        "`item_subitems` " .
+      "WHERE " .
+        "`item_subitems`.`subitem_index_guid`='" . $subitem_index_guid . "' " .
+      "LIMIT 1";
+
+    // Perform SQL query
+    $query = $this->db->query( $sql );
+
+    // Test for item exists
+    if ( $query->num_rows != 1 )
+    {
+
+      //------------------------------------------------------------------------
+      // Item not found
+      //------------------------------------------------------------------------
+
+      // Set not found status
+      $item_found = false;
+
+    }
+    else
+    {
+
+      //------------------------------------------------------------------------
+      // Item found
+      //------------------------------------------------------------------------
+
+      // Set item found status
+      $item_found = true;
+
+    }
+
+    // Return status
+    return( $item_found );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Get subitem referenced by Index_GUID existence status information
+  //----------------------------------------------------------------------------
+
+  public function Get_Subitem_By_Index_GUID( $subitem_index_guid = '' )
+  {
+
+    // Compose SQL query
+    $sql =
+      "SELECT * " .
+      "FROM " .
+        "`item_subitems` " .
+      "WHERE " .
+        "`item_subitems`.`subitem_index_guid`='" . $subitem_index_guid . "' " .
+      "LIMIT 1";
+
+    // Perform SQL query
+    $query = $this->db->query( $sql );
+
+    // Test for item exists
+    if ( $query->num_rows != 1 )
+    {
+
+      // Set default data
+      $return_data[ 'valid' ] = false;
+      $return_data[ 'subitem_index_guid' ] = '00000000000000000000000000000000';
+      $return_data[ 'item_guid' ] = '00000000000000000000000000000000';
+      $return_data[ 'subitem_guid' ] = '00000000000000000000000000000000';
+      $return_data[ 'designator' ] = '';
+      $return_data[ 'quantity' ] = '';
+      $return_data[ 'deleted' ] = '';
+
+    }
+    else
+    {
+
+      // Set product data
+      $return_data[ 'valid' ] = true;
+      $return_data[ 'subitem_index_guid' ] = $query->row[ 'subitem_index_guid' ];
+      $return_data[ 'item_guid' ] = $query->row[ 'item_guid' ];
+      $return_data[ 'subitem_guid' ] = $query->row[ 'subitem_guid' ];
+      $return_data[ 'designator' ] = $query->row[ 'designator' ];
+      $return_data[ 'quantity' ] = $query->row[ 'quantity' ];
+      $return_data[ 'deleted' ] = $query->row[ 'deleted' ];
+    }
+
+    // Return status
+    return( $return_data );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Edit subitem
+  //----------------------------------------------------------------------------
+
+  public function Edit_Subitem( $data = [] )
+  {
+
+    // Compose SQL query
+    $sql =
+      "UPDATE " .
+        "`item_subitems` " .
+      "SET " .
+        "`item_subitems`.`designator`= '" . $this->db->escape( $data['designator'] ) . "', " .
+        "`item_subitems`.`quantity`= '" . $this->db->escape( $data['quantity'] ) . "' " .
+      "WHERE " .
+        "`item_subitems`.`subitem_index_guid`='" . $this->db->escape( $data[ 'subitem_index_guid' ] ) . "' ";
+
+    // Query database
+    $this->db->query( $sql );
+
+    // Return success code
+    return( true );
+
+  }
+
+  //----------------------------------------------------------------------------
+  // Replace subitem
+  //----------------------------------------------------------------------------
+
+  public function Replace($data = [])
+  {
+
+    // Compose SQL query
+    $sql =
+      "UPDATE " .
+        "`item_subitems` " .
+      "SET " .
+        "`item_subitems`.`subitem_guid`= '" . $this->db->escape($data['subitem_guid']) . "' " .
+      "WHERE " .
+        "`item_subitems`.`subitem_index_guid`='" . $this->db->escape($data['subitem_index_guid']) . "' ";
+
+    // Query database
+    $this->db->query($sql);
+
+    // Compose SQL query
+    $sql =
+      "DELETE FROM" .
+        "`item_subitem_alternatives` " .
+      "WHERE " .
+        "`item_subitem_alternatives`.`subitem_index_guid`='" . $this->db->escape($data['subitem_index_guid']) . "' ";
+
+    // Query database
+    $this->db->query($sql);
+
+    // Return success code
+    return (true);
+
+  }
+
+}
+//------------------------------------------------------------------------------
+// End of file
+//------------------------------------------------------------------------------
+?>

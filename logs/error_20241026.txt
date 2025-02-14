@@ -1,0 +1,45 @@
+2024-10-26 15:31:18 - DEBUG: SYSTEM : System prepared for request processing.
+2024-10-26 15:31:18 - DEBUG: SYSTEM : Request dispatched.
+2024-10-26 15:31:30 - DEBUG: SYSTEM : System prepared for request processing.
+2024-10-26 15:31:30 - DEBUG: SYSTEM : Request dispatched.
+2024-10-26 15:31:30 - DEBUG: SYSTEM : System prepared for request processing.
+2024-10-26 15:31:30 - DEBUG: SYSTEM : Request dispatched.
+2024-10-26 15:31:34 - DEBUG: SYSTEM : System prepared for request processing.
+2024-10-26 15:31:34 - DEBUG: SYSTEM : Request dispatched.
+2024-10-26 15:31:34 - DEBUG: SYSTEM : System prepared for request processing.
+2024-10-26 15:31:34 - DEBUG: SYSTEM : Request dispatched.
+2024-10-26 15:31:52 - DEBUG: SYSTEM : System prepared for request processing.
+2024-10-26 15:31:52 - DEBUG: emailkonstantin.minch@anvilex.com
+2024-10-26 15:31:52 - DEBUG: passwordANVILEX_2008R2
+2024-10-26 15:31:58 - DEBUG: SYSTEM : System prepared for request processing.
+2024-10-26 15:31:59 - DEBUG: SYSTEM : System prepared for request processing.
+2024-10-26 15:31:59 - DEBUG: SYSTEM : System prepared for request processing.
+2024-10-26 15:31:59 - DEBUG: SYSTEM : Request dispatched.
+2024-10-26 15:41:38 - DEBUG: SYSTEM : System prepared for request processing.
+2024-10-26 15:41:38 - PHP WARNING: Undefined array key "assign_developer_task_href" in C:\xampp\htdocs\shop\catalog\view\template\workplace\front.tpl on line 130
+2024-10-26 15:41:38 - PHP WARNING: Undefined array key "start_task_href" in C:\xampp\htdocs\shop\catalog\view\template\workplace\front.tpl on line 136
+2024-10-26 15:41:38 - PHP WARNING: Undefined array key "reject_task_href" in C:\xampp\htdocs\shop\catalog\view\template\workplace\front.tpl on line 142
+2024-10-26 15:41:38 - DEBUG: SYSTEM : Request dispatched.
+2024-10-26 15:41:38 - DEBUG: SYSTEM : System prepared for request processing.
+2024-10-26 15:41:38 - PHP WARNING: Undefined array key "assign_developer_task_href" in C:\xampp\htdocs\shop\catalog\view\template\workplace\front.tpl on line 130
+2024-10-26 15:41:38 - PHP WARNING: Undefined array key "start_task_href" in C:\xampp\htdocs\shop\catalog\view\template\workplace\front.tpl on line 136
+2024-10-26 15:41:38 - PHP WARNING: Undefined array key "reject_task_href" in C:\xampp\htdocs\shop\catalog\view\template\workplace\front.tpl on line 142
+2024-10-26 15:41:38 - DEBUG: SYSTEM : Request dispatched.
+2024-10-26 15:41:40 - DEBUG: SYSTEM : System prepared for request processing.
+2024-10-26 15:41:40 - NOTICE: LANGUAGE : Message not found: workplace_projects_document_title_text
+2024-10-26 15:41:40 - NOTICE: LANGUAGE : Message not found: workplace_projects_document_description_text
+2024-10-26 15:41:40 - PHP WARNING: Undefined variable $workplace_projects_number_search_hint in C:\xampp\htdocs\shop\catalog\view\template\workplace\projects\list.tpl on line 24
+2024-10-26 15:41:40 - PHP WARNING: Undefined variable $workplace_projects_name_search_hint in C:\xampp\htdocs\shop\catalog\view\template\workplace\projects\list.tpl on line 31
+2024-10-26 15:41:40 - PHP WARNING: Undefined variable $workplace_projects_description_search_hint in C:\xampp\htdocs\shop\catalog\view\template\workplace\projects\list.tpl on line 38
+2024-10-26 15:41:40 - DEBUG: SYSTEM : Request dispatched.
+2024-10-26 15:41:40 - DEBUG: SYSTEM : System prepared for request processing.
+2024-10-26 15:41:40 - NOTICE: LANGUAGE : Message not found: workplace_projects_document_title_text
+2024-10-26 15:41:40 - NOTICE: LANGUAGE : Message not found: workplace_projects_document_description_text
+2024-10-26 15:41:40 - PHP WARNING: Undefined variable $workplace_projects_number_search_hint in C:\xampp\htdocs\shop\catalog\view\template\workplace\projects\list.tpl on line 24
+2024-10-26 15:41:40 - PHP WARNING: Undefined variable $workplace_projects_name_search_hint in C:\xampp\htdocs\shop\catalog\view\template\workplace\projects\list.tpl on line 31
+2024-10-26 15:41:40 - PHP WARNING: Undefined variable $workplace_projects_description_search_hint in C:\xampp\htdocs\shop\catalog\view\template\workplace\projects\list.tpl on line 38
+2024-10-26 15:41:40 - DEBUG: SYSTEM : Request dispatched.
+2024-10-26 15:41:42 - DEBUG: SYSTEM : System prepared for request processing.
+2024-10-26 15:41:42 - DEBUG: SYSTEM : Request dispatched.
+2024-10-26 15:48:01 - DEBUG: SYSTEM : System prepared for request processing.
+2024-10-26 15:48:01 - DEBUG: SYSTEM : Request dispatched.

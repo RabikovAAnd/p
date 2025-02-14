@@ -1,0 +1,97 @@
+/*----------------------------------------------------------------------------*/
+/* News teaser on the start page                                              */
+/*----------------------------------------------------------------------------*/
+
+.news-teaser-container {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-gap:0;
+    border: var(--global-border);
+    border-radius: var(--global-border-radius);
+    margin: var(--global-gap) 0;
+    background-color: var(--global-background-color);
+}
+.news-teaser-main-news{
+    display: flex;
+    flex-direction: column;
+    padding: var(--global-gap);
+    border-right: var(--global-border);
+    background-color: var(--global-header-footer-text-color);
+    border-top-left-radius: var(--global-border-radius);
+    border-bottom-left-radius: var(--global-border-radius);
+
+}
+.news-teaser-main-news h2 {
+    text-decoration: none;
+    text-align: left;
+    justify-content: left;
+}
+.news-teaser-main-news h4 {
+    margin:  0 0 var(--global-gap) 0;
+    text-align: center;
+    font-size: var(--global-text-headline-font-size);
+    font-weight: bold;
+    color: var(--global-text-color);
+}
+
+.news-teaser-main-news div {
+    font-size: var(--global-text-font-size);
+    text-align: justify;
+}
+
+.news-teaser-main-news div span{
+    width: 100%;
+}
+
+.news-teaser-main-news div img{
+    float:left;
+    margin-bottom: var(--global-gap);
+    margin-right: var(--global-gap);
+    width: 240px;
+}
+
+a:hover h2{
+    text-decoration: underline;
+}
+.news-teaser-item{
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border-top-right-radius: var(--global-border-radius);
+    border-bottom-right-radius: var(--global-border-radius);
+    background-color: var(--global-header-footer-text-color);
+}
+
+.news-list-item {
+    padding: var(--global-gap);
+    border-bottom: var(--global-border);
+
+    display: flex;
+    flex-direction: column;
+}
+
+.news-list-item:last-child{
+    border: none;
+}
+
+.news-list-item__headline{
+    text-decoration: none;
+    text-align: left;
+    justify-content: left;
+}
+
+.subscribe {
+    display: flex;
+    gap: var(--global-gap);
+    width: auto;
+}
+.subscribe input{
+    padding: 0 var(--global-gap);
+    width: 100%;
+}
+.subscribe button{
+    margin: 0;
+}
+.message{
+    margin: var(--global-gap) 0 0 0;
+}

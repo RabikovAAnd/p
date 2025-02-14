@@ -1,0 +1,50 @@
+#content{
+    margin-top: 0;
+}
+
+.content{
+    display: grid;
+    grid-template-columns: repeat( auto-fit, minmax(250px, 1fr) );
+    gap: var(--global-gap);
+    margin:var(--global-gap) 0;
+}
+
+#checkbox_legal_entity{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.content label{
+    display: flex;
+    flex-direction: column;
+    width: 0.5fr;
+}
+
+.news-subscribe{
+    display: flex;
+    /*flex-direction: column;*/
+}
+
+
+#submit-button{
+    display: flex;
+    justify-content: right;
+}
+
+.terms-and-conditions{
+    display: flex;
+    gap: var(--global-gap);
+    flex-direction: row;
+    justify-content: space-between;
+}
+.terms-and-conditions div{
+    display: flex;
+    flex-direction: column;
+}
+.terms-and-conditions label{
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+}
+

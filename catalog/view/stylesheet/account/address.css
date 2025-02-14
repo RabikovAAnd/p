@@ -1,0 +1,82 @@
+#content{
+    gap: var(--global-gap);
+}
+
+.address-block{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+
+}
+
+
+.address-block__address{
+    display: flex;
+    flex-direction: column;
+}
+
+.address-block__detail-address{
+    font-size: var(--global-text-font-size);
+}
+
+.address-block__global-address{
+    font-size: calc(var(--global-text-font-size)*0.8);
+}
+
+.address-block__settings{
+    display: flex;
+    flex-direction: column;
+}
+
+.address-form{
+position: relative;
+    display: none;
+}
+
+.contact-data {
+    display: grid;
+    grid-template-columns: repeat( auto-fit, minmax(300px, 1fr) );
+    gap: var(--global-gap);
+}
+
+.save-address input {
+    margin-top: var(--global-gap);
+}
+
+.contact-data__info {
+    display: grid;
+    grid-template-columns: repeat( auto-fit, minmax(250px, 1fr) );
+    gap: var(--global-gap);
+}
+
+.contact-data__info label {
+    display: flex;
+    flex-direction: column;
+    width: 0.5fr;
+}
+
+.contact-data__address, .contact-data__info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--global-gap);
+}
+
+.contact-data__address div, .contact-data__info div {
+    display: grid;
+    grid-template-columns: repeat( auto-fit, minmax(130px, 1fr) );
+    gap: var(--global-gap);
+    width: 100%;
+}
+
+.contact-data__address label, .contact-data__info label {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.contact-data__address label input {
+    width: auto;
+}
+

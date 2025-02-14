@@ -1,0 +1,25 @@
+.order-table {
+  display: grid;
+  grid-template-columns: 6fr 1fr 1fr 1fr 1fr 1fr 1fr;
+}
+
+.order-table>span:not(:first-child):nth-child(7n+1) {
+  text-align: left;
+  justify-content: left;
+}
+
+.order-general-info {
+  display: flex;
+  flex-direction: row;
+  gap: var(--global-gap);
+  justify-content: space-between;
+}
+
+.order-general-info>div {
+  display: flex;
+  flex-direction: column;
+}
+
+.order-general-info_amount-info {
+  text-align: end;
+}

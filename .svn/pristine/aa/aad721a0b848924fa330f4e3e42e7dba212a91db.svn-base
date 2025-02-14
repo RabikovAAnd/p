@@ -1,0 +1,77 @@
+<?php
+//------------------------------------------------------------------------------
+// Controller class for generating YML feed for Yandex.Market
+//------------------------------------------------------------------------------
+
+class ControllerFeedsYandex extends Controller 
+{
+
+  public function index()
+  {
+
+    // Generate XML header and main document structure
+    $output = '<?xml version="1.0" encoding="UTF-8"?>';
+    $output .= '<yml_catalog date="' . date( 'Y-m-d H:i:s' ) . '">';
+    $output .= '<shop>';
+
+    // Add main shop information
+    $output .= '<name>Anvilex</name>';
+    $output .= '<company>Anvilex</company>';
+    $output .= '<url>' . HTTPS_SERVER . '</url>';
+
+    // Specify the currency used
+    $output .= '<currencies>';
+    $output .= '<currency id="RUB" rate="1"/>';
+    $output .= '</currencies>';
+
+    // Start products section
+    $output .= '<offers>';
+
+    // Load product model
+    $this->load->model( 'catalog/product' );
+
+    // Get list of all products
+    $products = $this->model_catalog_product->getProducts();
+
+    // Loop through all products and generate XML for each
+    foreach ( $products as $product )
+    {
+
+      $output .= '<offer id="' . $product[ 'product_id' ] . '">';
+
+      // Add main product characteristics
+      $output .= '<name>' . htmlspecialchars( $product[ 'name' ] ) . '</name>';
+      $output .= '<vendor>' . htmlspecialchars( $product[ 'manufacturer' ] ) . '</vendor>';
+      $output .= '<url>' . $this->url->link( 'product/product', 'product_id=' . $product[ 'product_id' ] ) . '</url>';
+      $output .= '<description>' . htmlspecialchars( $product[ 'meta_description'] ) . '</description>';
+      $output .= '<price>' . $product[ 'price' ] . '</price>';
+      $output .= '<currencyId>RUB</currencyId>';
+      $output .= '<categoryId>' . $product[ 'category_id' ] . '</categoryId>';
+      $output .= '<vendorCode>' . htmlspecialchars( $product[ 'sku' ] ) . '</vendorCode>';
+
+      // Add delivery and pickup information
+      $output .= '<store>false</store>';
+      $output .= '<pickup>false</pickup>';
+      $output .= '<delivery>true</delivery>';
+      $output .= '</offer>';
+
+    }
+
+    // Close all open tags
+    $output .= '</offers>';
+    $output .= '</shop>';
+    $output .= '</yml_catalog>';
+
+    // Set response headers and send XML
+    $this->response->addHeader( 'Content-Type: application/xml; charset=utf-8' );
+
+    // Send content
+    $this->response->setOutput( $output );
+
+  }
+
+}
+//------------------------------------------------------------------------------
+// End of file
+//------------------------------------------------------------------------------
+?>
